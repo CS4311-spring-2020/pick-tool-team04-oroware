@@ -1,0 +1,24 @@
+Metadata-Version: 2.1
+Name: netgraph
+Version: 3.1.6
+Summary: Fork of networkx drawing utilities for publication quality plots of networks.
+Home-page: https://github.com/paulbrodersen/netgraph
+Author: Paul Brodersen
+Author-email: paulbrodersen+netgraph@gmail.com
+License: UNKNOWN
+Download-URL: https://github.com/paulbrodersen/netgraph/archive/3.1.6.tar.gz
+Keywords: matplotlib,network,visualisation
+Platform: Platform Independent
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+
+UNKNOWN
+
+
