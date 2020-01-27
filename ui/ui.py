@@ -4,7 +4,9 @@ from GraphWidget import GraphWidget
 import sys
 
 from LogEntry import LogEntry
-
+from LogEntryPopup import LogEntryPopup
+from Globals import logEntryManager
+from Globals import vectorManager
 
 class Ui_PICK(object):
 
@@ -389,36 +391,34 @@ class Ui_PICK(object):
         self.searchLogsTableWidget.setRowCount(0)
         self.verticalLayout_6.addWidget(self.searchLogsTableWidget)
         self.tabWidget.addTab(self.searchLogsTab, "")
-        self.initializeTestSearchLogs()
 
-    def initializeTestSearchLogs(self):
-        dates = ["1/26/20", "1/26/20", "1/26/20", "1/26/20", "1/26/20"]
-        teams = ["Blue", "White", "Red", "Red", "Blue"]
-        descriptions = ["Blue Team Defender Turns on Computer.", "White Team Analyst Starts Taking Notes.", "SQL Injection attack from Red Team.", "Cross=Site Scripting Attack from Red Team.", "Blue Team Defender turns off computer."]
-        for i in range(len(descriptions)):
-            logEntry = LogEntry()
-            logEntry.date = dates[i]
-            logEntry.description = descriptions[i]
-            logEntry.team = teams[i]
-            self.logEntries.append(logEntry)
-        colsSearchLogsTable = ["Time of Event", "Team", "Description", "Associate"]
-        totalRows = 5
-        self.searchLogsTableWidget.setColumnCount(len(colsSearchLogsTable))
+    def initializeSearchLogTable(self):
+        totalRows = len(self.logEntries)
+        self.searchLogsTableWidget.setColumnCount(len(self.colsSearchLogsTable))
         self.searchLogsTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
-        self.searchLogsTableWidget.setRowCount(5)
+        self.searchLogsTableWidget.setRowCount(totalRows)
         header = self.searchLogsTableWidget.horizontalHeader()
-        for col_num in range(len(colsSearchLogsTable)):
+        for col_num in range(len(self.colsSearchLogsTable)):
             self.searchLogsTableWidget.setColumnWidth(col_num, 200)
             header.setSectionResizeMode(col_num, QtWidgets.QHeaderView.Stretch)
-            self.searchLogsTableWidget.setHorizontalHeaderItem(col_num, QTableWidgetItem(colsSearchLogsTable[col_num]))
+            self.searchLogsTableWidget.setHorizontalHeaderItem(col_num, QTableWidgetItem(self.colsSearchLogsTable[col_num]))
         for row_num in range(totalRows):
             self.searchLogsTableWidget.setRowHeight(row_num, 50)
-            button = QtWidgets.QPushButton(self.searchLogsTableWidget)
-            button.setText("Associate")
-            self.searchLogsTableWidget.setCellWidget(row_num, len(colsSearchLogsTable) - 1, button)
-            self.searchLogsTableWidget.setItem(row_num, len(colsSearchLogsTable) - 2, QtWidgets.QTableWidgetItem(self.logEntries[row_num].description))
-            self.searchLogsTableWidget.setItem(row_num, len(colsSearchLogsTable) - 3, QtWidgets.QTableWidgetItem(self.logEntries[row_num].team))
-            self.searchLogsTableWidget.setItem(row_num, len(colsSearchLogsTable) - 4, QtWidgets.QTableWidgetItem(self.logEntries[row_num].date))
+            logEntryDescriptionItem = QtWidgets.QTableWidgetItem(self.logEntries[row_num].description)
+            self.searchLogsTableWidget.setItem(row_num, len(self.colsSearchLogsTable) - 1, logEntryDescriptionItem)
+            logEntryTeamItem = QtWidgets.QTableWidgetItem(self.logEntries[row_num].creator)
+            self.searchLogsTableWidget.setItem(row_num, len(self.colsSearchLogsTable) - 2, logEntryTeamItem)
+            logEntryDateItem = QtWidgets.QTableWidgetItem(self.logEntries[row_num].date)
+            self.searchLogsTableWidget.setItem(row_num, len(self.colsSearchLogsTable) - 3, logEntryDateItem)
+        self.searchLogsTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        self.searchLogsTableWidget.doubleClicked.connect(self.searchTableDoubleClicked)
+
+    def searchTableDoubleClicked(self):
+        logEntryRowClicked = self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row()
+        logEntryToEdit = self.logEntries[logEntryRowClicked]
+        self.editPopup = LogEntryPopup(self.vectors, logEntryToEdit, logEntryRowClicked)
+        self.editPopup.setGeometry(100, 200, 100, 100)
+        self.editPopup.show()
 
     def setupMangeVectorsTab(self, PICK):
         self.manageVectorsTab = QtWidgets.QWidget()
@@ -692,7 +692,17 @@ class Ui_PICK(object):
         self.setupMainWindow(PICK)
         self.setupTabWidget(PICK)
         self.setupIngestionTab(PICK)
+        global logEntryManager
+        self.logEntries = list(logEntryManager.logEntries.values())
+        logEntryManager.logEntriesInTable = self.logEntries
+        global vectorManager
+        logEntryManager.vectorManager = vectorManager
+        self.vectors = list(vectorManager.vectors.values())
         self.setupSearchLogsTab(PICK)
+        logEntryManager.searchLogEntryTableWidget = self.searchLogsTableWidget
+        self.colsSearchLogsTable = ["Time of Event", "Creator", "Description"]
+        logEntryManager.colNamesInSearchLogsTable = self.colsSearchLogsTable
+        self.initializeSearchLogTable()
         self.setupMangeVectorsTab(PICK)
         self.verticalLayout.addWidget(self.tabWidget)
         PICK.setCentralWidget(self.mainWindow)
@@ -750,7 +760,6 @@ class Ui_PICK(object):
         self.nodeTableLabel.setText(_translate("PICK", "Nodes:"))
         self.relationshipTableLabel.setText(_translate("PICK", "Relationships:"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.manageVectorsTab), _translate("PICK", "Manage Vectors"))
-
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
