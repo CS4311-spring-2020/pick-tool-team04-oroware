@@ -24,7 +24,6 @@ class GraphWidget(QWidget):
         vbox.addWidget(self.canvas)
 
     def draw(self):
-        print(self.pos)
         self.plotGraph()
         self.show()
 
