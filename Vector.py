@@ -1,3 +1,4 @@
+from Relationship import Relationship
 from SignifcantEvent import SignificantEvent
 
 class Vector:
@@ -21,6 +22,7 @@ class Vector:
             event.artifact = logEntry.artifact
             event.logEntry = logEntry
             event.id = 0 if len(self.significantEvents) == 0 else (max(list(self.significantEvents.keys())) + 1)
+            event.position = (event.id, 1)
             self.significantEvents[event.id] = event
 
     def removeSignificantEvent(self, eventId):
@@ -50,3 +52,10 @@ class Vector:
         for _, significantEvent in self.significantEvents.items():
             if significantEvent.logEntry.id == logEntry.id:
                 significantEvent.logEntry.description = logEntry.description
+
+    def addNewRelationship(self, sourceId, destId):
+        relationship = Relationship()
+        relationship.sourceSignificantEventId = sourceId
+        relationship.sourceSignificantEventId = destId
+        relationship.id = 0 if len(self.relationships) == 0 else (max(list(self.relationships.keys())) + 1)
+        self.relationships[relationship.id] = relationship

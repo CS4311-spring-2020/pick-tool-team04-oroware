@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtWidgets import QTableWidgetItem
 from GraphWidget import GraphWidget
 import sys
@@ -447,7 +448,7 @@ class Ui_PICK(object):
             self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 2, significantEventDateItem)
             significantEventDescriptionItem = QtWidgets.QTableWidgetItem(significantEvents[row_num].description)
             self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 1, significantEventDescriptionItem)
-        self.vectorsTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        self.vectorTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def updateRelationshipTable(self, vector):
         relationships = list(vector.relationships.values())
@@ -469,11 +470,12 @@ class Ui_PICK(object):
             relationshipDestItem = QtWidgets.QTableWidgetItem(relationships[row_num].destSignificantEventId)
             self.relationshipTableWidget.setItem(row_num, len(self.colsVectorTable) - 2, relationshipDestItem)
             relationshipDescriptionItem = QtWidgets.QTableWidgetItem(relationships[row_num].description)
-            self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 1, relationshipDescriptionItem)
+            self.relationshipTableWidget.setItem(row_num, len(self.colsVectorTable) - 1, relationshipDescriptionItem)
         self.relationshipTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def updateVectorGraph(self, vector):
-        print()
+        self.vectorGraphWidget.initializeVector(vector)
+        self.vectorGraphWidget.draw()
 
     def searchTableDoubleClicked(self):
         logEntryRowClicked = self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row()
@@ -505,7 +507,9 @@ class Ui_PICK(object):
         self.graphWidget.setObjectName("graphWidget")
         self.verticalLayout_10 = QtWidgets.QVBoxLayout(self.graphWidget)
         self.verticalLayout_10.setObjectName("verticalLayout_10")
-        self.vectorGraphWidget = GraphWidget(self.graphWidget)
+        triggerHelper = TriggerHelper()
+        triggerHelper.connect_trigger()
+        self.vectorGraphWidget = GraphWidget(self.graphWidget, triggerHelper)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -750,6 +754,12 @@ class Ui_PICK(object):
             self.updateRelationshipTable(vector)
             self.updateVectorGraph(vector)
 
+    def handleRelationshipTableTrigger(self):
+        if self.vectorComboBoxTable.count() > 0:
+            vectorName = self.vectorComboBoxTable.currentText()
+            global vectorManager
+            vector = vectorManager.vectors[vectorName]
+            self.updateRelationshipTable(vector)
 
     def updateVectorComboBoxes(self):
         vectorNames = (vectorManager.vectors.keys())
@@ -855,6 +865,15 @@ class Ui_PICK(object):
         self.nodeTableLabel.setText(_translate("PICK", "Nodes:"))
         self.relationshipTableLabel.setText(_translate("PICK", "Relationships:"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.manageVectorsTab), _translate("PICK", "Manage Vectors"))
+
+
+class TriggerHelper(QObject):
+    updateRelationshipTableTrigger = pyqtSignal()
+    def connect_trigger(self):
+        self.updateRelationshipTableTrigger.connect(ui.handleRelationshipTableTrigger)
+
+    def emit_trigger(self):
+        self.updateRelationshipTableTrigger.emit()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

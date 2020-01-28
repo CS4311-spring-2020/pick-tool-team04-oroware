@@ -2,39 +2,41 @@ from PyQt5.QtWidgets import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import networkx as nx
-import netgraph
 
 class GraphWidget(QWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, trigger):
+        self.trigger = trigger
         super(GraphWidget, self).__init__(parent)
         self.initUI()
 
     def initUI(self):
         self.setGeometry(10, 10, 505, 476)
         self.center()
+        self.vector = None
+        self.vectorGraph = nx.DiGraph()
+        self.node1 = None
+        self.node2 = None
         vbox = QVBoxLayout()
         self.setLayout(vbox)
         self.figure = plt.figure()
         self.canvas = FigureCanvas(self.figure)
         self.canvas.mpl_connect('button_press_event', self.onclick)
         self.canvas.mpl_connect('button_release_event', self.onRelease)
-        self.vector = nx.DiGraph()
-        self.pos = dict()
-        self.node1 = None
-        self.node2 = None
-        self.vector.add_nodes_from([1, 2, 3, 4], bipartite=0)
-        self.vector.add_nodes_from(['a', 'b', 'c', 'd', 'e'], bipartite=1)
-        self.vector.add_edges_from([(1, 'a'), (2, 'c'), (3, 'd'), (3, 'e'), (4, 'e'), (4, 'd')])
-        xValues = set(n for n, d in self.vector.nodes(data=True) if d['bipartite'] == 0)
-        yValues = set(self.vector) - xValues
-        xValues = sorted(xValues, reverse=True)
-        yValues = sorted(yValues, reverse=True)
-        self.pos.update((n, (1, i)) for i, n in enumerate(xValues)) # put nodes from X at x=1
-        self.pos.update((n, (2, i)) for i, n in enumerate(yValues)) # put nodes from Y at x=2
         vbox.addWidget(self.canvas)
+
+    def draw(self):
         self.plotGraph()
         self.show()
+
+    def initializeVector(self, vector):
+        self.vector = vector
+        self.pos = dict()
+        for significantEventId, significantEvent in vector.significantEvents.items():
+            self.vectorGraph.add_node(significantEventId)
+            self.pos[significantEventId] = significantEvent.position
+        for relationship in list(vector.relationships.values()):
+            self.vectorGraph.add_edges_from([relationship.sourceSignificantEventId, relationship.destSignificantEventId])
 
     def onclick(self, event):
         self.node1 = (event.xdata, event.ydata)
@@ -58,10 +60,13 @@ class GraphWidget(QWidget):
         if type(self.node2) is not dict and type(self.node1) is dict:
             node_name = list(self.node1.keys())[0]
             self.pos[node_name] = (event.xdata, event.ydata)
+            self.vector.significantEvents[node_name].position = (event.xdata, event.ydata)
         elif type(self.node2) is dict and type(self.node1) is dict:
             firstNodeName = list(self.node1.keys())[0]
             secondNodeName = list(self.node2.keys())[0]
-            self.vector.add_edges_from([(firstNodeName, secondNodeName)])
+            self.vectorGraph.add_edges_from([(firstNodeName, secondNodeName)])
+            self.vector.addNewRelationship(firstNodeName, secondNodeName)
+            self.trigger.emit_trigger()
         else:
             pass
         self.node1 = None
@@ -70,7 +75,7 @@ class GraphWidget(QWidget):
 
     def plotGraph(self):
         self.figure.clf()
-        nx.draw(self.vector, pos=self.pos, with_labels=True)
+        nx.draw(self.vectorGraph, pos=self.pos, with_labels=True)
         self.canvas.draw_idle()
 
     def center(self):
