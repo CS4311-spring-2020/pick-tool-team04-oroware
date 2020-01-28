@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem
 from GraphWidget import GraphWidget
 import sys
@@ -122,14 +122,16 @@ class Ui_PICK(object):
         self.vectorNameLabel.setSizePolicy(sizePolicy)
         self.vectorNameLabel.setObjectName("vectorNameLabel")
         self.verticalLayout_5.addWidget(self.vectorNameLabel)
-        self.vectorComboBoxLabel = QtWidgets.QComboBox(self.vectorInformation)
+        self.vectorComboBoxIngestion = QtWidgets.QComboBox(self.vectorInformation)
+        self.vectorComboBoxIngestion.setModel(QtGui.QStandardItemModel())
+        self.vectorComboBoxIngestion.view().pressed.connect(self.handleVectorComboBoxIngestion)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.vectorComboBoxLabel.sizePolicy().hasHeightForWidth())
-        self.vectorComboBoxLabel.setSizePolicy(sizePolicy)
-        self.vectorComboBoxLabel.setObjectName("vectorComboBoxLabel")
-        self.verticalLayout_5.addWidget(self.vectorComboBoxLabel)
+        sizePolicy.setHeightForWidth(self.vectorComboBoxIngestion.sizePolicy().hasHeightForWidth())
+        self.vectorComboBoxIngestion.setSizePolicy(sizePolicy)
+        self.vectorComboBoxIngestion.setObjectName("vectorComboBoxLabel")
+        self.verticalLayout_5.addWidget(self.vectorComboBoxIngestion)
         self.vectorDescriptionLabel = QtWidgets.QLabel(self.vectorInformation)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -281,6 +283,17 @@ class Ui_PICK(object):
         self.verticalLayout_2.addWidget(self.eventConfiguration)
         self.tabWidget.addTab(self.ingestionTab, "")
 
+    def handleVectorComboBoxIngestion(self, index):
+        global vectorManager
+        self.vectorDescriptionTextEdit.setPlainText(vectorManager.vectors[index.data()].vectorDescription)
+
+    def handleVectorComboBoxTable(self, index):
+        global vectorManager
+        currentVector = vectorManager.vectors[index.data()]
+        self.updateVectorTable(self, currentVector)
+        self.updateRelationshipTable(self, currentVector)
+        self.updateVectorGraph(self, currentVector)
+
     def setupSearchLogsTab(self, PICK):
         self.searchLogsTab = QtWidgets.QWidget()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -392,7 +405,7 @@ class Ui_PICK(object):
         self.verticalLayout_6.addWidget(self.searchLogsTableWidget)
         self.tabWidget.addTab(self.searchLogsTab, "")
 
-    def initializeSearchLogTable(self):
+    def updateSearchLogTable(self):
         totalRows = len(self.logEntries)
         self.searchLogsTableWidget.setColumnCount(len(self.colsSearchLogsTable))
         self.searchLogsTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
@@ -412,6 +425,55 @@ class Ui_PICK(object):
             self.searchLogsTableWidget.setItem(row_num, len(self.colsSearchLogsTable) - 3, logEntryDateItem)
         self.searchLogsTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.searchLogsTableWidget.doubleClicked.connect(self.searchTableDoubleClicked)
+
+    def updateVectorTable(self, vector):
+        significantEvents = list(vector.significantEvents.values())
+        totalRows = len(significantEvents)
+        self.vectorTableWidget.setColumnCount(len(self.colsVectorTable))
+        self.vectorTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.vectorTableWidget.setRowCount(totalRows)
+        header = self.vectorTableWidget.horizontalHeader()
+        for col_num in range(len(self.colsVectorTable)):
+            self.vectorTableWidget.setColumnWidth(col_num, 200)
+            header.setSectionResizeMode(col_num, QtWidgets.QHeaderView.Stretch)
+            self.vectorTableWidget.setHorizontalHeaderItem(col_num, QTableWidgetItem(self.colsVectorTable[col_num]))
+        for row_num in range(totalRows):
+            self.vectorTableWidget.setRowHeight(row_num, 50)
+            significantEventIdItem = QtWidgets.QTableWidgetItem(str(significantEvents[row_num].id))
+            self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 4, significantEventIdItem)
+            significantEventNameItem = QtWidgets.QTableWidgetItem(significantEvents[row_num].name)
+            self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 3, significantEventNameItem)
+            significantEventDateItem = QtWidgets.QTableWidgetItem(significantEvents[row_num].date)
+            self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 2, significantEventDateItem)
+            significantEventDescriptionItem = QtWidgets.QTableWidgetItem(significantEvents[row_num].description)
+            self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 1, significantEventDescriptionItem)
+        self.vectorsTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+
+    def updateRelationshipTable(self, vector):
+        relationships = list(vector.relationships.values())
+        totalRows = len(relationships)
+        self.relationshipTableWidget.setColumnCount(len(self.colsRelationshipTable))
+        self.relationshipTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.relationshipTableWidget.setRowCount(totalRows)
+        header = self.relationshipTableWidget.horizontalHeader()
+        for col_num in range(len(self.colsRelationshipTable)):
+            self.relationshipTableWidget.setColumnWidth(col_num, 200)
+            header.setSectionResizeMode(col_num, QtWidgets.QHeaderView.Stretch)
+            self.relationshipTableWidget.setHorizontalHeaderItem(col_num, QTableWidgetItem(self.colsRelationshipTable[col_num]))
+        for row_num in range(totalRows):
+            self.relationshipTableWidget.setRowHeight(row_num, 50)
+            relationshipIdItem = QtWidgets.QTableWidgetItem(relationships[row_num].id)
+            self.relationshipTableWidget.setItem(row_num, len(self.colsVectorTable) - 4, relationshipIdItem)
+            relationshipSourceItem = QtWidgets.QTableWidgetItem(relationships[row_num].sourceSignificantEventId)
+            self.relationshipTableWidget.setItem(row_num, len(self.colsVectorTable) - 3, relationshipSourceItem)
+            relationshipDestItem = QtWidgets.QTableWidgetItem(relationships[row_num].destSignificantEventId)
+            self.relationshipTableWidget.setItem(row_num, len(self.colsVectorTable) - 2, relationshipDestItem)
+            relationshipDescriptionItem = QtWidgets.QTableWidgetItem(relationships[row_num].description)
+            self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 1, relationshipDescriptionItem)
+        self.relationshipTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+
+    def updateVectorGraph(self, vector):
+        print()
 
     def searchTableDoubleClicked(self):
         logEntryRowClicked = self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row()
@@ -677,6 +739,25 @@ class Ui_PICK(object):
         self.verticalLayout_11.addWidget(self.relationshipTableWidget)
         self.horizontalLayout.addWidget(self.widget_2)
         self.tabWidget.addTab(self.manageVectorsTab, "")
+        self.tabWidget.currentChanged.connect(self.onTabChange)
+
+    def onTabChange(self):
+        if self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.manageVectorsTab) and self.vectorComboBoxTable.count() > 0:
+            vectorName = self.vectorComboBoxTable.currentText()
+            global vectorManager
+            vector = vectorManager.vectors[vectorName]
+            self.updateVectorTable(vector)
+            self.updateRelationshipTable(vector)
+            self.updateVectorGraph(vector)
+
+
+    def updateVectorComboBoxes(self):
+        vectorNames = (vectorManager.vectors.keys())
+        self.vectorComboBoxIngestion.clear()
+        self.vectorComboBoxTable.clear()
+        for vectorName in vectorNames:
+            self.vectorComboBoxIngestion.addItem(vectorName)
+            self.vectorComboBoxTable.addItem(vectorName)
 
     def setupUi(self, PICK):
         PICK.setObjectName("PICK")
@@ -688,26 +769,40 @@ class Ui_PICK(object):
         PICK.setSizePolicy(sizePolicy)
         PICK.setMaximumSize(QtCore.QSize(16777215, 3000))
         PICK.setMinimumSize(QtCore.QSize(0, 900))
+
+        # Table column names
+        self.colsSearchLogsTable = ["Time of Event", "Creator", "Description"]
+        self.colsVectorTable = ["ID", "Event Name", "Time", "Description"]
+        self.colsRelationshipTable = ["ID", "Parent", "Child", "Description"]
+
+        # Log entry list used for search logs table
         self.logEntries = list()
-        self.setupMainWindow(PICK)
-        self.setupTabWidget(PICK)
-        self.setupIngestionTab(PICK)
+        # Initialization of log entry list
         global logEntryManager
         self.logEntries = list(logEntryManager.logEntries.values())
         logEntryManager.logEntriesInTable = self.logEntries
+
+        # Vector list
+        self.vectors = list()
+        # Initialization of vector list
         global vectorManager
         logEntryManager.vectorManager = vectorManager
         self.vectors = list(vectorManager.vectors.values())
+
+        self.setupMainWindow(PICK)
+        self.setupTabWidget(PICK)
+        self.setupIngestionTab(PICK)
         self.setupSearchLogsTab(PICK)
         logEntryManager.searchLogEntryTableWidget = self.searchLogsTableWidget
-        self.colsSearchLogsTable = ["Time of Event", "Creator", "Description"]
         logEntryManager.colNamesInSearchLogsTable = self.colsSearchLogsTable
-        self.initializeSearchLogTable()
+        self.updateSearchLogTable()
         self.setupMangeVectorsTab(PICK)
+        self.updateVectorComboBoxes()
+
         self.verticalLayout.addWidget(self.tabWidget)
         PICK.setCentralWidget(self.mainWindow)
         self.retranslateUi(PICK)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(PICK)
 
     def retranslateUi(self, PICK):

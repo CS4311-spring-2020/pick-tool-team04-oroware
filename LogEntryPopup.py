@@ -45,14 +45,13 @@ class LogEntryPopup(QWidget):
         self.setWindowTitle("Log Entry Edit Popup")
 
     def onSaveClick(self):
-        editedLogEntry = LogEntry()
-        editedLogEntry.id = self.logEntry.id
-        editedLogEntry.description = self.logEntryDescriptionTextEdit.toPlainText()
+        self.logEntry.description = self.logEntryDescriptionTextEdit.toPlainText()
+        newVectors = list()
         for i in range(len(self.vectors)):
             item = self.associationComboBox.model().item(i, 0)
             if item.checkState() == QtCore.Qt.Checked:
-                editedLogEntry.associatedVectors.append(self.vectors[i].vectorName)
-        logEntryManager.editLogEntry(editedLogEntry, self.logEntryRowClicked)
+                newVectors.append(self.vectors[i].vectorName)
+        logEntryManager.editLogEntryVectors(self.logEntryRowClicked, newVectors)
         self.close()
 
 
