@@ -12,7 +12,7 @@ class LogEntryManager:
         dates = ["1/26/20", "1/26/20", "1/26/20", "1/26/20", "1/26/20"]
         teams = ["Blue Team", "White Team", "Red Team", "Red Team", "Blue Team"]
         descriptions = ["Blue Team Defender Turns on Computer.", "White Team Analyst Starts Taking Notes.",
-                        "SQL Injection attack from Red Team.", "Cross=Site Scripting Attack from Red Team.",
+                        "SQL Injection attack from Red Team.", "Cross-Site Scripting Attack from Red Team.",
                         "Blue Team Defender turns off computer."]
         artifacts = ["blue_log.csv", "white_recording.png", "red_attack.txt", "red_escalation.txt", "blue_response.csv"]
         for i in range(len(descriptions)):

@@ -5,6 +5,7 @@ class Vector:
     def __init__(self):
         self.vectorName = ""
         self.vectorDescription = None
+        self.vectorDimensions = 5
         self.significantEvents = dict()
         self.relationships = dict()
         self.nameVisibility = False
@@ -21,7 +22,12 @@ class Vector:
             event.description = logEntry.description
             event.artifact = logEntry.artifact
             event.logEntry = logEntry
-            event.id = 0 if len(self.significantEvents) == 0 else (max(list(self.significantEvents.keys())) + 1)
+            if len(self.significantEvents) == 0:
+                event.id = 0
+            elif (max(list(self.significantEvents.keys())) + 1) <= self.vectorDimensions:
+                event.id = max(list(self.significantEvents.keys())) + 1
+            else:
+                event.id = self.vectorDimensions
             event.position = (event.id, 1)
             self.significantEvents[event.id] = event
 
@@ -29,7 +35,7 @@ class Vector:
         del self.significantEvents[eventId]
         deadRelationships = list()
         for relationshipId, relationship in self.relationships.items():
-            if relationship.sourceSignificantEventId == eventId or relationship.destSignificantEvenId == eventId:
+            if relationship.sourceSignificantEventId == eventId or relationship.destSignificantEventId == eventId:
                 deadRelationships.append(relationshipId)
         for relationshipId in deadRelationships:
             del self.relationships[relationshipId]
@@ -56,6 +62,6 @@ class Vector:
     def addNewRelationship(self, sourceId, destId):
         relationship = Relationship()
         relationship.sourceSignificantEventId = sourceId
-        relationship.sourceSignificantEventId = destId
+        relationship.destSignificantEventId = destId
         relationship.id = 0 if len(self.relationships) == 0 else (max(list(self.relationships.keys())) + 1)
         self.relationships[relationship.id] = relationship

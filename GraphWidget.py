@@ -12,9 +12,7 @@ class GraphWidget(QWidget):
 
     def initUI(self):
         self.setGeometry(10, 10, 505, 476)
-        self.center()
         self.vector = None
-        self.vectorGraph = nx.DiGraph()
         self.node1 = None
         self.node2 = None
         vbox = QVBoxLayout()
@@ -26,36 +24,49 @@ class GraphWidget(QWidget):
         vbox.addWidget(self.canvas)
 
     def draw(self):
+        print(self.pos)
         self.plotGraph()
         self.show()
 
+    def initializeHelperNodes(self):
+        helperNodeCounter = -1
+        for i in range(self.vector.vectorDimensions):
+            self.vectorGraph.add_nodes_from([helperNodeCounter])
+            self.pos[helperNodeCounter] = (i, 0)
+            helperNodeCounter -= 1
+            self.vectorGraph.add_nodes_from([helperNodeCounter])
+            self.pos[helperNodeCounter] = (i, 2)
+            helperNodeCounter -= 1
+
     def initializeVector(self, vector):
+        self.vectorGraph = nx.DiGraph()
         self.vector = vector
         self.pos = dict()
+        self.initializeHelperNodes()
         for significantEventId, significantEvent in vector.significantEvents.items():
-            self.vectorGraph.add_node(significantEventId)
+            self.vectorGraph.add_nodes_from([significantEventId])
             self.pos[significantEventId] = significantEvent.position
         for relationship in list(vector.relationships.values()):
-            self.vectorGraph.add_edges_from([relationship.sourceSignificantEventId, relationship.destSignificantEventId])
+            self.vectorGraph.add_edges_from([(relationship.sourceSignificantEventId, relationship.destSignificantEventId)])
 
     def onclick(self, event):
         self.node1 = (event.xdata, event.ydata)
-        threshold = 0.03
-        for key, value in self.pos.items():
-            xValueDifference = max(value[0], self.node1[0]) - min(value[0], self.node1[0])
-            yValueDifference = max(value[1], self.node1[1]) - min(value[1], self.node1[1])
+        threshold = 0.10
+        for key, value in self.vector.significantEvents.items():
+            xValueDifference = max(value.position[0], self.node1[0]) - min(value.position[0], self.node1[0])
+            yValueDifference = max(value.position[1], self.node1[1]) - min(value.position[1], self.node1[1])
             if xValueDifference <= threshold and yValueDifference <= threshold:
                 self.node1 = {key : self.node1}
                 break
 
     def onRelease(self, event):
         self.node2 = (event.xdata, event.ydata)
-        threshold = 0.03
-        for key, value in self.pos.items():
-            xValue_difference = max(value[0], self.node2[0]) - min(value[0], self.node2[0])
-            yValue_difference = max(value[1], self.node2[1]) - min(value[1], self.node2[1])
-            if xValue_difference <= threshold and yValue_difference <= threshold:
-                self.node2 = {key: self.node1}
+        threshold = 0.10
+        for key, value in self.vector.significantEvents.items():
+            xValueDifference = max(value.position[0], self.node2[0]) - min(value.position[0], self.node2[0])
+            yValueDifference = max(value.position[1], self.node2[1]) - min(value.position[1], self.node2[1])
+            if xValueDifference <= threshold and yValueDifference <= threshold:
+                self.node2 = {key: self.node2}
                 break
         if type(self.node2) is not dict and type(self.node1) is dict:
             node_name = list(self.node1.keys())[0]
@@ -64,18 +75,30 @@ class GraphWidget(QWidget):
         elif type(self.node2) is dict and type(self.node1) is dict:
             firstNodeName = list(self.node1.keys())[0]
             secondNodeName = list(self.node2.keys())[0]
-            self.vectorGraph.add_edges_from([(firstNodeName, secondNodeName)])
-            self.vector.addNewRelationship(firstNodeName, secondNodeName)
-            self.trigger.emit_trigger()
+            if firstNodeName != secondNodeName:
+                self.vectorGraph.add_edges_from([(firstNodeName, secondNodeName)])
+                self.vector.addNewRelationship(firstNodeName, secondNodeName)
+                self.trigger.emit_trigger()
         else:
             pass
+        node_sizes = list()
+        for _ in range(len(list(self.pos.keys()))):
+            node_sizes.append(2000)
         self.node1 = None
         self.node2 = None
         self.plotGraph()
 
     def plotGraph(self):
         self.figure.clf()
-        nx.draw(self.vectorGraph, pos=self.pos, with_labels=True)
+        node_sizes = list()
+        node_colors = list()
+        for i in range(len(list(self.pos.keys()))):
+            node_sizes.append(2000)
+            if i < (2 * self.vector.vectorDimensions):
+                node_colors.append("white")
+            else:
+                node_colors.append("blue")
+        nx.draw(self.vectorGraph, node_size=node_sizes, node_color=node_colors, pos=self.pos, with_labels=True, font_color="white")
         self.canvas.draw_idle()
 
     def center(self):
