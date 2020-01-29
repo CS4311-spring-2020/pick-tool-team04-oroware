@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from GraphWidget import GraphWidget
 import sys
 import datetime
+import xlwt
 
 from LogEntry import LogEntry
 from LogEntryPopup import LogEntryPopup
@@ -718,6 +719,7 @@ class Ui_PICK(object):
         sizePolicy.setHeightForWidth(self.exportTableButton.sizePolicy().hasHeightForWidth())
         self.exportTableButton.setSizePolicy(sizePolicy)
         self.exportTableButton.setObjectName("exportTableButton")
+        self.exportTableButton.clicked.connect(self.handleExport)
         self.verticalLayout_8.addWidget(self.exportTableButton)
         self.verticalLayout_11.addWidget(self.vectorFrame)
         self.nodeTableLabel = QtWidgets.QLabel(self.widget_2)
@@ -750,6 +752,54 @@ class Ui_PICK(object):
         self.tabWidget.addTab(self.manageVectorsTab, "")
         self.tabWidget.currentChanged.connect(self.onTabChange)
 
+    def handleExport(self):
+        if self.vectorComboBoxTable.count() > 0:
+            self.vectorGraphWidget.export()
+            self.exportVectorTable(self.vectorComboBoxTable.currentText())
+            self.exportRelationshipTable(self.vectorComboBoxTable.currentText())
+
+    def exportVectorTable(self, vectorName):
+        filename = vectorName + "_SignificantEventTable.xls"
+        wbk = xlwt.Workbook()
+        sheet = wbk.add_sheet("sheet", cell_overwrite_ok=True)
+        style = xlwt.XFStyle()
+        font = xlwt.Font()
+        font.bold = True
+        style.font = font
+        model = self.vectorTableWidget.model()
+        for column in range(model.columnCount()):
+            text = model.headerData(column, QtCore.Qt.Horizontal)
+            sheet.write(0, column + 1, text, style=style)
+        for row in range(model.rowCount()):
+            text = model.headerData(row, QtCore.Qt.Vertical)
+            sheet.write(row + 1, 0, text, style=style)
+        for column in range(model.columnCount()):
+            for row in range(model.rowCount()):
+                text = model.data(model.index(row, column))
+                sheet.write(row + 1, column + 1, text)
+        wbk.save(filename)
+
+    def exportRelationshipTable(self, vectorName):
+        filename = vectorName + "_RelationshipTable.xls"
+        wbk = xlwt.Workbook()
+        sheet = wbk.add_sheet("sheet", cell_overwrite_ok=True)
+        style = xlwt.XFStyle()
+        font = xlwt.Font()
+        font.bold = True
+        style.font = font
+        model = self.relationshipTableWidget.model()
+        for column in range(model.columnCount()):
+            text = model.headerData(column, QtCore.Qt.Horizontal)
+            sheet.write(0, column + 1, text, style=style)
+        for row in range(model.rowCount()):
+            text = model.headerData(row, QtCore.Qt.Vertical)
+            sheet.write(row + 1, 0, text, style=style)
+        for column in range(model.columnCount()):
+            for row in range(model.rowCount()):
+                text = model.data(model.index(row, column))
+                sheet.write(row + 1, column + 1, text)
+        wbk.save(filename)
+
     def handleAddNode(self):
         if self.vectorComboBoxTable.count() > 0:
             vectorName = self.vectorComboBoxTable.currentText()
@@ -760,7 +810,7 @@ class Ui_PICK(object):
             logEntry.creator = logEntry.WHITE_TEAM
             logEntry.id = logEntryManager.nextAvailableId
             logEntryManager.nextAvailableId += 1
-            logEntry.date = (datetime.datetime.today()).strftime("%d/%B/%Y %H:%M %p")
+            logEntry.date = (datetime.datetime.today()).strftime("%m/%d/%Y %H:%M %p").lstrip("0")
             logEntry.associatedVectors.append(self.vectorComboBoxTable.currentText())
             vector.addSignificantEventFromLogEntry(logEntry)
             self.updateVectorTable(vector)

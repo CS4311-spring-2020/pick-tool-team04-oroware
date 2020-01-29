@@ -27,6 +27,10 @@ class GraphWidget(QWidget):
         self.plotGraph()
         self.show()
 
+    def export(self):
+        if self.vector != None:
+           self.figure.savefig((self.vector.vectorName + "_Graph.png"), format="PNG")
+
     def initializeHelperNodes(self):
         helperNodeCounter = -1
         for i in range(self.vector.vectorDimensions):
