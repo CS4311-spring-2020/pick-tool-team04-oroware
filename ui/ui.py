@@ -407,7 +407,8 @@ class Ui_PICK(object):
         self.tabWidget.addTab(self.searchLogsTab, "")
 
     def updateSearchLogTable(self):
-        totalRows = len(self.logEntries)
+        global logEntryManager
+        totalRows = len(logEntryManager.logEntriesInTable)
         self.searchLogsTableWidget.setColumnCount(len(self.colsSearchLogsTable))
         self.searchLogsTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.searchLogsTableWidget.setRowCount(totalRows)
@@ -418,11 +419,11 @@ class Ui_PICK(object):
             self.searchLogsTableWidget.setHorizontalHeaderItem(col_num, QTableWidgetItem(self.colsSearchLogsTable[col_num]))
         for row_num in range(totalRows):
             self.searchLogsTableWidget.setRowHeight(row_num, 50)
-            logEntryDescriptionItem = QtWidgets.QTableWidgetItem(self.logEntries[row_num].description)
+            logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[row_num].description)
             self.searchLogsTableWidget.setItem(row_num, len(self.colsSearchLogsTable) - 1, logEntryDescriptionItem)
-            logEntryTeamItem = QtWidgets.QTableWidgetItem(self.logEntries[row_num].creator)
+            logEntryTeamItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[row_num].creator)
             self.searchLogsTableWidget.setItem(row_num, len(self.colsSearchLogsTable) - 2, logEntryTeamItem)
-            logEntryDateItem = QtWidgets.QTableWidgetItem(self.logEntries[row_num].date)
+            logEntryDateItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[row_num].date)
             self.searchLogsTableWidget.setItem(row_num, len(self.colsSearchLogsTable) - 3, logEntryDateItem)
         self.searchLogsTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.searchLogsTableWidget.doubleClicked.connect(self.searchTableDoubleClicked)
@@ -478,8 +479,9 @@ class Ui_PICK(object):
         self.vectorGraphWidget.draw()
 
     def searchTableDoubleClicked(self):
+        global logEntryManager
         logEntryRowClicked = self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row()
-        logEntryToEdit = self.logEntries[logEntryRowClicked]
+        logEntryToEdit = logEntryManager.logEntries[logEntryRowClicked]
         self.editPopup = LogEntryPopup(self.vectors, logEntryToEdit, logEntryRowClicked)
         self.editPopup.setGeometry(100, 200, 100, 100)
         self.editPopup.show()
@@ -785,17 +787,11 @@ class Ui_PICK(object):
         self.colsVectorTable = ["ID", "Event Name", "Time", "Description"]
         self.colsRelationshipTable = ["ID", "Parent", "Child", "Description"]
 
-        # Log entry list used for search logs table
-        self.logEntries = list()
-        # Initialization of log entry list
-        global logEntryManager
-        self.logEntries = list(logEntryManager.logEntries.values())
-        logEntryManager.logEntriesInTable = self.logEntries
-
         # Vector list
         self.vectors = list()
         # Initialization of vector list
         global vectorManager
+        global logEntryManager
         logEntryManager.vectorManager = vectorManager
         self.vectors = list(vectorManager.vectors.values())
 

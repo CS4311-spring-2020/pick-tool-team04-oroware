@@ -23,11 +23,11 @@ class LogEntryManager:
             logEntry.id = ids[i]
             logEntry.artifact = artifacts[i]
             self.logEntries[ids[i]] = logEntry
+        self.logEntriesInTable = list(self.logEntries.values())
 
-    def editLogEntryVectors(self, logEntryRowClicked, newVectors):
-        logEntry = self.logEntriesInTable[logEntryRowClicked]
-        oldVectors = self.logEntries[logEntry.id].associatedVectors
-        self.logEntries[logEntry.id].associatedVectors = newVectors
+    def editLogEntryVectors(self, logEntry, logEntryRowClicked, newVectors):
+        oldVectors = logEntry.associatedVectors
+        logEntry.associatedVectors = newVectors
         self.vectorManager.handleUpdateToLogEntry(oldVectors, newVectors, logEntry)
         if self.searchLogEntryTableWidget != None:
             self.updateSearchLogTableEntry(logEntry, logEntryRowClicked)

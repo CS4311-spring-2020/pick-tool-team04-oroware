@@ -51,7 +51,7 @@ class LogEntryPopup(QWidget):
             item = self.associationComboBox.model().item(i, 0)
             if item.checkState() == QtCore.Qt.Checked:
                 newVectors.append(self.vectors[i].vectorName)
-        logEntryManager.editLogEntryVectors(self.logEntryRowClicked, newVectors)
+        logEntryManager.editLogEntryVectors(self.logEntry, self.logEntryRowClicked, newVectors)
         self.close()
 
 
