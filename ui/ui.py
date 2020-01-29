@@ -841,6 +841,7 @@ class Ui_PICK(object):
             self.vectorComboBoxTable.addItem(vectorName)
 
     def setupUi(self, PICK):
+        print()
         PICK.setObjectName("PICK")
         PICK.resize(2500, 1750)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
