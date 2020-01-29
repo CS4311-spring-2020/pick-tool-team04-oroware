@@ -3,6 +3,7 @@ from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtWidgets import QTableWidgetItem
 from GraphWidget import GraphWidget
 import sys
+import datetime
 
 from LogEntry import LogEntry
 from LogEntryPopup import LogEntryPopup
@@ -538,6 +539,7 @@ class Ui_PICK(object):
         sizePolicy.setHeightForWidth(self.addNodeGraphButton.sizePolicy().hasHeightForWidth())
         self.addNodeGraphButton.setSizePolicy(sizePolicy)
         self.addNodeGraphButton.setObjectName("addNodeGraphButton")
+        self.addNodeGraphButton.clicked.connect(self.handleAddNode)
         self.verticalLayout_9.addWidget(self.addNodeGraphButton)
         self.intervalLabel = QtWidgets.QLabel(self.graphFrame)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
@@ -707,6 +709,7 @@ class Ui_PICK(object):
         sizePolicy.setHeightForWidth(self.addNodeTableButton.sizePolicy().hasHeightForWidth())
         self.addNodeTableButton.setSizePolicy(sizePolicy)
         self.addNodeTableButton.setObjectName("addNodeTableButton")
+        self.addNodeTableButton.clicked.connect(self.handleAddNode)
         self.verticalLayout_8.addWidget(self.addNodeTableButton)
         self.exportTableButton = QtWidgets.QPushButton(self.vectorFrame)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
@@ -746,6 +749,22 @@ class Ui_PICK(object):
         self.horizontalLayout.addWidget(self.widget_2)
         self.tabWidget.addTab(self.manageVectorsTab, "")
         self.tabWidget.currentChanged.connect(self.onTabChange)
+
+    def handleAddNode(self):
+        if self.vectorComboBoxTable.count() > 0:
+            vectorName = self.vectorComboBoxTable.currentText()
+            global vectorManager
+            global logEntryManager
+            vector = vectorManager.vectors[vectorName]
+            logEntry = LogEntry()
+            logEntry.creator = logEntry.WHITE_TEAM
+            logEntry.id = logEntryManager.nextAvailableId
+            logEntryManager.nextAvailableId += 1
+            logEntry.date = (datetime.datetime.today()).strftime("%d/%B/%Y %H:%M %p")
+            logEntry.associatedVectors.append(self.vectorComboBoxTable.currentText())
+            vector.addSignificantEventFromLogEntry(logEntry)
+            self.updateVectorTable(vector)
+            self.updateVectorGraph(vector)
 
     def onTabChange(self):
         if self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.manageVectorsTab) and self.vectorComboBoxTable.count() > 0:
