@@ -1044,4 +1044,5 @@ if __name__ == "__main__":
     ui = Ui_PICK()
     ui.setupUi(PICK)
     PICK.show()
+    print()
     sys.exit(app.exec_())
