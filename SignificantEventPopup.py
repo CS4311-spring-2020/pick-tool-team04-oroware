@@ -12,6 +12,7 @@ class SignificantEventPopup(QWidget):
         self.trigger = trigger
         self.trigger.connectVectorTableEntryTrigger(self.significantEvent)
         self.trigger.connectSearchLogTableEntryTrigger(self.significantEvent.logEntry)
+        self.trigger.connectVectorTableTrigger()
         layout = QVBoxLayout()
         self.logEntryDescriptionLabel = QLabel()
         self.logEntryDescriptionLabel.setText("Description:")
@@ -44,5 +45,10 @@ class SignificantEventPopup(QWidget):
         self.close()
 
     def delete(self):
-        print()
+        self.vector.removeSignificantEvent(self.significantEvent.id)
+        logEntry = self.significantEvent.logEntry
+        vectorIndex = logEntry.associatedVectors.index(self.vector.vectorName)
+        del logEntry.associatedVectors[vectorIndex]
+        self.trigger.emitVectorTableTrigger()
+        self.close()
 

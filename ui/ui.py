@@ -289,15 +289,17 @@ class Ui_PICK(object):
         self.tabWidget.addTab(self.ingestionTab, "")
 
     def handleVectorComboBoxIngestion(self, index):
-        global vectorManager
-        self.vectorDescriptionTextEdit.setPlainText(vectorManager.vectors[index.data()].vectorDescription)
+        if self.vectorComboBoxIngestion > 0:
+            global vectorManager
+            self.vectorDescriptionTextEdit.setPlainText(vectorManager.vectors[index.data()].vectorDescription)
 
     def handleVectorComboBoxTable(self, index):
-        global vectorManager
-        currentVector = vectorManager.vectors[index.data()]
-        self.updateVectorTable(self, currentVector)
-        self.updateRelationshipTable(self, currentVector)
-        self.updateVectorGraph(self, currentVector)
+        if self.vectorComboBoxTable.count() > 0:
+            global vectorManager
+            currentVector = vectorManager.vectors[index.data()]
+            self.updateVectorTable(currentVector)
+            self.updateRelationshipTable(currentVector)
+            self.updateVectorGraph(currentVector)
 
     def setupSearchLogsTab(self, PICK):
         self.searchLogsTab = QtWidgets.QWidget()
@@ -723,6 +725,7 @@ class Ui_PICK(object):
         sizePolicy.setHeightForWidth(self.vectorComboBoxTable.sizePolicy().hasHeightForWidth())
         self.vectorComboBoxTable.setSizePolicy(sizePolicy)
         self.vectorComboBoxTable.setObjectName("vectorComboBoxTable")
+        self.vectorComboBoxTable.view().pressed.connect(self.handleVectorComboBoxTable)
         self.verticalLayout_8.addWidget(self.vectorComboBoxTable)
         self.addNodeTableButton = QtWidgets.QPushButton(self.vectorFrame)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
@@ -968,8 +971,13 @@ class TriggerHelper(QObject):
     updateRelationshipTableTrigger = pyqtSignal()
     updateVectorTableEntryTrigger = pyqtSignal()
     updateSearchLogTableEntryTrigger = pyqtSignal()
+    updateVectorTableTrigger = pyqtSignal()
+
     def connectRelationshipTableTrigger(self):
         self.updateRelationshipTableTrigger.connect(ui.handleRelationshipTableTrigger)
+
+    def connectVectorTableTrigger(self):
+        self.updateVectorTableTrigger.connect(ui.onTabChange)
 
     def connectVectorTableEntryTrigger(self, significantEvent):
         self.updateVectorTableEntryTrigger.connect(lambda: ui.handleVectorTableEntryUpdate(significantEvent))
@@ -979,6 +987,9 @@ class TriggerHelper(QObject):
 
     def emitRelationshipTableTrigger(self):
         self.updateRelationshipTableTrigger.emit()
+
+    def emitVectorTableTrigger(self):
+        self.updateVectorTableTrigger.emit()
 
     def emitVectorTableEntryTrigger(self):
         self.updateVectorTableEntryTrigger.emit()
