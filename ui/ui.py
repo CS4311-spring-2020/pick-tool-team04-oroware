@@ -1036,12 +1036,8 @@ class TriggerHelper(QObject):
 
     def emitSearchLogTableEntryTrigger(self):
         self.updateSearchLogTableEntryTrigger.emit()
-        print()
-        print()
-        print()
 
 if __name__ == "__main__":
-    print()
     app = QtWidgets.QApplication(sys.argv)
     PICK = QtWidgets.QMainWindow()
     ui = Ui_PICK()
@@ -1049,5 +1045,4 @@ if __name__ == "__main__":
     print()
     ui.setupUi(PICK)
     PICK.show()
-    print()
     sys.exit(app.exec_())
