@@ -1041,8 +1041,6 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     PICK = QtWidgets.QMainWindow()
     ui = Ui_PICK()
-    print()
-    print()
     ui.setupUi(PICK)
     PICK.show()
     sys.exit(app.exec_())
