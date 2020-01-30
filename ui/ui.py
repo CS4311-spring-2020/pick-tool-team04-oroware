@@ -10,6 +10,7 @@ from LogEntry import LogEntry
 from LogEntryPopup import LogEntryPopup
 from Globals import logEntryManager
 from Globals import vectorManager
+from RelationshipPopup import RelationshipPopup
 from SignificantEventPopup import SignificantEventPopup
 
 
@@ -486,6 +487,7 @@ class Ui_PICK(object):
             self.relationshipTableWidget.setItem(rowNum, len(self.colsRelationshipTable) - 1, relationshipDescriptionItem)
             relationships[rowNum].rowIndexInTable = rowNum
         self.relationshipTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        self.relationshipTableWidget.doubleClicked.connect(self.relationshipTableDoubleClicked)
 
     def updateVectorGraph(self, vector):
         self.vectorGraphWidget.initializeVector(vector)
@@ -510,6 +512,18 @@ class Ui_PICK(object):
         self.editVectorPopup = SignificantEventPopup(vector, significantEventToEdit, trigger)
         self.editVectorPopup.setGeometry(100, 200, 100, 100)
         self.editVectorPopup.show()
+
+    def relationshipTableDoubleClicked(self):
+        global vectorManager
+        trigger = TriggerHelper()
+        relationshipId = self.relationshipTableWidget.verticalHeaderItem(self.relationshipTableWidget.selectionModel().selectedIndexes()[0].row()).text()
+        vectorName = self.vectorComboBoxTable.currentText()
+        vector = vectorManager.vectors[vectorName]
+        relationshipToEdit = vector.relationships[int(relationshipId)]
+        self.editRelationshipPopup = RelationshipPopup(vector, relationshipToEdit, trigger)
+        self.editRelationshipPopup.setGeometry(100, 200, 100, 100)
+        self.editRelationshipPopup.show()
+
 
     def setupMangeVectorsTab(self, PICK):
         self.manageVectorsTab = QtWidgets.QWidget()
@@ -782,8 +796,8 @@ class Ui_PICK(object):
             self.exportVectorTable(self.vectorComboBoxTable.currentText())
             self.exportRelationshipTable(self.vectorComboBoxTable.currentText())
 
-    def handleVectorTableEntryUpdate(self, significantEvent):
-        if significantEvent.rowIndexInTable != -1:
+    def handleVectorTableEntryUpdate(self, significantEvent, vectorName):
+        if significantEvent.rowIndexInTable != -1 and self.vectorComboBoxTable.count() > 0 and self.vectorComboBoxTable.currentText() == vectorName:
             significantEventDescriptionItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.description)
             self.vectorTableWidget.setItem(significantEvent.rowIndexInTable, len(self.colsVectorTable) - 1,
                                                    significantEventDescriptionItem)
@@ -792,6 +806,11 @@ class Ui_PICK(object):
             logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntry.description)
             self.searchLogsTableWidget.setItem(logEntry.rowIndexInTable, len(self.colsSearchLogsTable) - 1,
                                                    logEntryDescriptionItem)
+    def handleRelationshipTableEntryUpdate(self, relationship, vectorName):
+        if relationship.rowIndexInTable != -1 and self.vectorComboBoxTable.count() > 0 and self.vectorComboBoxTable.currentText() == vectorName:
+            relationshipDescriptionItem = QtWidgets.QTableWidgetItem(relationship.description)
+            self.relationshipTableWidget.setItem(relationship.rowIndexInTable, len(self.colsVectorTable) - 1,
+                                                   relationshipDescriptionItem)
 
     def exportVectorTable(self, vectorName):
         filename = vectorName + "_SignificantEventTable.xls"
@@ -866,6 +885,13 @@ class Ui_PICK(object):
             global vectorManager
             vector = vectorManager.vectors[vectorName]
             self.updateRelationshipTable(vector)
+
+    def handleVectorGraphTrigger(self):
+        if self.vectorComboBoxTable.count() > 0:
+            vectorName = self.vectorComboBoxTable.currentText()
+            global vectorManager
+            vector = vectorManager.vectors[vectorName]
+            self.updateVectorGraph(vector)
 
     def updateVectorComboBoxes(self):
         vectorNames = (vectorManager.vectors.keys())
@@ -969,24 +995,38 @@ class Ui_PICK(object):
 
 class TriggerHelper(QObject):
     updateRelationshipTableTrigger = pyqtSignal()
+    updateVectorGraphTrigger = pyqtSignal()
     updateVectorTableEntryTrigger = pyqtSignal()
     updateSearchLogTableEntryTrigger = pyqtSignal()
+    updateRelationshipTableEntryTrigger = pyqtSignal()
     updateVectorTableTrigger = pyqtSignal()
 
     def connectRelationshipTableTrigger(self):
         self.updateRelationshipTableTrigger.connect(ui.handleRelationshipTableTrigger)
 
+    def connectVectorGraphTrigger(self):
+        self.updateVectorGraphTrigger.connect(ui.handleVectorGraphTrigger)
+
     def connectVectorTableTrigger(self):
         self.updateVectorTableTrigger.connect(ui.onTabChange)
 
-    def connectVectorTableEntryTrigger(self, significantEvent):
-        self.updateVectorTableEntryTrigger.connect(lambda: ui.handleVectorTableEntryUpdate(significantEvent))
+    def connectVectorTableEntryTrigger(self, significantEvent, vectorName):
+        self.updateVectorTableEntryTrigger.connect(lambda: ui.handleVectorTableEntryUpdate(significantEvent, vectorName))
 
     def connectSearchLogTableEntryTrigger(self, logEntry):
         self.updateSearchLogTableEntryTrigger.connect(lambda: ui.handleSearchLogTableEntryUpdate(logEntry))
 
+    def connectRelationshipTableEntryTrigger(self, logEntry, vectorName):
+        self.updateRelationshipTableEntryTrigger.connect(lambda: ui.handleRelationshipTableEntryUpdate(logEntry, vectorName))
+
+    def emitVectorGraphTrigger(self):
+        self.updateVectorGraphTrigger.emit()
+
     def emitRelationshipTableTrigger(self):
         self.updateRelationshipTableTrigger.emit()
+
+    def emitRelationshipTableEntryTrigger(self):
+        self.updateRelationshipTableEntryTrigger.emit()
 
     def emitVectorTableTrigger(self):
         self.updateVectorTableTrigger.emit()

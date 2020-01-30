@@ -1,8 +1,4 @@
-from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import *
-
-from LogEntry import LogEntry
-from Globals import logEntryManager
 
 class SignificantEventPopup(QWidget):
     def __init__(self, vector, significantEvent, trigger):
@@ -10,7 +6,7 @@ class SignificantEventPopup(QWidget):
         self.vector = vector
         self.significantEvent = significantEvent
         self.trigger = trigger
-        self.trigger.connectVectorTableEntryTrigger(self.significantEvent)
+        self.trigger.connectVectorTableEntryTrigger(self.significantEvent, vector.vectorName)
         self.trigger.connectSearchLogTableEntryTrigger(self.significantEvent.logEntry)
         self.trigger.connectVectorTableTrigger()
         layout = QVBoxLayout()

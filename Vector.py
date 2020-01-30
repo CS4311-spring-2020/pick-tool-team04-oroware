@@ -56,3 +56,6 @@ class Vector:
         relationship.destSignificantEventId = destId
         relationship.id = 0 if len(self.relationships) == 0 else (max(list(self.relationships.keys())) + 1)
         self.relationships[relationship.id] = relationship
+
+    def removeRelationship(self, relationshipId):
+        del self.relationships[relationshipId]
