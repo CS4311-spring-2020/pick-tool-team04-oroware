@@ -9,4 +9,5 @@ class LogEntry:
         self.description = ""
         self.artifact = ""
         self.id = ""
+        self.rowIndexInTable = -1
         self.associatedVectors = list()

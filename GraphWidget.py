@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import networkx as nx
 
+from LogEntry import LogEntry
+
+
 class GraphWidget(QWidget):
 
     def __init__(self, parent, trigger):
@@ -81,7 +84,7 @@ class GraphWidget(QWidget):
             if firstNodeName != secondNodeName:
                 self.vectorGraph.add_edges_from([(firstNodeName, secondNodeName)])
                 self.vector.addNewRelationship(firstNodeName, secondNodeName)
-                self.trigger.emit_trigger()
+                self.trigger.emitRelationshipTableTrigger()
         else:
             pass
         node_sizes = list()
@@ -95,12 +98,17 @@ class GraphWidget(QWidget):
         self.figure.clf()
         node_sizes = list()
         node_colors = list()
-        for i in range(len(list(self.pos.keys()))):
+        for i in list(self.pos.keys()):
             node_sizes.append(2000)
-            if i < (2 * self.vector.vectorDimensions):
+            if i < 0:
                 node_colors.append("white")
             else:
-                node_colors.append("blue")
+                if self.vector.significantEvents[i].logEntry.creator == LogEntry.WHITE_TEAM:
+                    node_colors.append("grey")
+                elif self.vector.significantEvents[i].logEntry.creator == LogEntry.BLUE_TEAM:
+                    node_colors.append("blue")
+                elif self.vector.significantEvents[i].logEntry.creator == LogEntry.RED_TEAM:
+                    node_colors.append("maroon")
         nx.draw(self.vectorGraph, node_size=node_sizes, node_color=node_colors, pos=self.pos, with_labels=True, font_color="white")
         self.canvas.draw_idle()
 

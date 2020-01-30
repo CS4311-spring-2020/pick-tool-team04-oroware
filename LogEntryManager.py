@@ -5,8 +5,6 @@ class LogEntryManager:
     def __init__(self):
         self.logEntries = dict()
         self.logEntriesInTable = list()
-        self.searchLogEntryTableWidget = None
-        self.colNamesInSearchLogsTable = list()
         self.vectorManager = None
         self.nextAvailableId = 5
         ids = [0, 1, 2, 3, 4]
@@ -26,23 +24,9 @@ class LogEntryManager:
             self.logEntries[ids[i]] = logEntry
         self.logEntriesInTable = list(self.logEntries.values())
 
-    def editLogEntryVectors(self, logEntry, logEntryRowClicked, newVectors):
+    def editLogEntryVectors(self, logEntry, newVectors):
         oldVectors = logEntry.associatedVectors
         logEntry.associatedVectors = newVectors
         self.vectorManager.handleUpdateToLogEntry(oldVectors, newVectors, logEntry)
-        if self.searchLogEntryTableWidget != None:
-            self.updateSearchLogTableEntry(logEntry, logEntryRowClicked)
-
-    def updateSearchLogTableEntry(self, logEntry, logEntryRowClicked):
-        logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntry.description)
-        if (self.logEntriesInTable[logEntryRowClicked].id == logEntry.id):
-            self.searchLogEntryTableWidget.setItem(logEntryRowClicked, len(self.colNamesInSearchLogsTable) - 1,
-                                               logEntryDescriptionItem)
-        else:
-            for i in range(len(self.logEntriesInTable)):
-                if (self.logEntriesInTable[i].id == logEntry.id):
-                    self.searchLogEntryTableWidget.setItem(i, len(self.colNamesInSearchLogsTable) - 1,
-                                                       logEntryDescriptionItem)
-                break
 
 

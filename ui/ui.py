@@ -10,6 +10,8 @@ from LogEntry import LogEntry
 from LogEntryPopup import LogEntryPopup
 from Globals import logEntryManager
 from Globals import vectorManager
+from SignificantEventPopup import SignificantEventPopup
+
 
 class Ui_PICK(object):
 
@@ -408,25 +410,29 @@ class Ui_PICK(object):
         self.verticalLayout_6.addWidget(self.searchLogsTableWidget)
         self.tabWidget.addTab(self.searchLogsTab, "")
 
-    def updateSearchLogTable(self):
+    def updateLogTable(self):
         global logEntryManager
-        totalRows = len(logEntryManager.logEntriesInTable)
+        logEntries = logEntryManager.logEntriesInTable
+        totalRows = len(logEntries)
         self.searchLogsTableWidget.setColumnCount(len(self.colsSearchLogsTable))
         self.searchLogsTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.searchLogsTableWidget.setRowCount(totalRows)
         header = self.searchLogsTableWidget.horizontalHeader()
-        for col_num in range(len(self.colsSearchLogsTable)):
-            self.searchLogsTableWidget.setColumnWidth(col_num, 200)
-            header.setSectionResizeMode(col_num, QtWidgets.QHeaderView.Stretch)
-            self.searchLogsTableWidget.setHorizontalHeaderItem(col_num, QTableWidgetItem(self.colsSearchLogsTable[col_num]))
-        for row_num in range(totalRows):
-            self.searchLogsTableWidget.setRowHeight(row_num, 50)
-            logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[row_num].description)
-            self.searchLogsTableWidget.setItem(row_num, len(self.colsSearchLogsTable) - 1, logEntryDescriptionItem)
-            logEntryTeamItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[row_num].creator)
-            self.searchLogsTableWidget.setItem(row_num, len(self.colsSearchLogsTable) - 2, logEntryTeamItem)
-            logEntryDateItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[row_num].date)
-            self.searchLogsTableWidget.setItem(row_num, len(self.colsSearchLogsTable) - 3, logEntryDateItem)
+        for colNum in range(len(self.colsSearchLogsTable)):
+            self.searchLogsTableWidget.setColumnWidth(colNum, 200)
+            header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
+            self.searchLogsTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsSearchLogsTable[colNum]))
+        for rowNum in range(totalRows):
+            logEntryIdItem = QtWidgets.QTableWidgetItem(str(logEntries[rowNum].id))
+            self.searchLogsTableWidget.setVerticalHeaderItem(rowNum, logEntryIdItem)
+            self.searchLogsTableWidget.setRowHeight(rowNum, 50)
+            logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntries[rowNum].description)
+            self.searchLogsTableWidget.setItem(rowNum, len(self.colsSearchLogsTable) - 1, logEntryDescriptionItem)
+            logEntryTeamItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[rowNum].creator)
+            self.searchLogsTableWidget.setItem(rowNum, len(self.colsSearchLogsTable) - 2, logEntryTeamItem)
+            logEntryDateItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[rowNum].date)
+            self.searchLogsTableWidget.setItem(rowNum, len(self.colsSearchLogsTable) - 3, logEntryDateItem)
+            logEntries[rowNum].rowIndexInTable = rowNum
         self.searchLogsTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.searchLogsTableWidget.doubleClicked.connect(self.searchTableDoubleClicked)
 
@@ -437,21 +443,23 @@ class Ui_PICK(object):
         self.vectorTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.vectorTableWidget.setRowCount(totalRows)
         header = self.vectorTableWidget.horizontalHeader()
-        for col_num in range(len(self.colsVectorTable)):
-            self.vectorTableWidget.setColumnWidth(col_num, 200)
-            header.setSectionResizeMode(col_num, QtWidgets.QHeaderView.Stretch)
-            self.vectorTableWidget.setHorizontalHeaderItem(col_num, QTableWidgetItem(self.colsVectorTable[col_num]))
-        for row_num in range(totalRows):
-            self.vectorTableWidget.setRowHeight(row_num, 50)
-            significantEventIdItem = QtWidgets.QTableWidgetItem(str(significantEvents[row_num].id))
-            self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 4, significantEventIdItem)
-            significantEventNameItem = QtWidgets.QTableWidgetItem(significantEvents[row_num].name)
-            self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 3, significantEventNameItem)
-            significantEventDateItem = QtWidgets.QTableWidgetItem(significantEvents[row_num].date)
-            self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 2, significantEventDateItem)
-            significantEventDescriptionItem = QtWidgets.QTableWidgetItem(significantEvents[row_num].description)
-            self.vectorTableWidget.setItem(row_num, len(self.colsVectorTable) - 1, significantEventDescriptionItem)
+        for colNum in range(len(self.colsVectorTable)):
+            self.vectorTableWidget.setColumnWidth(colNum, 200)
+            header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
+            self.vectorTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorTable[colNum]))
+        for rowNum in range(totalRows):
+            significantEventIdItem = QtWidgets.QTableWidgetItem(str(significantEvents[rowNum].id))
+            self.vectorTableWidget.setVerticalHeaderItem(rowNum, significantEventIdItem)
+            self.vectorTableWidget.setRowHeight(rowNum, 50)
+            significantEventDateItem = QtWidgets.QTableWidgetItem(significantEvents[rowNum].logEntry.date)
+            self.vectorTableWidget.setItem(rowNum, len(self.colsVectorTable) - 3, significantEventDateItem)
+            significantEventCreatorItem = QtWidgets.QTableWidgetItem(significantEvents[rowNum].logEntry.creator)
+            self.vectorTableWidget.setItem(rowNum, len(self.colsVectorTable) - 2, significantEventCreatorItem)
+            significantEventDescriptionItem = QtWidgets.QTableWidgetItem(significantEvents[rowNum].logEntry.description)
+            self.vectorTableWidget.setItem(rowNum, len(self.colsVectorTable) - 1, significantEventDescriptionItem)
+            significantEvents[rowNum].rowIndexInTable = rowNum
         self.vectorTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        self.vectorTableWidget.doubleClicked.connect(self.vectorTableDoubleClicked)
 
     def updateRelationshipTable(self, vector):
         relationships = list(vector.relationships.values())
@@ -460,20 +468,21 @@ class Ui_PICK(object):
         self.relationshipTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.relationshipTableWidget.setRowCount(totalRows)
         header = self.relationshipTableWidget.horizontalHeader()
-        for col_num in range(len(self.colsRelationshipTable)):
-            self.relationshipTableWidget.setColumnWidth(col_num, 200)
-            header.setSectionResizeMode(col_num, QtWidgets.QHeaderView.Stretch)
-            self.relationshipTableWidget.setHorizontalHeaderItem(col_num, QTableWidgetItem(self.colsRelationshipTable[col_num]))
-        for row_num in range(totalRows):
-            self.relationshipTableWidget.setRowHeight(row_num, 50)
-            relationshipIdItem = QtWidgets.QTableWidgetItem(str(relationships[row_num].id))
-            self.relationshipTableWidget.setItem(row_num, len(self.colsVectorTable) - 4, relationshipIdItem)
-            relationshipSourceItem = QtWidgets.QTableWidgetItem(str(relationships[row_num].sourceSignificantEventId))
-            self.relationshipTableWidget.setItem(row_num, len(self.colsVectorTable) - 3, relationshipSourceItem)
-            relationshipDestItem = QtWidgets.QTableWidgetItem(str(relationships[row_num].destSignificantEventId))
-            self.relationshipTableWidget.setItem(row_num, len(self.colsVectorTable) - 2, relationshipDestItem)
-            relationshipDescriptionItem = QtWidgets.QTableWidgetItem(relationships[row_num].description)
-            self.relationshipTableWidget.setItem(row_num, len(self.colsVectorTable) - 1, relationshipDescriptionItem)
+        for colNum in range(len(self.colsRelationshipTable)):
+            self.relationshipTableWidget.setColumnWidth(colNum, 200)
+            header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
+            self.relationshipTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsRelationshipTable[colNum]))
+        for rowNum in range(totalRows):
+            self.relationshipTableWidget.setRowHeight(rowNum, 50)
+            relationshipIdItem = QtWidgets.QTableWidgetItem(str(relationships[rowNum].id))
+            self.relationshipTableWidget.setVerticalHeaderItem(rowNum, relationshipIdItem)
+            relationshipSourceItem = QtWidgets.QTableWidgetItem(str(relationships[rowNum].sourceSignificantEventId))
+            self.relationshipTableWidget.setItem(rowNum, len(self.colsRelationshipTable) - 3, relationshipSourceItem)
+            relationshipDestItem = QtWidgets.QTableWidgetItem(str(relationships[rowNum].destSignificantEventId))
+            self.relationshipTableWidget.setItem(rowNum, len(self.colsRelationshipTable) - 2, relationshipDestItem)
+            relationshipDescriptionItem = QtWidgets.QTableWidgetItem(relationships[rowNum].description)
+            self.relationshipTableWidget.setItem(rowNum, len(self.colsRelationshipTable) - 1, relationshipDescriptionItem)
+            relationships[rowNum].rowIndexInTable = rowNum
         self.relationshipTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def updateVectorGraph(self, vector):
@@ -482,11 +491,23 @@ class Ui_PICK(object):
 
     def searchTableDoubleClicked(self):
         global logEntryManager
-        logEntryRowClicked = self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row()
-        logEntryToEdit = logEntryManager.logEntries[logEntryRowClicked]
-        self.editPopup = LogEntryPopup(self.vectors, logEntryToEdit, logEntryRowClicked)
+        trigger = TriggerHelper()
+        logEntryId = self.searchLogsTableWidget.verticalHeaderItem(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row()).text()
+        logEntryToEdit = logEntryManager.logEntries[int(logEntryId)]
+        self.editPopup = LogEntryPopup(self.vectors, logEntryToEdit, trigger)
         self.editPopup.setGeometry(100, 200, 100, 100)
         self.editPopup.show()
+
+    def vectorTableDoubleClicked(self):
+        global vectorManager
+        trigger = TriggerHelper()
+        significantEventId = self.vectorTableWidget.verticalHeaderItem(self.vectorTableWidget.selectionModel().selectedIndexes()[0].row()).text()
+        vectorName = self.vectorComboBoxTable.currentText()
+        vector = vectorManager.vectors[vectorName]
+        significantEventToEdit = vector.significantEvents[int(significantEventId)]
+        self.editVectorPopup = SignificantEventPopup(vector, significantEventToEdit, trigger)
+        self.editVectorPopup.setGeometry(100, 200, 100, 100)
+        self.editVectorPopup.show()
 
     def setupMangeVectorsTab(self, PICK):
         self.manageVectorsTab = QtWidgets.QWidget()
@@ -512,7 +533,7 @@ class Ui_PICK(object):
         self.verticalLayout_10 = QtWidgets.QVBoxLayout(self.graphWidget)
         self.verticalLayout_10.setObjectName("verticalLayout_10")
         triggerHelper = TriggerHelper()
-        triggerHelper.connect_trigger()
+        triggerHelper.connectRelationshipTableTrigger()
         self.vectorGraphWidget = GraphWidget(self.graphWidget, triggerHelper)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -758,6 +779,17 @@ class Ui_PICK(object):
             self.exportVectorTable(self.vectorComboBoxTable.currentText())
             self.exportRelationshipTable(self.vectorComboBoxTable.currentText())
 
+    def handleVectorTableEntryUpdate(self, significantEvent):
+        if significantEvent.rowIndexInTable != -1:
+            significantEventDescriptionItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.description)
+            self.vectorTableWidget.setItem(significantEvent.rowIndexInTable, len(self.colsVectorTable) - 1,
+                                                   significantEventDescriptionItem)
+    def handleSearchLogTableEntryUpdate(self, logEntry):
+        if logEntry.rowIndexInTable != -1:
+            logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntry.description)
+            self.searchLogsTableWidget.setItem(logEntry.rowIndexInTable, len(self.colsSearchLogsTable) - 1,
+                                                   logEntryDescriptionItem)
+
     def exportVectorTable(self, vectorName):
         filename = vectorName + "_SignificantEventTable.xls"
         wbk = xlwt.Workbook()
@@ -810,7 +842,7 @@ class Ui_PICK(object):
             logEntry.creator = logEntry.WHITE_TEAM
             logEntry.id = logEntryManager.nextAvailableId
             logEntryManager.nextAvailableId += 1
-            logEntry.date = (datetime.datetime.today()).strftime("%m/%d/%Y %H:%M %p").lstrip("0")
+            logEntry.date = (datetime.datetime.today()).strftime("%m/%d/%Y %I:%M %p").lstrip("0")
             logEntry.associatedVectors.append(self.vectorComboBoxTable.currentText())
             vector.addSignificantEventFromLogEntry(logEntry)
             self.updateVectorTable(vector)
@@ -841,7 +873,6 @@ class Ui_PICK(object):
             self.vectorComboBoxTable.addItem(vectorName)
 
     def setupUi(self, PICK):
-        print()
         PICK.setObjectName("PICK")
         PICK.resize(2500, 1750)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -854,8 +885,8 @@ class Ui_PICK(object):
 
         # Table column names
         self.colsSearchLogsTable = ["Time of Event", "Creator", "Description"]
-        self.colsVectorTable = ["ID", "Event Name", "Time", "Description"]
-        self.colsRelationshipTable = ["ID", "Parent", "Child", "Description"]
+        self.colsVectorTable = ["Time Of Event", "Creator", "Description"]
+        self.colsRelationshipTable = ["Parent", "Child", "Description"]
 
         # Vector list
         self.vectors = list()
@@ -871,7 +902,7 @@ class Ui_PICK(object):
         self.setupSearchLogsTab(PICK)
         logEntryManager.searchLogEntryTableWidget = self.searchLogsTableWidget
         logEntryManager.colNamesInSearchLogsTable = self.colsSearchLogsTable
-        self.updateSearchLogTable()
+        self.updateLogTable()
         self.setupMangeVectorsTab(PICK)
         self.updateVectorComboBoxes()
 
@@ -935,11 +966,25 @@ class Ui_PICK(object):
 
 class TriggerHelper(QObject):
     updateRelationshipTableTrigger = pyqtSignal()
-    def connect_trigger(self):
+    updateVectorTableEntryTrigger = pyqtSignal()
+    updateSearchLogTableEntryTrigger = pyqtSignal()
+    def connectRelationshipTableTrigger(self):
         self.updateRelationshipTableTrigger.connect(ui.handleRelationshipTableTrigger)
 
-    def emit_trigger(self):
+    def connectVectorTableEntryTrigger(self, significantEvent):
+        self.updateVectorTableEntryTrigger.connect(lambda: ui.handleVectorTableEntryUpdate(significantEvent))
+
+    def connectSearchLogTableEntryTrigger(self, logEntry):
+        self.updateSearchLogTableEntryTrigger.connect(lambda: ui.handleSearchLogTableEntryUpdate(logEntry))
+
+    def emitRelationshipTableTrigger(self):
         self.updateRelationshipTableTrigger.emit()
+
+    def emitVectorTableEntryTrigger(self):
+        self.updateVectorTableEntryTrigger.emit()
+
+    def emitSearchLogTableEntryTrigger(self):
+        self.updateSearchLogTableEntryTrigger.emit()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

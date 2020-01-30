@@ -4,3 +4,4 @@ class Relationship:
         self.sourceSignificantEventId = None
         self.destSignificantEventId = None
         self.description = None
+        self.rowIndexInTable = -1

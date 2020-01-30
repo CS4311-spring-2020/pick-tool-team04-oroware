@@ -4,23 +4,14 @@ from SignifcantEvent import SignificantEvent
 class Vector:
     def __init__(self):
         self.vectorName = ""
-        self.vectorDescription = None
+        self.vectorDescription = ""
         self.vectorDimensions = 5
         self.significantEvents = dict()
         self.relationships = dict()
-        self.nameVisibility = False
-        self.dateVisibility = False
-        self.descriptionVisibility = False
-        self.creatorVisibility = False
-        self.isLocalCopy = False
 
     def addSignificantEventFromLogEntry(self, logEntry):
         if not self.isLogEntryEventInVector(logEntry.id):
             event = SignificantEvent()
-            event.date = logEntry.date
-            event.creator = logEntry.creator
-            event.description = logEntry.description
-            event.artifact = logEntry.artifact
             event.logEntry = logEntry
             if len(self.significantEvents) == 0:
                 event.id = 0

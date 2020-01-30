@@ -5,11 +5,12 @@ from LogEntry import LogEntry
 from Globals import logEntryManager
 
 class LogEntryPopup(QWidget):
-    def __init__(self, vectors, logEntry, logEntryRowClicked):
+    def __init__(self, vectors, logEntry, trigger):
         super(LogEntryPopup, self).__init__()
         self.vectors = vectors
         self.logEntry = logEntry
-        self.logEntryRowClicked = logEntryRowClicked
+        self.trigger = trigger
+        self.trigger.connectSearchLogTableEntryTrigger(logEntry)
         layout = QVBoxLayout()
         self.logEntryDescriptionLabel = QLabel()
         self.logEntryDescriptionLabel.setText("Description:")
@@ -51,7 +52,8 @@ class LogEntryPopup(QWidget):
             item = self.associationComboBox.model().item(i, 0)
             if item.checkState() == QtCore.Qt.Checked:
                 newVectors.append(self.vectors[i].vectorName)
-        logEntryManager.editLogEntryVectors(self.logEntry, self.logEntryRowClicked, newVectors)
+        self.trigger.emitSearchLogTableEntryTrigger()
+        logEntryManager.editLogEntryVectors(self.logEntry, newVectors)
         self.close()
 
 
