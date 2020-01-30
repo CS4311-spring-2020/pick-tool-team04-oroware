@@ -1038,6 +1038,7 @@ class TriggerHelper(QObject):
         self.updateSearchLogTableEntryTrigger.emit()
         print()
         print()
+        print()
 
 if __name__ == "__main__":
     print()
