@@ -188,10 +188,6 @@ class Ui_PICK(object):
             logEntryDateItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[rowNum].date)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Timestamp"), logEntryDateItem)
             logEntries[rowNum].rowIndexInTable = rowNum
-            saveCheckboxItem = QtWidgets.QTableWidgetItem()
-            saveCheckboxItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-            saveCheckboxItem.setCheckState(QtCore.Qt.Unchecked)
-            self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Save"), saveCheckboxItem)
             vectorComboBoxSearchTable = CheckableComboBox()
             counter = 0
             for vector in vectorManager.vectors.values():
@@ -227,10 +223,6 @@ class Ui_PICK(object):
                                                vectorNameItem)
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
             self.searchLogsTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Description"), vectorDescriptionItem)
-            saveCheckboxItem = QtWidgets.QTableWidgetItem()
-            saveCheckboxItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-            saveCheckboxItem.setCheckState(QtCore.Qt.Unchecked)
-            self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Save"), saveCheckboxItem)
             rowNum += 1
         self.searchLogsTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
@@ -255,10 +247,6 @@ class Ui_PICK(object):
                                                iconNameItem)
             iconSourceItem = QtWidgets.QTableWidgetItem(icon.source)
             self.iconConfigurationTableWidget.setItem(rowNum, self.colsIconConfigurationTable.index("Icon Source"), iconSourceItem)
-            saveCheckboxItem = QtWidgets.QTableWidgetItem()
-            saveCheckboxItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-            saveCheckboxItem.setCheckState(QtCore.Qt.Unchecked)
-            self.iconConfigurationTableWidget.setItem(rowNum, self.colsIconConfigurationTable.index("Save"), saveCheckboxItem)
             viewIconButton = QtWidgets.QPushButton()
             viewIconButton.setText("View Icon")
             self.iconConfigurationTableWidget.setCellWidget(rowNum, self.colsIconConfigurationTable.index("Icon Preview"),
@@ -288,11 +276,6 @@ class Ui_PICK(object):
             significantEventIdItem = QtWidgets.QTableWidgetItem(str(significantEvents[rowNum-1].id))
             self.vectorTableWidget.setVerticalHeaderItem(rowNum, significantEventIdItem)
             self.vectorTableWidget.setRowHeight(rowNum, 50)
-            saveCheckboxItem = QtWidgets.QTableWidgetItem()
-            saveCheckboxItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-            saveCheckboxItem.setCheckState(QtCore.Qt.Unchecked)
-            self.vectorTableWidget.setItem(rowNum, self.colsIconConfigurationTable.index("Save"),
-                                                      saveCheckboxItem)
             significantEventTypeItem = QtWidgets.QTableWidgetItem(significantEvents[rowNum-1].logEntry.eventType)
             viewEntryButton = QtWidgets.QPushButton()
             viewEntryButton.setText("View Log Entry")
@@ -605,10 +588,10 @@ class Ui_PICK(object):
         self.numConnections = 0
 
         # Table column names
-        self.colsSearchLogsTable = ["Save", "Timestamp", "Content", "Artifact", "Creator", "Event Type", "Vectors"]
-        self.colsVectorConfigurationTable = ["Save", "Vector Name", "Vector Description"]
-        self.colsIconConfigurationTable = ["Save", "Icon Name", "Icon Source", "Icon Preview"]
-        self.colsVectorTable = ["Save", "Node Name", "Node Timestamp", "Node Description", "Reference", "Event Creator", "Event Type", "Icon Type", "Artifact"]
+        self.colsSearchLogsTable = ["Timestamp", "Content", "Artifact", "Creator", "Event Type", "Vectors"]
+        self.colsVectorConfigurationTable = ["Vector Name", "Vector Description"]
+        self.colsIconConfigurationTable = ["Icon Name", "Icon Source", "Icon Preview"]
+        self.colsVectorTable = ["Node Name", "Node Timestamp", "Node Description", "Reference", "Event Creator", "Event Type", "Icon Type", "Artifact"]
         self.colsRelationshipTable = ["Parent", "Child", "Description"]
 
         # Vector list
