@@ -15,11 +15,13 @@ class Vector:
             event.logEntry = logEntry
             if len(self.significantEvents) == 0:
                 event.id = 0
-            elif (max(list(self.significantEvents.keys())) + 1) <= self.vectorDimensions:
+                event.position = (event.id, 1)
+            elif (max(list(self.significantEvents.keys())) + 1) < self.vectorDimensions:
                 event.id = max(list(self.significantEvents.keys())) + 1
+                event.position = (event.id, 1)
             else:
-                event.id = self.vectorDimensions
-            event.position = (event.id, 1)
+                event.id = max(list(self.significantEvents.keys())) + 1
+                event.position = (self.vectorDimensions, 1)
             self.significantEvents[event.id] = event
 
     def removeSignificantEvent(self, eventId):

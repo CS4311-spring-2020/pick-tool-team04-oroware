@@ -19,6 +19,7 @@ class LogEntryManager:
             logEntry.date = dates[i]
             logEntry.description = descriptions[i]
             logEntry.creator = teams[i]
+            logEntry.eventType = teams[i]
             logEntry.id = ids[i]
             logEntry.artifact = artifacts[i]
             self.logEntries[ids[i]] = logEntry
