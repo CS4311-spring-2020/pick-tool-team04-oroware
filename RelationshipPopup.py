@@ -34,6 +34,7 @@ class RelationshipPopup(QWidget):
     def onSaveClick(self):
         self.relationship.description = self.relationshipDescriptionTextEdit.toPlainText()
         self.trigger.emitRelationshipTableEntryTrigger()
+        self.trigger.emitVectorGraphTrigger()
         self.close()
 
     def delete(self):

@@ -71,6 +71,7 @@ class GraphWidget(QWidget):
         self.vector = vector
         self.pos = dict()
         self.nodeLabels = dict()
+        self.edgeLabels = dict()
         self.initializeHelperNodes()
         for significantEventId, significantEvent in vector.significantEvents.items():
             self.vectorGraph.add_nodes_from([significantEventId])
@@ -78,6 +79,7 @@ class GraphWidget(QWidget):
             self.nodeLabels[significantEventId] = self.createNodeLabel(significantEvent)
         for relationship in list(vector.relationships.values()):
             self.vectorGraph.add_edges_from([(relationship.sourceSignificantEventId, relationship.destSignificantEventId)])
+            self.edgeLabels[(relationship.sourceSignificantEventId, relationship.destSignificantEventId)] = relationship.description
 
     def onclick(self, event):
         self.node1 = (event.xdata, event.ydata)
@@ -136,6 +138,7 @@ class GraphWidget(QWidget):
         self.figure.clf()
         nx.draw(self.vectorGraph, node_size=self.nodeSizes, node_color=self.nodeColors, pos=self.pos, font_color="black")
         nx.draw_networkx_labels(self.vectorGraph, pos=self.pos, labels=self.nodeLabels)
+        nx.draw_networkx_edge_labels(self.vectorGraph, pos=self.pos, edge_labels=self.edgeLabels)
         self.canvas.draw_idle()
 
     def maximize(self):
