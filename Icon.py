@@ -3,6 +3,7 @@ class Icon:
     def __init__(self):
         self.name = ""
         self.source = ""
+        self.rowIndexInTable = -1
         self.preview = None
 
     def getImageFromSource(self):

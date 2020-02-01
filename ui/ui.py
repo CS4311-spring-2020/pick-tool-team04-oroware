@@ -160,6 +160,47 @@ class Ui_PICK(object):
         self.searchLogsLayout.addWidget(self.searchLogsTableWidget)
         self.tabWidget.addTab(self.searchLogsTab, "")
 
+    def setupVectorDbTab(self):
+        self.vectorDbTab = QtWidgets.QWidget()
+        self.vectorDbLayout = QtWidgets.QVBoxLayout(self.vectorDbTab)
+        self.vectorDbLabel = QtWidgets.QLabel(self.vectorDbTab)
+        self.vectorDbLayout.addWidget(self.vectorDbLabel)
+        if self.isLead:
+            self.approvalLabel = QtWidgets.QLabel(self.vectorDbTab)
+            self.vectorDbLayout.addWidget(self.approvalLabel)
+            self.approvalTableWidget = QtWidgets.QTableWidget(self.vectorDbTab)
+            self.approvalTableWidget.setColumnCount(0)
+            self.approvalTableWidget.setRowCount(0)
+            self.approvalTableWidget.setMinimumSize(1250, 1750)
+            self.vectorDbLayout.addWidget(self.approvalTableWidget)
+        else:
+            self.connectionStatusLabel = QtWidgets.QLabel(self.vectorDbTab)
+            self.vectorDbLayout.addWidget(self.connectionStatusLabel)
+            self.pullTableLabel = QtWidgets.QLabel(self.vectorDbTab)
+            self.vectorDbLayout.addWidget(self.pullTableLabel)
+            self.pullTableWidget = QtWidgets.QTableWidget(self.vectorDbTab)
+            self.pullTableWidget.setColumnCount(0)
+            self.pullTableWidget.setRowCount(0)
+            self.pullTableWidget.setMinimumSize(1250, 850)
+            self.vectorDbLayout.addWidget(self.pullTableWidget)
+            self.pullButton = QtWidgets.QPushButton(self.vectorDbTab)
+            self.vectorDbLayout.addWidget(self.pullButton)
+            self.pushTableLabel = QtWidgets.QLabel(self.vectorDbTab)
+            self.vectorDbLayout.addWidget(self.pushTableLabel)
+            self.pushTableWidget = QtWidgets.QTableWidget(self.vectorDbTab)
+            self.pushTableWidget.setColumnCount(0)
+            self.pushTableWidget.setRowCount(0)
+            self.pushTableWidget.setMinimumSize(1250, 850)
+            self.vectorDbLayout.addWidget(self.pushTableWidget)
+            self.pushButton = QtWidgets.QPushButton(self.vectorDbTab)
+            self.vectorDbLayout.addWidget(self.pushButton)
+            self.pushButton.clicked.connect(self.handlePush)
+            self.vectorDbLayout.addWidget(self.pushButton)
+        self.tabWidget.addTab(self.vectorDbTab, "")
+
+    def handlePush(self):
+        self.updatePushTable()
+
     def updateLogTable(self):
         global logEntryManager
         global vectorManager
@@ -219,12 +260,89 @@ class Ui_PICK(object):
         for vectorName, vector in vectors.items():
             self.vectorConfigurationTableWidget.setRowHeight(rowNum, 50)
             vectorNameItem = QtWidgets.QTableWidgetItem(vectorName)
-            self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Name"),
-                                               vectorNameItem)
+            self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Name"), vectorNameItem)
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
-            self.searchLogsTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Description"), vectorDescriptionItem)
+            self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Description"), vectorDescriptionItem)
             rowNum += 1
-        self.searchLogsTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        self.vectorConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+
+    def updatePullTable(self, pulledVectorManager):
+        vectors = pulledVectorManager.vectors
+        totalRows = len(vectors)
+        self.pullTableWidget.setColumnCount(len(self.colsPullTable))
+        self.pullTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.pullTableWidget.setRowCount(totalRows)
+        header = self.pullTableWidget.horizontalHeader()
+        for colNum in range(len(self.colsPullTable)):
+            self.pullTableWidget.setColumnWidth(colNum, 200)
+            header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
+            self.pullTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsPullTable[colNum]))
+        rowNum = 0
+        for vectorName, vector in vectors.items():
+            self.pullTableWidget.setRowHeight(rowNum, 50)
+            vectorNameItem = QtWidgets.QTableWidgetItem(vectorName)
+            self.pullTableWidget.setItem(rowNum, self.colsPullTable.index("Vector Name"), vectorNameItem)
+            vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
+            self.pullTableWidget.setItem(rowNum, self.colsPullTable.index("Vector Description"), vectorDescriptionItem)
+            graphButton = QtWidgets.QPushButton()
+            graphButton.setText("View Graph")
+            self.pullTableWidget.setCellWidget(rowNum, self.colsPullTable.index("Vector Graph"), graphButton)
+            rowNum += 1
+        self.pushTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+
+    def updatePushTable(self):
+        global vectorManager
+        vectors = vectorManager.vectors
+        totalRows = len(vectors)
+        self.pushTableWidget.setColumnCount(len(self.colsPushTable))
+        self.pushTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.pushTableWidget.setRowCount(totalRows)
+        header = self.pushTableWidget.horizontalHeader()
+        for colNum in range(len(self.colsPushTable)):
+            self.pushTableWidget.setColumnWidth(colNum, 200)
+            header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
+            self.pushTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsPushTable[colNum]))
+        rowNum = 0
+        for vectorName, vector in vectors.items():
+            self.pushTableWidget.setRowHeight(rowNum, 50)
+            vectorNameItem = QtWidgets.QTableWidgetItem(vectorName)
+            self.pushTableWidget.setItem(rowNum, self.colsPushTable.index("Vector Name"), vectorNameItem)
+            vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
+            self.pushTableWidget.setItem(rowNum, self.colsPushTable.index("Vector Description"), vectorDescriptionItem)
+            graphButton = QtWidgets.QPushButton()
+            graphButton.setText("View Graph")
+            self.pushTableWidget.setCellWidget(rowNum, self.colsPushTable.index("Vector Graph"), graphButton)
+            rowNum += 1
+        self.pushTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+
+    def updateApproveTable(self, pushedVectors, pushedIps, pushedTimestamps):
+        self.colsApproveTable = ["Source IP", "Request Timestamp", "Vector Name", "Vector Description", "Graph", "Approve"]
+        totalRows = len(pushedVectors)
+        self.approvalTableWidget.setColumnCount(len(self.colsApproveTable))
+        self.approvalTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.approvalTableWidget.setRowCount(totalRows)
+        header = self.approvalTableWidget.horizontalHeader()
+        for colNum in range(len(self.colsApproveTable)):
+            self.approvalTableWidget.setColumnWidth(colNum, 200)
+            header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
+            self.approvalTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsApproveTable[colNum]))
+        for rowNum in range(pushedVectors):
+            self.approvalTableWidget.setRowHeight(rowNum, 50)
+            vectorNameItem = QtWidgets.QTableWidgetItem(pushedVectors[rowNum].vectorName)
+            self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Vector Name"), vectorNameItem)
+            timestampItem = QtWidgets.QTableWidgetItem(pushedTimestamps[rowNum])
+            self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Request Timestamp"), timestampItem)
+            sourceItem = QtWidgets.QTableWidgetItem(pushedIps[rowNum])
+            self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Source IP"), sourceItem)
+            vectorDescriptionItem = QtWidgets.QTableWidgetItem(pushedVectors[rowNum].vectorDescription)
+            self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Vector Description"), vectorDescriptionItem)
+            graphButton = QtWidgets.QPushButton()
+            graphButton.setText("View Graph")
+            self.approvalTableWidget.setCellWidget(rowNum, self.colsApproveTable.index("Vector Graph"), graphButton)
+            approveButton = QtWidgets.QPushButton()
+            approveButton.setText("Approve")
+            self.approvalTableWidget.setCellWidget(rowNum, self.colsApproveTable.index("Approve"), approveButton)
+        self.approvalTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def updateIconConfigurationTable(self):
         global iconManager
@@ -251,6 +369,7 @@ class Ui_PICK(object):
             viewIconButton.setText("View Icon")
             self.iconConfigurationTableWidget.setCellWidget(rowNum, self.colsIconConfigurationTable.index("Icon Preview"),
                                                      viewIconButton)
+            icon.rowIndexInTable = rowNum
             rowNum += 1
         self.iconConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
@@ -265,12 +384,13 @@ class Ui_PICK(object):
             self.vectorTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.vectorTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorTable[colNum]))
-            if colNum >= 1:
+            if colNum != self.colsVectorTable.index("Icon Type") and colNum != self.colsVectorTable.index("Reference"):
                 visibilityCheckboxItem = QtWidgets.QTableWidgetItem()
                 visibilityCheckboxItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 visibilityCheckboxItem.setCheckState(QtCore.Qt.Unchecked)
                 visibilityCheckboxItem.setText("Visible")
                 self.vectorTableWidget.setItem(0, colNum, visibilityCheckboxItem)
+        self.vectorTableWidget.setVerticalHeaderItem(0, QtWidgets.QTableWidgetItem(""))
         rowNum = 1
         while(rowNum < totalRows):
             significantEventIdItem = QtWidgets.QTableWidgetItem(str(significantEvents[rowNum-1].id))
@@ -380,8 +500,10 @@ class Ui_PICK(object):
         self.addNodeGraphButton.clicked.connect(self.handleAddNode)
         self.filterGraphLayout.addWidget(self.addNodeGraphButton)
         self.zoomInButtonGraph = QtWidgets.QPushButton(self.graphFrame)
+        self.zoomInButtonGraph.clicked.connect(self.vectorGraphWidget.maximize)
         self.filterGraphLayout.addWidget(self.zoomInButtonGraph)
         self.zoomOutButtonGraph = QtWidgets.QPushButton(self.graphFrame)
+        self.zoomOutButtonGraph.clicked.connect(self.vectorGraphWidget.minimize)
         self.filterGraphLayout.addWidget(self.zoomOutButtonGraph)
         self.graphLayout.addWidget(self.graphFrame)
         self.leftEditVectorLayout.addWidget(self.graphWidget)
@@ -397,12 +519,14 @@ class Ui_PICK(object):
         self.vectorComboBoxTable = QtWidgets.QComboBox(self.vectorFrame)
         self.vectorComboBoxTable.view().pressed.connect(self.handleVectorComboBoxTable)
         self.editVectorTableLayout.addWidget(self.vectorComboBoxTable)
-        self.addNodeTableButton = QtWidgets.QPushButton(self.vectorFrame)
-        self.addNodeTableButton.clicked.connect(self.handleAddNode)
-        self.editVectorTableLayout.addWidget(self.addNodeTableButton)
+        self.vectorDescriptionLabel = QtWidgets.QLabel(self.vectorFrame)
+        self.editVectorTableLayout.addWidget(self.vectorDescriptionLabel)
         self.exportTableButton = QtWidgets.QPushButton(self.vectorFrame)
         self.exportTableButton.clicked.connect(self.handleExport)
         self.editVectorTableLayout.addWidget(self.exportTableButton)
+        self.addNodeTableButton = QtWidgets.QPushButton(self.vectorFrame)
+        self.addNodeTableButton.clicked.connect(self.handleAddNode)
+        self.editVectorTableLayout.addWidget(self.addNodeTableButton)
         self.rightEditVectorLayout.addWidget(self.vectorFrame)
         self.nodeTableLabel = QtWidgets.QLabel(self.rightEditVectorWidget)
         self.rightEditVectorLayout.addWidget(self.nodeTableLabel)
@@ -586,6 +710,8 @@ class Ui_PICK(object):
 
         self.establishedConnections = 0
         self.numConnections = 0
+        self.isLead = False
+        self.connectionStatus = True
 
         # Table column names
         self.colsSearchLogsTable = ["Timestamp", "Content", "Artifact", "Creator", "Event Type", "Vectors"]
@@ -593,6 +719,9 @@ class Ui_PICK(object):
         self.colsIconConfigurationTable = ["Icon Name", "Icon Source", "Icon Preview"]
         self.colsVectorTable = ["Node Name", "Node Timestamp", "Node Description", "Reference", "Event Creator", "Event Type", "Icon Type", "Artifact"]
         self.colsRelationshipTable = ["Parent", "Child", "Description"]
+        self.colsPullTable = ["Vector Name", "Vector Description", "Vector Graph"]
+        self.colsPushTable = ["Vector Name", "Vector Description", "Vector Graph"]
+        self.colsApproveTable = ["Source IP", "Request Timestamp", "Vector Name", "Vector Description", "Graph", "Approve"]
 
         # Vector list
         self.vectors = list()
@@ -614,8 +743,12 @@ class Ui_PICK(object):
         self.updateVectorConfigurationTable()
         self.updateIconConfigurationTable()
         self.setupEditVectorTab()
+        self.setupVectorDbTab()
         self.updateVectorComboBoxes()
-
+        if self.vectorComboBoxTable.count() > 0:
+            self.vectorDescriptionLabel.setText("Vector Description: " + vectorManager.vectors[self.vectorComboBoxTable.itemText(0)].vectorDescription)
+        if self.vectorComboBoxConfiguration.count() > 0:
+            self.configurationVectorDescriptionTextEdit.setPlainText(vectorManager.vectors[self.vectorComboBoxConfiguration.itemText(0)].vectorDescription)
         self.verticalLayout.addWidget(self.tabWidget)
         PICK.setCentralWidget(self.mainWindow)
         self.setAllText(PICK)
@@ -629,8 +762,16 @@ class Ui_PICK(object):
         self.addIconButton.setText("Add Icon")
         self.deleteVectorButton.setText("Delete Vector")
         self.editVectorButton.setText("Edit Vector")
+        self.exportTableButton.setText("Export Vector")
         self.teamConfigurationLabel.setText("TEAM CONFIGURATION")
         self.teamConfigurationLabel.setText("TEAM CONFIGURATION")
+        self.vectorDbLabel.setText("VECTOR DB CONFIGURATION")
+        self.connectionStatusLabel.setText("Connected with lead: " + str(self.connectionStatus))
+        if self.isLead:
+            self.approvalLabel.setText("Approval sync:")
+        else:
+            self.pullTableLabel.setText("Pulled Vector DB Table (Analyst):")
+            self.pushTableLabel.setText("Pushed Vector DB Table (Analyst):")
         self.eventConfigurationLabel.setText("EVENT CONFIGURATION")
         self.leadCheckBox.setText("Lead")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ingestionTab), "Ingestion")
@@ -647,10 +788,12 @@ class Ui_PICK(object):
         self.eventTypeSearchLabel.setText("Event Type:")
         self.fromSearchLabel.setText("Start Timestamp:")
         self.eventConfigurationLabel.setText("EVENT CONFIGURATION")
+        self.iconConfigurationLabel.setText("ICON CONFIGURATION")
         self.toSearchLabel.setText("End Timestamp:")
         self.redTeamLabel.setText("Red Team Folder: ")
         self.searchButton.setText("Apply Filter")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.searchLogsTab), "Search Logs")
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.vectorDbTab), "Vector DB Configuration")
         self.addNodeGraphButton.setText("Add Node")
         self.leadCheckBox.setText("Lead: ")
         self.filterConfigurationLabel.setText("FILTER CONFIGURATION")
@@ -671,7 +814,6 @@ class Ui_PICK(object):
         self.addNodeTableButton.setText("Add Node")
         self.establishedConnectionsLabel.setText("No. of established connections to the lead’s IP address: " + str(self.establishedConnections))
         self.numConnectionsLabel.setText("No. of connections to the lead’s IP address: " + str(self.numConnections))
-        self.exportTableButton.setText("Export Vector")
         self.endEventConfigurationLabel.setText("Event end timestamp:")
         self.blueTeamLabel.setText("Blue Team Folder: ")
         self.nodeTableLabel.setText("Nodes:")

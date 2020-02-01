@@ -8,6 +8,9 @@ from LogEntry import LogEntry
 
 class GraphWidget(QWidget):
 
+    MINIMUM_NODE_SIZE = 1000
+    STARTING_NODE_SIZE = 2000
+    MAXIMIMUM_NODE_SIZE = 5000
     def __init__(self, parent, trigger):
         self.trigger = trigger
         super(GraphWidget, self).__init__(parent)
@@ -18,6 +21,7 @@ class GraphWidget(QWidget):
         self.vector = None
         self.node1 = None
         self.node2 = None
+        self.nodeSize = GraphWidget.STARTING_NODE_SIZE
         vbox = QVBoxLayout()
         self.setLayout(vbox)
         self.figure = plt.figure()
@@ -87,30 +91,72 @@ class GraphWidget(QWidget):
                 self.trigger.emitRelationshipTableTrigger()
         else:
             pass
-        node_sizes = list()
-        for _ in range(len(list(self.pos.keys()))):
-            node_sizes.append(2000)
         self.node1 = None
         self.node2 = None
         self.plotGraph()
 
     def plotGraph(self):
         self.figure.clf()
-        node_sizes = list()
-        node_colors = list()
+        nodeSizes = list()
+        nodeColors = list()
         for i in list(self.pos.keys()):
-            node_sizes.append(2000)
             if i < 0:
-                node_colors.append("white")
+                nodeColors.append("white")
+                nodeSizes.append(self.STARTING_NODE_SIZE)
             else:
                 if self.vector.significantEvents[i].logEntry.creator == LogEntry.WHITE_TEAM:
-                    node_colors.append("grey")
+                    nodeColors.append("grey")
                 elif self.vector.significantEvents[i].logEntry.creator == LogEntry.BLUE_TEAM:
-                    node_colors.append("blue")
+                    nodeColors.append("blue")
                 elif self.vector.significantEvents[i].logEntry.creator == LogEntry.RED_TEAM:
-                    node_colors.append("maroon")
-        nx.draw(self.vectorGraph, node_size=node_sizes, node_color=node_colors, pos=self.pos, with_labels=True, font_color="white")
+                    nodeColors.append("maroon")
+                nodeSizes.append(self.nodeSize)
+        nx.draw(self.vectorGraph, node_size=nodeSizes, node_color=nodeColors, pos=self.pos, with_labels=True, font_color="white")
         self.canvas.draw_idle()
+
+    def maximize(self):
+        if self.vector:
+            self.figure.clf()
+            nodeSizes = list()
+            nodeColors = list()
+            self.nodeSize = (self.nodeSize + 300) if self.nodeSize < GraphWidget.MAXIMIMUM_NODE_SIZE else GraphWidget.MAXIMIMUM_NODE_SIZE
+            for i in list(self.pos.keys()):
+                if i < 0:
+                    nodeColors.append("white")
+                    nodeSizes.append(GraphWidget.STARTING_NODE_SIZE)
+                else:
+                    if self.vector.significantEvents[i].logEntry.creator == LogEntry.WHITE_TEAM:
+                        nodeColors.append("grey")
+                    elif self.vector.significantEvents[i].logEntry.creator == LogEntry.BLUE_TEAM:
+                        nodeColors.append("blue")
+                    elif self.vector.significantEvents[i].logEntry.creator == LogEntry.RED_TEAM:
+                        nodeColors.append("maroon")
+                    nodeSizes.append(self.nodeSize)
+            nx.draw(self.vectorGraph, node_size=nodeSizes, node_color=nodeColors, pos=self.pos, with_labels=True,
+                    font_color="white")
+            self.canvas.draw_idle()
+
+    def minimize(self):
+        if self.vector:
+            self.figure.clf()
+            nodeSizes = list()
+            nodeColors = list()
+            self.nodeSize = (self.nodeSize - 300) if self.nodeSize > GraphWidget.MINIMUM_NODE_SIZE else GraphWidget.MINIMUM_NODE_SIZE
+            for i in list(self.pos.keys()):
+                if i < 0:
+                    nodeColors.append("white")
+                    nodeSizes.append(GraphWidget.STARTING_NODE_SIZE)
+                else:
+                    if self.vector.significantEvents[i].logEntry.creator == LogEntry.WHITE_TEAM:
+                        nodeColors.append("grey")
+                    elif self.vector.significantEvents[i].logEntry.creator == LogEntry.BLUE_TEAM:
+                        nodeColors.append("blue")
+                    elif self.vector.significantEvents[i].logEntry.creator == LogEntry.RED_TEAM:
+                        nodeColors.append("maroon")
+                    nodeSizes.append(self.nodeSize)
+            nx.draw(self.vectorGraph, node_size=nodeSizes, node_color=nodeColors, pos=self.pos, with_labels=True,
+                    font_color="white")
+            self.canvas.draw_idle()
 
     def center(self):
         qr = self.frameGeometry()
