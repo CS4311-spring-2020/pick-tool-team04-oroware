@@ -43,19 +43,39 @@ class GraphWidget(QWidget):
         for i in range(self.vector.vectorDimensions):
             self.vectorGraph.add_nodes_from([helperNodeCounter])
             self.pos[helperNodeCounter] = (i, 0)
+            self.nodeLabels[helperNodeCounter] = ""
             helperNodeCounter -= 1
             self.vectorGraph.add_nodes_from([helperNodeCounter])
             self.pos[helperNodeCounter] = (i, 2)
+            self.nodeLabels[helperNodeCounter] = ""
             helperNodeCounter -= 1
+
+    def createNodeLabel(self, significantEvent):
+        nodeLabel = "ID: " + str(significantEvent.id)
+        if self.vector.visibility["Node Name"]:
+            nodeLabel += "\n Name: " + significantEvent.name
+        if self.vector.visibility["Node Description"]:
+            nodeLabel += "\n Description: " + significantEvent.description
+        if self.vector.visibility["Artifact"]:
+            nodeLabel += "\n Artifact: " + significantEvent.logEntry.artifact
+        if self.vector.visibility["Node Timestamp"]:
+            nodeLabel += "\n Timestamp: " + significantEvent.logEntry.date
+        if self.vector.visibility["Event Creator"]:
+            nodeLabel += "\n Creator: " + significantEvent.logEntry.creator
+        if self.vector.visibility["Event Type"]:
+            nodeLabel += "\n Type: " + significantEvent.logEntry.eventType
+        return nodeLabel
 
     def initializeVector(self, vector):
         self.vectorGraph = nx.DiGraph()
         self.vector = vector
         self.pos = dict()
+        self.nodeLabels = dict()
         self.initializeHelperNodes()
         for significantEventId, significantEvent in vector.significantEvents.items():
             self.vectorGraph.add_nodes_from([significantEventId])
             self.pos[significantEventId] = significantEvent.position
+            self.nodeLabels[significantEventId] = self.createNodeLabel(significantEvent)
         for relationship in list(vector.relationships.values()):
             self.vectorGraph.add_edges_from([(relationship.sourceSignificantEventId, relationship.destSignificantEventId)])
 
@@ -96,67 +116,65 @@ class GraphWidget(QWidget):
         self.plotGraph()
 
     def plotGraph(self):
-        self.figure.clf()
-        nodeSizes = list()
-        nodeColors = list()
+        self.nodeSizes = list()
+        self.nodeColors = list()
         for i in list(self.pos.keys()):
             if i < 0:
-                nodeColors.append("white")
-                nodeSizes.append(self.STARTING_NODE_SIZE)
+                self.nodeColors.append("white")
+                self.nodeSizes.append(self.STARTING_NODE_SIZE)
             else:
                 if self.vector.significantEvents[i].logEntry.creator == LogEntry.WHITE_TEAM:
-                    nodeColors.append("grey")
+                    self.nodeColors.append("grey")
                 elif self.vector.significantEvents[i].logEntry.creator == LogEntry.BLUE_TEAM:
-                    nodeColors.append("blue")
+                    self.nodeColors.append("cyan")
                 elif self.vector.significantEvents[i].logEntry.creator == LogEntry.RED_TEAM:
-                    nodeColors.append("maroon")
-                nodeSizes.append(self.nodeSize)
-        nx.draw(self.vectorGraph, node_size=nodeSizes, node_color=nodeColors, pos=self.pos, with_labels=True, font_color="white")
+                    self.nodeColors.append("red")
+                self.nodeSizes.append(self.nodeSize)
+        self.paint()
+
+    def paint(self):
+        self.figure.clf()
+        nx.draw(self.vectorGraph, node_size=self.nodeSizes, node_color=self.nodeColors, pos=self.pos, font_color="black")
+        nx.draw_networkx_labels(self.vectorGraph, pos=self.pos, labels=self.nodeLabels)
         self.canvas.draw_idle()
 
     def maximize(self):
         if self.vector:
-            self.figure.clf()
-            nodeSizes = list()
-            nodeColors = list()
+            self.nodeSizes = list()
+            self.nodeColors = list()
             self.nodeSize = (self.nodeSize + 300) if self.nodeSize < GraphWidget.MAXIMIMUM_NODE_SIZE else GraphWidget.MAXIMIMUM_NODE_SIZE
             for i in list(self.pos.keys()):
                 if i < 0:
-                    nodeColors.append("white")
-                    nodeSizes.append(GraphWidget.STARTING_NODE_SIZE)
+                    self.nodeColors.append("white")
+                    self.nodeSizes.append(GraphWidget.STARTING_NODE_SIZE)
                 else:
                     if self.vector.significantEvents[i].logEntry.creator == LogEntry.WHITE_TEAM:
-                        nodeColors.append("grey")
+                        self.nodeColors.append("grey")
                     elif self.vector.significantEvents[i].logEntry.creator == LogEntry.BLUE_TEAM:
-                        nodeColors.append("blue")
+                        self.nodeColors.append("cyan")
                     elif self.vector.significantEvents[i].logEntry.creator == LogEntry.RED_TEAM:
-                        nodeColors.append("maroon")
-                    nodeSizes.append(self.nodeSize)
-            nx.draw(self.vectorGraph, node_size=nodeSizes, node_color=nodeColors, pos=self.pos, with_labels=True,
-                    font_color="white")
-            self.canvas.draw_idle()
+                        self.nodeColors.append("red")
+                    self.nodeSizes.append(self.nodeSize)
+            self.paint()
 
     def minimize(self):
         if self.vector:
-            self.figure.clf()
-            nodeSizes = list()
-            nodeColors = list()
+            self.nodeSizes = list()
+            self.nodeColors = list()
             self.nodeSize = (self.nodeSize - 300) if self.nodeSize > GraphWidget.MINIMUM_NODE_SIZE else GraphWidget.MINIMUM_NODE_SIZE
             for i in list(self.pos.keys()):
                 if i < 0:
-                    nodeColors.append("white")
-                    nodeSizes.append(GraphWidget.STARTING_NODE_SIZE)
+                    self.nodeColors.append("white")
+                    self.nodeSizes.append(GraphWidget.STARTING_NODE_SIZE)
                 else:
                     if self.vector.significantEvents[i].logEntry.creator == LogEntry.WHITE_TEAM:
-                        nodeColors.append("grey")
+                        self.nodeColors.append("grey")
                     elif self.vector.significantEvents[i].logEntry.creator == LogEntry.BLUE_TEAM:
-                        nodeColors.append("blue")
+                        self.nodeColors.append("cyan")
                     elif self.vector.significantEvents[i].logEntry.creator == LogEntry.RED_TEAM:
-                        nodeColors.append("maroon")
-                    nodeSizes.append(self.nodeSize)
-            nx.draw(self.vectorGraph, node_size=nodeSizes, node_color=nodeColors, pos=self.pos, with_labels=True,
-                    font_color="white")
-            self.canvas.draw_idle()
+                        self.nodeColors.append("red")
+                    self.nodeSizes.append(self.nodeSize)
+        self.paint()
 
     def center(self):
         qr = self.frameGeometry()

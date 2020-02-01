@@ -388,11 +388,10 @@ class Ui_PICK(object):
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.vectorTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorTable[colNum]))
             if colNum != self.colsVectorTable.index("Icon Type") and colNum != self.colsVectorTable.index("Reference"):
-                visibilityCheckboxItem = QtWidgets.QTableWidgetItem()
-                visibilityCheckboxItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-                visibilityCheckboxItem.setCheckState(QtCore.Qt.Unchecked)
-                visibilityCheckboxItem.setText("Visible")
-                self.vectorTableWidget.setItem(0, colNum, visibilityCheckboxItem)
+                visibilityCheckbox = VisibilityCheckBox(self.colsVectorTable[colNum], vector)
+                visibilityCheckbox.setCheckState(QtCore.Qt.Checked if vector.visibility[self.colsVectorTable[colNum]] else QtCore.Qt.Unchecked)
+                visibilityCheckbox.setText("Visible")
+                self.vectorTableWidget.setCellWidget(0, colNum, visibilityCheckbox)
         self.vectorTableWidget.setVerticalHeaderItem(0, QtWidgets.QTableWidgetItem(""))
         rowNum = 1
         while(rowNum < totalRows):
@@ -401,10 +400,9 @@ class Ui_PICK(object):
             self.vectorTableWidget.setVerticalHeaderItem(rowNum, significantEventIdItem)
             self.vectorTableWidget.setRowHeight(rowNum, 50)
             significantEventTypeItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.eventType)
-            viewEntryButton = QtWidgets.QPushButton()
-            viewEntryButton.setText("View Log Entry")
             logEntry = significantEvent.logEntry
-            viewEntryButton.clicked.connect(lambda: self.viewLogEntryClicked(logEntry))
+            viewEntryButton = ViewReferenceButton(logEntry)
+            viewEntryButton.setText("View Log Entry")
             self.vectorTableWidget.setCellWidget(rowNum, self.colsVectorTable.index("Reference"),
                                                      viewEntryButton)
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Event Type"), significantEventTypeItem)
@@ -447,11 +445,11 @@ class Ui_PICK(object):
             relationshipIdItem = QtWidgets.QTableWidgetItem(str(relationships[rowNum].id))
             self.relationshipTableWidget.setVerticalHeaderItem(rowNum, relationshipIdItem)
             relationshipSourceItem = QtWidgets.QTableWidgetItem(str(relationships[rowNum].sourceSignificantEventId))
-            self.relationshipTableWidget.setItem(rowNum, len(self.colsRelationshipTable) - 3, relationshipSourceItem)
+            self.relationshipTableWidget.setItem(rowNum, self.colsRelationshipTable.index("Parent"), relationshipSourceItem)
             relationshipDestItem = QtWidgets.QTableWidgetItem(str(relationships[rowNum].destSignificantEventId))
-            self.relationshipTableWidget.setItem(rowNum, len(self.colsRelationshipTable) - 2, relationshipDestItem)
+            self.relationshipTableWidget.setItem(rowNum, self.colsRelationshipTable.index("Child"), relationshipDestItem)
             relationshipDescriptionItem = QtWidgets.QTableWidgetItem(relationships[rowNum].description)
-            self.relationshipTableWidget.setItem(rowNum, len(self.colsRelationshipTable) - 1, relationshipDescriptionItem)
+            self.relationshipTableWidget.setItem(rowNum, self.colsRelationshipTable.index("Label"), relationshipDescriptionItem)
             relationships[rowNum].rowIndexInTable = rowNum
         self.relationshipTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.relationshipTableWidget.doubleClicked.connect(self.relationshipTableDoubleClicked)
@@ -922,6 +920,25 @@ class IconComboBox(QtWidgets.QComboBox):
         else:
             self.significantEvent.iconType = newIconName
 
+class VisibilityCheckBox(QtWidgets.QCheckBox):
+    def __init__(self, fieldName, vector):
+        super(VisibilityCheckBox, self).__init__()
+        self.fieldName = fieldName
+        self.vector = vector
+        self.clicked.connect(self.handleCheck)
+
+    def handleCheck(self):
+        self.vector.visibility[self.fieldName] = not self.vector.visibility[self.fieldName]
+        ui.updateVectorGraph(self.vector)
+
+class ViewReferenceButton(QtWidgets.QPushButton):
+    def __init__(self, logEntry):
+        super(ViewReferenceButton, self).__init__()
+        self.logEntry = logEntry
+        self.clicked.connect(self.handleClick)
+
+    def handleClick(self):
+        ui.viewLogEntryClicked(self.logEntry)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
