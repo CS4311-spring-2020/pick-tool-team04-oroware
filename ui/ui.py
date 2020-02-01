@@ -6,11 +6,13 @@ import sys
 import datetime
 import xlwt
 
+from Icon import Icon
 from LogEntry import LogEntry
 from LogEntryPopup import LogEntryPopup
 from Globals import logEntryManager
 from Globals import vectorManager
 from Globals import iconManager
+from LogEntryViewPopup import LogEntryViewPopup
 from RelationshipPopup import RelationshipPopup
 from SignificantEventPopup import SignificantEventPopup
 
@@ -229,7 +231,7 @@ class Ui_PICK(object):
             logEntryDateItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[rowNum].date)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Timestamp"), logEntryDateItem)
             logEntries[rowNum].rowIndexInTable = rowNum
-            vectorComboBoxSearchTable = CheckableComboBox()
+            vectorComboBoxSearchTable = CheckableComboBox(logEntries[rowNum])
             counter = 0
             for vector in vectorManager.vectors.values():
                 vectorComboBoxSearchTable.addItem(vector.vectorName)
@@ -374,6 +376,7 @@ class Ui_PICK(object):
         self.iconConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def updateVectorTable(self, vector):
+        global iconManager
         significantEvents = list(vector.significantEvents.values())
         totalRows = len(significantEvents) + 1
         self.vectorTableWidget.setColumnCount(len(self.colsVectorTable))
@@ -393,31 +396,40 @@ class Ui_PICK(object):
         self.vectorTableWidget.setVerticalHeaderItem(0, QtWidgets.QTableWidgetItem(""))
         rowNum = 1
         while(rowNum < totalRows):
-            significantEventIdItem = QtWidgets.QTableWidgetItem(str(significantEvents[rowNum-1].id))
+            significantEvent = significantEvents[rowNum-1]
+            significantEventIdItem = QtWidgets.QTableWidgetItem(str(significantEvent.id))
             self.vectorTableWidget.setVerticalHeaderItem(rowNum, significantEventIdItem)
             self.vectorTableWidget.setRowHeight(rowNum, 50)
-            significantEventTypeItem = QtWidgets.QTableWidgetItem(significantEvents[rowNum-1].logEntry.eventType)
+            significantEventTypeItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.eventType)
             viewEntryButton = QtWidgets.QPushButton()
             viewEntryButton.setText("View Log Entry")
+            logEntry = significantEvent.logEntry
+            viewEntryButton.clicked.connect(lambda: self.viewLogEntryClicked(logEntry))
             self.vectorTableWidget.setCellWidget(rowNum, self.colsVectorTable.index("Reference"),
                                                      viewEntryButton)
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Event Type"), significantEventTypeItem)
-            significantEventIconTypeItem = QtWidgets.QTableWidgetItem(significantEvents[rowNum-1].iconType)
-            self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Icon Type"), significantEventIconTypeItem)
-            significantEventNameItem = QtWidgets.QTableWidgetItem(significantEvents[rowNum-1].name)
+            iconComboBox = IconComboBox(significantEvent)
+            iconComboBox.addItem(significantEvent.iconType)
+            if Icon.DEFAULT != significantEvent.iconType:
+                iconComboBox.addItem(Icon.DEFAULT)
+            for iconName, icon in iconManager.icons.items():
+                if iconName != significantEvent.iconType:
+                    iconComboBox.addItem(iconName)
+            self.vectorTableWidget.setCellWidget(rowNum, self.colsVectorTable.index("Icon Type"), iconComboBox)
+            significantEventNameItem = QtWidgets.QTableWidgetItem(significantEvent.name)
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Node Name"), significantEventNameItem)
-            significantEventDateItem = QtWidgets.QTableWidgetItem(significantEvents[rowNum-1].logEntry.date)
+            significantEventDateItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.date)
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Node Timestamp"), significantEventDateItem)
-            significantEventCreatorItem = QtWidgets.QTableWidgetItem(significantEvents[rowNum-1].logEntry.creator)
+            significantEventCreatorItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.creator)
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Event Creator"), significantEventCreatorItem)
-            significantEventDescriptionItem = QtWidgets.QTableWidgetItem(significantEvents[rowNum-1].description)
+            significantEventDescriptionItem = QtWidgets.QTableWidgetItem(significantEvent.description)
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Node Description"), significantEventDescriptionItem)
-            significantEventArtifactItem = QtWidgets.QTableWidgetItem(significantEvents[rowNum-1].logEntry.artifact)
+            significantEventArtifactItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.artifact)
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Artifact"), significantEventArtifactItem)
-            significantEvents[rowNum-1].rowIndexInTable = rowNum
+            significantEvent.rowIndexInTable = rowNum
             rowNum += 1
         self.vectorTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
-        # self.vectorTableWidget.doubleClicked.connect(self.vectorTableDoubleClicked)
+        self.vectorTableWidget.doubleClicked.connect(self.vectorTableDoubleClicked)
 
     def updateRelationshipTable(self, vector):
         relationships = list(vector.relationships.values())
@@ -442,11 +454,16 @@ class Ui_PICK(object):
             self.relationshipTableWidget.setItem(rowNum, len(self.colsRelationshipTable) - 1, relationshipDescriptionItem)
             relationships[rowNum].rowIndexInTable = rowNum
         self.relationshipTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
-        # self.relationshipTableWidget.doubleClicked.connect(self.relationshipTableDoubleClicked)
+        self.relationshipTableWidget.doubleClicked.connect(self.relationshipTableDoubleClicked)
 
     def updateVectorGraph(self, vector):
         self.vectorGraphWidget.initializeVector(vector)
         self.vectorGraphWidget.draw()
+
+    def viewLogEntryClicked(self, logEntry):
+        self.viewPopup = LogEntryViewPopup(logEntry)
+        self.viewPopup.setGeometry(100, 200, 200, 200)
+        self.viewPopup.show()
 
     def searchTableDoubleClicked(self):
         global logEntryManager
@@ -455,7 +472,7 @@ class Ui_PICK(object):
         logEntryDescriptionWidget = self.searchLogsTableWidget.item(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Content"))
         associatedVectorsWidget = self.searchLogsTableWidget.cellWidget(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Vectors"))
         self.editPopup = LogEntryPopup(logEntry, logEntryDescriptionWidget, associatedVectorsWidget)
-        self.editPopup.setGeometry(100, 200, 100, 100)
+        self.editPopup.setGeometry(100, 200, 200, 200)
         self.editPopup.show()
 
     def vectorTableDoubleClicked(self):
@@ -465,9 +482,9 @@ class Ui_PICK(object):
         vectorName = self.vectorComboBoxTable.currentText()
         vector = vectorManager.vectors[vectorName]
         significantEventToEdit = vector.significantEvents[int(significantEventId)]
-        self.editVectorPopup = SignificantEventPopup(vector, significantEventToEdit, trigger)
-        self.editVectorPopup.setGeometry(100, 200, 100, 100)
-        self.editVectorPopup.show()
+        self.editEventPopup = SignificantEventPopup(vector, significantEventToEdit, trigger)
+        self.editEventPopup.setGeometry(100, 200, 200, 200)
+        self.editEventPopup.show()
 
     def relationshipTableDoubleClicked(self):
         global vectorManager
@@ -549,6 +566,8 @@ class Ui_PICK(object):
         self.vectorConfigurationLayout = QtWidgets.QVBoxLayout(self.vectorConfigurationTab)
         self.vectorConfigurationLabel = QtWidgets.QLabel(self.vectorConfigurationTab)
         self.vectorConfigurationLayout.addWidget(self.vectorConfigurationLabel)
+        self.currentVectorConfigurationLabel = QtWidgets.QLabel(self.vectorConfigurationTab)
+        self.vectorConfigurationLayout.addWidget(self.currentVectorConfigurationLabel)
         self.vectorComboBoxConfiguration = QtWidgets.QComboBox(self.vectorConfigurationTab)
         self.vectorComboBoxConfiguration.setModel(QtGui.QStandardItemModel())
         self.vectorComboBoxConfiguration.view().pressed.connect(self.handleVectorComboBoxConfiguration)
@@ -600,13 +619,13 @@ class Ui_PICK(object):
     def handleSearchLogTableEntryUpdate(self, logEntry):
         if logEntry.rowIndexInTable != -1:
             logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntry.description)
-            self.searchLogsTableWidget.setItem(logEntry.rowIndexInTable, len(self.colsSearchLogsTable) - 1,
+            self.searchLogsTableWidget.setItem(logEntry.rowIndexInTable, self.colsSearchLogsTable.index("Content"),
                                                    logEntryDescriptionItem)
 
     def handleRelationshipTableEntryUpdate(self, relationship, vectorName):
         if relationship.rowIndexInTable != -1 and self.vectorComboBoxTable.count() > 0 and self.vectorComboBoxTable.currentText() == vectorName:
             relationshipDescriptionItem = QtWidgets.QTableWidgetItem(relationship.description)
-            self.relationshipTableWidget.setItem(relationship.rowIndexInTable, len(self.colsRelationshipTable) - 1,
+            self.relationshipTableWidget.setItem(relationship.rowIndexInTable, self.colsRelationshipTable.index("Label"),
                                                    relationshipDescriptionItem)
 
     def exportVectorTable(self, vectorName):
@@ -659,6 +678,7 @@ class Ui_PICK(object):
             vector = vectorManager.vectors[vectorName]
             logEntry = LogEntry()
             logEntry.creator = logEntry.WHITE_TEAM
+            logEntry.eventType = logEntry.WHITE_TEAM
             logEntry.id = logEntryManager.nextAvailableId
             logEntryManager.nextAvailableId += 1
             logEntry.date = (datetime.datetime.today()).strftime("%m/%d/%Y %I:%M %p").lstrip("0")
@@ -718,7 +738,7 @@ class Ui_PICK(object):
         self.colsVectorConfigurationTable = ["Vector Name", "Vector Description"]
         self.colsIconConfigurationTable = ["Icon Name", "Icon Source", "Icon Preview"]
         self.colsVectorTable = ["Node Name", "Node Timestamp", "Node Description", "Reference", "Event Creator", "Event Type", "Icon Type", "Artifact"]
-        self.colsRelationshipTable = ["Parent", "Child", "Description"]
+        self.colsRelationshipTable = ["Parent", "Child", "Label"]
         self.colsPullTable = ["Vector Name", "Vector Description", "Vector Graph"]
         self.colsPushTable = ["Vector Name", "Vector Description", "Vector Graph"]
         self.colsApproveTable = ["Source IP", "Request Timestamp", "Vector Name", "Vector Description", "Graph", "Approve"]
@@ -792,6 +812,7 @@ class Ui_PICK(object):
         self.toSearchLabel.setText("End Timestamp:")
         self.redTeamLabel.setText("Red Team Folder: ")
         self.searchButton.setText("Apply Filter")
+        self.currentVectorConfigurationLabel.setText("Current vector:")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.searchLogsTab), "Search Logs")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.vectorDbTab), "Vector DB Configuration")
         self.addNodeGraphButton.setText("Add Node")
@@ -807,6 +828,9 @@ class Ui_PICK(object):
         self.startEventConfigurationLabel.setText("Event start timestamp:")
         self.directoryConfigurationLabel.setText("DIRECTORY CONFIGURATION")
         self.vectorTableLabel.setText("Vector:")
+        self.pushButton.setText("Push Button")
+        self.pullButton.setText("Pull Button")
+        self.configurationVectorDescriptionLabel.setText("Vector Description:")
         self.logEntryConfigurationLabel.setText("LOG ENTRY CONFIGURATION")
         self.saveEventButton.setText("Save Event")
         self.ingestionButton.setText("Start Data Ingestion")
@@ -865,17 +889,39 @@ class TriggerHelper(QObject):
         self.updateSearchLogTableEntryTrigger.emit()
 
 class CheckableComboBox(QtWidgets.QComboBox):
-    def __init__(self):
+    def __init__(self, logEntry):
         super(CheckableComboBox, self).__init__()
+        self.logEntry = logEntry
         self.view().pressed.connect(self.handleItemPressed)
         self.setModel(QtGui.QStandardItemModel(self))
 
     def handleItemPressed(self, index):
+        global vectorManager
         item = self.model().itemFromIndex(index)
         if item.checkState() == QtCore.Qt.Checked:
             item.setCheckState(QtCore.Qt.Unchecked)
         else:
             item.setCheckState(QtCore.Qt.Checked)
+        newVectors = list()
+        for i in range(self.count()):
+            if self.model().item(i, 0).checkState() == QtCore.Qt.Checked:
+                newVectors.append(self.associationComboBox.itemText(i))
+        vectorManager.handleUpdateToLogEntry(self.logEntry.associatedVectors, newVectors, self.logEntry)
+
+class IconComboBox(QtWidgets.QComboBox):
+    def __init__(self, significantEvent):
+        super(IconComboBox, self).__init__()
+        self.view().pressed.connect(self.handleItemPressed)
+        self.setModel(QtGui.QStandardItemModel(self))
+        self.significantEvent = significantEvent
+
+    def handleItemPressed(self, index):
+        newIconName = index.data()
+        if newIconName == Icon.DEFAULT:
+            self.significantEvent.iconType = Icon.Default
+        else:
+            self.significantEvent.iconType = newIconName
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

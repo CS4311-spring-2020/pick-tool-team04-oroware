@@ -8,7 +8,7 @@ class LogEntryManager:
         self.vectorManager = None
         self.nextAvailableId = 5
         ids = [0, 1, 2, 3, 4]
-        dates = ["1/26/20", "1/26/20", "1/26/20", "1/26/20", "1/26/20"]
+        dates = ["1/31/2020 12:08 AM", "2/1/2020 11:43 PM", "2/2/2020 11:24 PM", "2/3/2020 11:01 AM", "2/4/2020 12:33 PM"]
         teams = [LogEntry.BLUE_TEAM, LogEntry.WHITE_TEAM, LogEntry.BLUE_TEAM, LogEntry.RED_TEAM, LogEntry.BLUE_TEAM]
         descriptions = ["Blue Team Defender Turns on Computer.", "White Team Analyst Starts Taking Notes.",
                         "SQL Injection attack from Red Team.", "Cross-Site Scripting Attack from Red Team.",

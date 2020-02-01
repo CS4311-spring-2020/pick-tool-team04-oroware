@@ -1,7 +1,9 @@
+from Icon import Icon
 from Relationship import Relationship
 from SignifcantEvent import SignificantEvent
 
 class Vector:
+
     def __init__(self):
         self.vectorName = ""
         self.vectorDescription = ""

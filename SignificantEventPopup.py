@@ -6,19 +6,26 @@ class SignificantEventPopup(QWidget):
         self.vector = vector
         self.significantEvent = significantEvent
         self.trigger = trigger
-        self.trigger.connectVectorTableEntryTrigger(self.significantEvent, vector.vectorName)
-        self.trigger.connectSearchLogTableEntryTrigger(self.significantEvent.logEntry)
         self.trigger.connectVectorTableTrigger()
         layout = QVBoxLayout()
-        self.logEntryDescriptionLabel = QLabel()
-        self.logEntryDescriptionLabel.setText("Description:")
-        layout.addWidget(self.logEntryDescriptionLabel)
-        self.logEntryDescriptionTextEdit = QPlainTextEdit()
-        self.logEntryDescriptionTextEdit.setPlainText(self.significantEvent.logEntry.description)
-        layout.addWidget(self.logEntryDescriptionTextEdit)
+        self.eventNameLabel = QLabel()
+        self.eventNameLabel.setText("Name:")
+        layout.addWidget(self.eventNameLabel)
+        self.eventNameTextEdit = QPlainTextEdit()
+        self.eventNameTextEdit.setPlainText(self.significantEvent.name)
+        layout.addWidget(self.eventNameTextEdit)
+        self.eventDescriptionLabel = QLabel()
+        self.eventDescriptionLabel.setText("Description:")
+        layout.addWidget(self.eventDescriptionLabel)
+        self.eventDescriptionTextEdit = QPlainTextEdit()
+        self.eventDescriptionTextEdit.setPlainText(self.significantEvent.description)
+        layout.addWidget(self.eventDescriptionTextEdit)
         self.creatorLabel = QLabel()
         self.creatorLabel.setText("Creator: " + self.significantEvent.logEntry.creator)
         layout.addWidget(self.creatorLabel)
+        self.typeLabel = QLabel()
+        self.typeLabel.setText("Event: " + self.significantEvent.logEntry.eventType)
+        layout.addWidget(self.typeLabel)
         self.dateLabel = QLabel()
         self.dateLabel.setText("Time of Event: " + self.significantEvent.logEntry.date)
         layout.addWidget(self.dateLabel)
@@ -35,9 +42,9 @@ class SignificantEventPopup(QWidget):
         self.setWindowTitle("Significant Event Edit Popup")
 
     def onSaveClick(self):
-        self.significantEvent.logEntry.description = self.logEntryDescriptionTextEdit.toPlainText()
-        self.trigger.emitVectorTableEntryTrigger()
-        self.trigger.emitSearchLogTableEntryTrigger()
+        self.significantEvent.name = self.eventNameTextEdit.toPlainText()
+        self.significantEvent.description = self.eventDescriptionTextEdit.toPlainText()
+        self.trigger.emitVectorTableTrigger()
         self.close()
 
     def delete(self):

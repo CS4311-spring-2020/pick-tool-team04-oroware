@@ -1,5 +1,6 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import *
+from Globals import logEntryManager
 
 class LogEntryPopup(QWidget):
     def __init__(self, logEntry, logEntryDescriptionWidget, associatedVectorsWidget):
@@ -17,6 +18,9 @@ class LogEntryPopup(QWidget):
         self.creatorLabel = QLabel()
         self.creatorLabel.setText("Creator: " + self.logEntry.creator)
         self.layout.addWidget(self.creatorLabel)
+        self.typeLabel = QLabel()
+        self.typeLabel.setText("Event: " + self.logEntry.eventType)
+        self.layout.addWidget(self.typeLabel)
         self.dateLabel = QLabel()
         self.dateLabel.setText("Timestamp: " + self.logEntry.date)
         self.layout.addWidget(self.dateLabel)
@@ -35,17 +39,23 @@ class LogEntryPopup(QWidget):
             else:
                 item.setCheckState(QtCore.Qt.Unchecked)
         self.layout.addWidget(self.associationComboBox)
-        self.saveButtonLogEntryPopup = QPushButton('Save Changes Locally', self)
+        self.saveButtonLogEntryPopup = QPushButton('Save Changes', self)
         self.saveButtonLogEntryPopup.clicked.connect(self.onSaveClick)
         self.layout.addWidget(self.saveButtonLogEntryPopup)
         self.setLayout(self.layout)
         self.setWindowTitle("Log Entry Edit Popup")
 
     def onSaveClick(self):
+        global logEntryManager
         self.logEntryDescriptionWidget.setText(self.logEntryDescriptionTextEdit.toPlainText())
+        self.logEntry.description = self.logEntryDescriptionTextEdit.toPlainText()
+        newVectors = list()
         for i in range(self.associationComboBox.count()):
+            if self.associationComboBox.model().item(i, 0).checkState() == QtCore.Qt.Checked:
+                newVectors.append(self.associationComboBox.itemText(i))
             item = self.associatedVectorsWidget.model().item(i, 0)
             item.setCheckState(self.associationComboBox.model().item(i, 0).checkState())
+        logEntryManager.editLogEntryVectors(self.logEntry, newVectors)
         self.close()
 
 class CheckableComboBox(QtWidgets.QComboBox):

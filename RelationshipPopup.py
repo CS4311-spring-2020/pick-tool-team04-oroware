@@ -11,7 +11,7 @@ class RelationshipPopup(QWidget):
         self.trigger.connectRelationshipTableEntryTrigger(self.relationship, self.vector.vectorName)
         layout = QVBoxLayout()
         self.relationshipDescriptionLabel = QLabel()
-        self.relationshipDescriptionLabel.setText("Description:")
+        self.relationshipDescriptionLabel.setText("Label:")
         layout.addWidget(self.relationshipDescriptionLabel)
         self.relationshipDescriptionTextEdit = QPlainTextEdit()
         self.relationshipDescriptionTextEdit.setPlainText(self.relationship.description)
