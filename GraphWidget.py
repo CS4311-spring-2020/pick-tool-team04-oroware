@@ -1,3 +1,4 @@
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -5,18 +6,34 @@ import networkx as nx
 
 from LogEntry import LogEntry
 
-
 class GraphWidget(QWidget):
 
     MINIMUM_NODE_SIZE = 1000
     STARTING_NODE_SIZE = 2000
     MAXIMIMUM_NODE_SIZE = 5000
-    def __init__(self, parent, trigger):
+    def __init__(self, parent, trigger, mutable=True):
         self.trigger = trigger
         super(GraphWidget, self).__init__(parent)
-        self.initUI()
+        if mutable:
+            self.initUI()
+        else:
+            self.initImmutableUI()
 
     def initUI(self):
+        self.setGeometry(10, 10, 505, 476)
+        self.vector = None
+        self.node1 = None
+        self.node2 = None
+        self.nodeSize = GraphWidget.STARTING_NODE_SIZE
+        self.vbox = QVBoxLayout()
+        self.setLayout(self.vbox)
+        self.figure = plt.figure()
+        self.canvas = FigureCanvas(self.figure)
+        self.canvas.mpl_connect('button_press_event', self.onclick)
+        self.canvas.mpl_connect('button_release_event', self.onRelease)
+        self.vbox.addWidget(self.canvas)
+
+    def initImmutableUI(self):
         self.setGeometry(10, 10, 505, 476)
         self.vector = None
         self.node1 = None
@@ -26,8 +43,6 @@ class GraphWidget(QWidget):
         self.setLayout(vbox)
         self.figure = plt.figure()
         self.canvas = FigureCanvas(self.figure)
-        self.canvas.mpl_connect('button_press_event', self.onclick)
-        self.canvas.mpl_connect('button_release_event', self.onRelease)
         vbox.addWidget(self.canvas)
 
     def draw(self):

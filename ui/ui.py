@@ -1,6 +1,8 @@
+import copy
+
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtWidgets import QTableWidgetItem, QVBoxLayout
 from GraphWidget import GraphWidget
 import sys
 import datetime
@@ -201,7 +203,9 @@ class Ui_PICK(object):
         self.tabWidget.addTab(self.vectorDbTab, "")
 
     def handlePush(self):
-        self.updatePushTable()
+        global vectorManager
+        self.pushedVectorManager = copy.deepcopy(vectorManager)
+        self.updatePushTable(self.pushedVectorManager)
 
     def updateLogTable(self):
         global logEntryManager
@@ -286,15 +290,14 @@ class Ui_PICK(object):
             self.pullTableWidget.setItem(rowNum, self.colsPullTable.index("Vector Name"), vectorNameItem)
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
             self.pullTableWidget.setItem(rowNum, self.colsPullTable.index("Vector Description"), vectorDescriptionItem)
-            graphButton = QtWidgets.QPushButton()
+            graphButton = ViewGraphButton(vector)
             graphButton.setText("View Graph")
             self.pullTableWidget.setCellWidget(rowNum, self.colsPullTable.index("Vector Graph"), graphButton)
             rowNum += 1
         self.pushTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
-    def updatePushTable(self):
-        global vectorManager
-        vectors = vectorManager.vectors
+    def updatePushTable(self, pushedVectorManager):
+        vectors = pushedVectorManager.vectors
         totalRows = len(vectors)
         self.pushTableWidget.setColumnCount(len(self.colsPushTable))
         self.pushTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
@@ -311,7 +314,7 @@ class Ui_PICK(object):
             self.pushTableWidget.setItem(rowNum, self.colsPushTable.index("Vector Name"), vectorNameItem)
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
             self.pushTableWidget.setItem(rowNum, self.colsPushTable.index("Vector Description"), vectorDescriptionItem)
-            graphButton = QtWidgets.QPushButton()
+            graphButton = ViewGraphButton(vector)
             graphButton.setText("View Graph")
             self.pushTableWidget.setCellWidget(rowNum, self.colsPushTable.index("Vector Graph"), graphButton)
             rowNum += 1
@@ -462,6 +465,18 @@ class Ui_PICK(object):
         self.viewPopup = LogEntryViewPopup(logEntry)
         self.viewPopup.setGeometry(100, 200, 200, 200)
         self.viewPopup.show()
+
+    def viewGraphClicked(self, vector):
+        self.viewGraphWindow = QtWidgets.QWidget()
+        layout = QVBoxLayout()
+        immutableGraphWidget = GraphWidget(self.viewGraphWindow, None, mutable=False)
+        immutableGraphWidget.initializeVector(vector)
+        immutableGraphWidget.draw()
+        layout.addWidget(immutableGraphWidget)
+        self.viewGraphWindow.setLayout(layout)
+        self.viewGraphWindow.setWindowTitle("View Graph Popup")
+        self.viewGraphWindow.setGeometry(500, 500, 600, 600)
+        self.viewGraphWindow.show()
 
     def searchTableDoubleClicked(self):
         global logEntryManager
@@ -687,6 +702,12 @@ class Ui_PICK(object):
 
     def onTabChange(self):
         if self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.editVectorTab) and self.vectorComboBoxTable.count() > 0:
+            self.graphLayout.removeWidget(self.vectorGraphWidget)
+            triggerHelper = TriggerHelper()
+            triggerHelper.connectRelationshipTableTrigger()
+            self.vectorGraphWidget = GraphWidget(self.graphWidget, triggerHelper)
+            self.vectorGraphWidget.setMinimumSize(QtCore.QSize(1500, 1500))
+            self.graphLayout.addWidget(self.vectorGraphWidget)
             vectorName = self.vectorComboBoxTable.currentText()
             global vectorManager
             vector = vectorManager.vectors[vectorName]
@@ -939,6 +960,15 @@ class ViewReferenceButton(QtWidgets.QPushButton):
 
     def handleClick(self):
         ui.viewLogEntryClicked(self.logEntry)
+
+class ViewGraphButton(QtWidgets.QPushButton):
+    def __init__(self, vector):
+        super(ViewGraphButton, self).__init__()
+        self.vector = vector
+        self.clicked.connect(self.handleClick)
+
+    def handleClick(self):
+        ui.viewGraphClicked(self.vector)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
