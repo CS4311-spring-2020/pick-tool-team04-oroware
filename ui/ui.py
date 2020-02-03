@@ -11,9 +11,7 @@ import xlwt
 from Icon import Icon
 from LogEntry import LogEntry
 from LogEntryPopup import LogEntryPopup
-from Globals import logEntryManager
-from Globals import vectorManager
-from Globals import iconManager
+from ClientHandler import ClientHandler
 from LogEntryViewPopup import LogEntryViewPopup
 from RelationshipPopup import RelationshipPopup
 from SignificantEventPopup import SignificantEventPopup
@@ -109,13 +107,11 @@ class Ui_PICK(object):
 
     def handleVectorComboBoxConfiguration(self, index):
         if self.vectorComboBoxConfiguration.count() > 0:
-            global vectorManager
-            self.configurationVectorDescriptionTextEdit.setPlainText(vectorManager.vectors[index.data()].vectorDescription)
+            self.configurationVectorDescriptionTextEdit.setPlainText(self.clientHandler.vectorManager.vectors[index.data()].vectorDescription)
 
     def handleVectorComboBoxTable(self, index):
         if self.vectorComboBoxTable.count() > 0:
-            global vectorManager
-            currentVector = vectorManager.vectors[index.data()]
+            currentVector = self.clientHandler.vectorManager.vectors[index.data()]
             self.updateVectorTable(currentVector)
             self.updateRelationshipTable(currentVector)
             self.updateVectorGraph(currentVector)
@@ -188,6 +184,7 @@ class Ui_PICK(object):
             self.pullTableWidget.setMinimumSize(1250, 850)
             self.vectorDbLayout.addWidget(self.pullTableWidget)
             self.pullButton = QtWidgets.QPushButton(self.vectorDbTab)
+            self.pullButton.clicked.connect(self.handlePull)
             self.vectorDbLayout.addWidget(self.pullButton)
             self.pushTableLabel = QtWidgets.QLabel(self.vectorDbTab)
             self.vectorDbLayout.addWidget(self.pushTableLabel)
@@ -202,15 +199,20 @@ class Ui_PICK(object):
             self.vectorDbLayout.addWidget(self.pushButton)
         self.tabWidget.addTab(self.vectorDbTab, "")
 
+    def handlePull(self):
+        self.clientHandler.pullVectorDb()
+        self.pulledVectorManager = copy.deepcopy(self.clientHandler.vectorManager)
+        self.updatePullTable(self.pulledVectorManager)
+        self.updateVectorComboBoxes()
+        self.updateLogTable()
+        self.pullButton.clicked.disconnect(self.handlePull)
+
     def handlePush(self):
-        global vectorManager
-        self.pushedVectorManager = copy.deepcopy(vectorManager)
+        self.pushedVectorManager = copy.deepcopy(self.clientHandler.vectorManager)
         self.updatePushTable(self.pushedVectorManager)
 
     def updateLogTable(self):
-        global logEntryManager
-        global vectorManager
-        logEntries = logEntryManager.logEntriesInTable
+        logEntries = self.clientHandler.logEntryManager.logEntriesInTable
         totalRows = len(logEntries)
         self.searchLogsTableWidget.setColumnCount(len(self.colsSearchLogsTable))
         self.searchLogsTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
@@ -226,18 +228,18 @@ class Ui_PICK(object):
             self.searchLogsTableWidget.setRowHeight(rowNum, 50)
             logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntries[rowNum].description)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Content"), logEntryDescriptionItem)
-            logEntryTeamItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[rowNum].creator)
+            logEntryTeamItem = QtWidgets.QTableWidgetItem(self.clientHandler.logEntryManager.logEntries[rowNum].creator)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Creator"), logEntryTeamItem)
-            logEntryArtifactItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[rowNum].artifact)
+            logEntryArtifactItem = QtWidgets.QTableWidgetItem(self.clientHandler.logEntryManager.logEntries[rowNum].artifact)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Artifact"), logEntryArtifactItem)
-            logEntryEventTypeItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[rowNum].eventType)
+            logEntryEventTypeItem = QtWidgets.QTableWidgetItem(self.clientHandler.logEntryManager.logEntries[rowNum].eventType)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Event Type"), logEntryEventTypeItem)
-            logEntryDateItem = QtWidgets.QTableWidgetItem(logEntryManager.logEntries[rowNum].date)
+            logEntryDateItem = QtWidgets.QTableWidgetItem(self.clientHandler.logEntryManager.logEntries[rowNum].date)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Timestamp"), logEntryDateItem)
             logEntries[rowNum].rowIndexInTable = rowNum
             vectorComboBoxSearchTable = CheckableComboBox(logEntries[rowNum])
             counter = 0
-            for vector in vectorManager.vectors.values():
+            for vector in self.clientHandler.vectorManager.vectors.values():
                 vectorComboBoxSearchTable.addItem(vector.vectorName)
                 item = vectorComboBoxSearchTable.model().item(counter, 0)
                 if vector.vectorName in logEntries[rowNum].associatedVectors:
@@ -250,8 +252,7 @@ class Ui_PICK(object):
         self.searchLogsTableWidget.doubleClicked.connect(self.searchTableDoubleClicked)
 
     def updateVectorConfigurationTable(self):
-        global vectorManager
-        vectors = vectorManager.vectors
+        vectors = self.clientHandler.vectorManager.vectors
         totalRows = len(vectors)
         self.vectorConfigurationTableWidget.setColumnCount(len(self.colsVectorConfigurationTable))
         self.vectorConfigurationTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
@@ -320,8 +321,8 @@ class Ui_PICK(object):
             rowNum += 1
         self.pushTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
-    def updateApproveTable(self, pushedVectors, pushedIps, pushedTimestamps):
-        self.colsApproveTable = ["Source IP", "Request Timestamp", "Vector Name", "Vector Description", "Graph", "Approve"]
+    def updateApproveTable(self, pushedVectors, pushedIps, pushedTimestamps, changeSummaries):
+        self.colsApproveTable = ["Source IP", "Request Timestamp", "Vector Name", "Vector Description", "Graph", "Change Summary", "Approve"]
         totalRows = len(pushedVectors)
         self.approvalTableWidget.setColumnCount(len(self.colsApproveTable))
         self.approvalTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
@@ -335,6 +336,8 @@ class Ui_PICK(object):
             self.approvalTableWidget.setRowHeight(rowNum, 50)
             vectorNameItem = QtWidgets.QTableWidgetItem(pushedVectors[rowNum].vectorName)
             self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Vector Name"), vectorNameItem)
+            changeItem = QtWidgets.QTableWidgetItem(changeSummaries[rowNum])
+            self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Change Summary"), changeItem)
             timestampItem = QtWidgets.QTableWidgetItem(pushedTimestamps[rowNum])
             self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Request Timestamp"), timestampItem)
             sourceItem = QtWidgets.QTableWidgetItem(pushedIps[rowNum])
@@ -350,8 +353,7 @@ class Ui_PICK(object):
         self.approvalTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def updateIconConfigurationTable(self):
-        global iconManager
-        icons = iconManager.icons
+        icons = self.clientHandler.iconManager.icons
         totalRows = len(icons)
         self.iconConfigurationTableWidget.setColumnCount(len(self.colsIconConfigurationTable))
         self.iconConfigurationTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
@@ -379,7 +381,6 @@ class Ui_PICK(object):
         self.iconConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def updateVectorTable(self, vector):
-        global iconManager
         significantEvents = list(vector.significantEvents.values())
         totalRows = len(significantEvents) + 1
         self.vectorTableWidget.setColumnCount(len(self.colsVectorTable))
@@ -413,7 +414,7 @@ class Ui_PICK(object):
             iconComboBox.addItem(significantEvent.iconType)
             if Icon.DEFAULT != significantEvent.iconType:
                 iconComboBox.addItem(Icon.DEFAULT)
-            for iconName, icon in iconManager.icons.items():
+            for iconName, icon in self.clientHandler.iconManager.icons.items():
                 if iconName != significantEvent.iconType:
                     iconComboBox.addItem(iconName)
             self.vectorTableWidget.setCellWidget(rowNum, self.colsVectorTable.index("Icon Type"), iconComboBox)
@@ -479,32 +480,29 @@ class Ui_PICK(object):
         self.viewGraphWindow.show()
 
     def searchTableDoubleClicked(self):
-        global logEntryManager
         logEntryId = self.searchLogsTableWidget.verticalHeaderItem(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row()).text()
-        logEntry = logEntryManager.logEntries[int(logEntryId)]
+        logEntry = self.clientHandler.logEntryManager.logEntries[int(logEntryId)]
         logEntryDescriptionWidget = self.searchLogsTableWidget.item(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Content"))
         associatedVectorsWidget = self.searchLogsTableWidget.cellWidget(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Vectors"))
-        self.editPopup = LogEntryPopup(logEntry, logEntryDescriptionWidget, associatedVectorsWidget)
+        self.editPopup = LogEntryPopup(logEntry, logEntryDescriptionWidget, associatedVectorsWidget, self.clientHandler)
         self.editPopup.setGeometry(100, 200, 200, 200)
         self.editPopup.show()
 
     def vectorTableDoubleClicked(self):
-        global vectorManager
         trigger = TriggerHelper()
         significantEventId = self.vectorTableWidget.verticalHeaderItem(self.vectorTableWidget.selectionModel().selectedIndexes()[0].row()).text()
         vectorName = self.vectorComboBoxTable.currentText()
-        vector = vectorManager.vectors[vectorName]
+        vector = self.clientHandler.vectorManager.vectors[vectorName]
         significantEventToEdit = vector.significantEvents[int(significantEventId)]
         self.editEventPopup = SignificantEventPopup(vector, significantEventToEdit, trigger)
         self.editEventPopup.setGeometry(100, 200, 200, 200)
         self.editEventPopup.show()
 
     def relationshipTableDoubleClicked(self):
-        global vectorManager
         trigger = TriggerHelper()
         relationshipId = self.relationshipTableWidget.verticalHeaderItem(self.relationshipTableWidget.selectionModel().selectedIndexes()[0].row()).text()
         vectorName = self.vectorComboBoxTable.currentText()
-        vector = vectorManager.vectors[vectorName]
+        vector = self.clientHandler.vectorManager.vectors[vectorName]
         relationshipToEdit = vector.relationships[int(relationshipId)]
         self.editRelationshipPopup = RelationshipPopup(vector, relationshipToEdit, trigger)
         self.editRelationshipPopup.setGeometry(100, 200, 100, 100)
@@ -686,14 +684,12 @@ class Ui_PICK(object):
     def handleAddNode(self):
         if self.vectorComboBoxTable.count() > 0:
             vectorName = self.vectorComboBoxTable.currentText()
-            global vectorManager
-            global logEntryManager
-            vector = vectorManager.vectors[vectorName]
+            vector = self.clientHandler.vectorManager.vectors[vectorName]
             logEntry = LogEntry()
             logEntry.creator = logEntry.WHITE_TEAM
             logEntry.eventType = logEntry.WHITE_TEAM
-            logEntry.id = logEntryManager.nextAvailableId
-            logEntryManager.nextAvailableId += 1
+            logEntry.id = self.clientHandler.logEntryManager.nextAvailableId
+            self.clientHandler.logEntryManager.nextAvailableId += 1
             logEntry.date = (datetime.datetime.today()).strftime("%m/%d/%Y %I:%M %p").lstrip("0")
             logEntry.associatedVectors.append(self.vectorComboBoxTable.currentText())
             vector.addSignificantEventFromLogEntry(logEntry)
@@ -709,8 +705,7 @@ class Ui_PICK(object):
             self.vectorGraphWidget.setMinimumSize(QtCore.QSize(1500, 1500))
             self.graphLayout.addWidget(self.vectorGraphWidget)
             vectorName = self.vectorComboBoxTable.currentText()
-            global vectorManager
-            vector = vectorManager.vectors[vectorName]
+            vector = self.clientHandler.vectorManager.vectors[vectorName]
             self.updateVectorTable(vector)
             self.updateRelationshipTable(vector)
             self.updateVectorGraph(vector)
@@ -718,19 +713,17 @@ class Ui_PICK(object):
     def handleRelationshipTableTrigger(self):
         if self.vectorComboBoxTable.count() > 0:
             vectorName = self.vectorComboBoxTable.currentText()
-            global vectorManager
-            vector = vectorManager.vectors[vectorName]
+            vector = self.clientHandler.vectorManager.vectors[vectorName]
             self.updateRelationshipTable(vector)
 
     def handleVectorGraphTrigger(self):
         if self.vectorComboBoxTable.count() > 0:
             vectorName = self.vectorComboBoxTable.currentText()
-            global vectorManager
-            vector = vectorManager.vectors[vectorName]
+            vector = self.clientHandler.vectorManager.vectors[vectorName]
             self.updateVectorGraph(vector)
 
     def updateVectorComboBoxes(self):
-        vectorNames = (vectorManager.vectors.keys())
+        vectorNames = (self.clientHandler.vectorManager.vectors.keys())
         self.vectorComboBoxTable.clear()
         self.vectorComboBoxConfiguration.clear()
         for vectorName in vectorNames:
@@ -762,13 +755,12 @@ class Ui_PICK(object):
         self.colsPushTable = ["Vector Name", "Vector Description", "Vector Graph"]
         self.colsApproveTable = ["Source IP", "Request Timestamp", "Vector Name", "Vector Description", "Graph", "Approve"]
 
+        self.clientHandler = ClientHandler()
+
         # Vector list
         self.vectors = list()
         # Initialization of vector list
-        global vectorManager
-        global logEntryManager
-        logEntryManager.vectorManager = vectorManager
-        self.vectors = list(vectorManager.vectors.values())
+        self.vectors = list(self.clientHandler.vectorManager.vectors.values())
 
         self.setupMainWindow(PICK)
         self.setupTabWidget()
@@ -776,8 +768,8 @@ class Ui_PICK(object):
         self.setupSearchLogsTab()
         self.setupVectorConfigurationTab()
         self.setupIconConfigurationTab()
-        logEntryManager.searchLogEntryTableWidget = self.searchLogsTableWidget
-        logEntryManager.colNamesInSearchLogsTable = self.colsSearchLogsTable
+        self.clientHandler.logEntryManager.searchLogEntryTableWidget = self.searchLogsTableWidget
+        self.clientHandler.logEntryManager.colNamesInSearchLogsTable = self.colsSearchLogsTable
         self.updateLogTable()
         self.updateVectorConfigurationTable()
         self.updateIconConfigurationTable()
@@ -785,9 +777,9 @@ class Ui_PICK(object):
         self.setupVectorDbTab()
         self.updateVectorComboBoxes()
         if self.vectorComboBoxTable.count() > 0:
-            self.vectorDescriptionLabel.setText("Vector Description: " + vectorManager.vectors[self.vectorComboBoxTable.itemText(0)].vectorDescription)
+            self.vectorDescriptionLabel.setText("Vector Description: " + self.clientHandler.vectorManager.vectors[self.vectorComboBoxTable.itemText(0)].vectorDescription)
         if self.vectorComboBoxConfiguration.count() > 0:
-            self.configurationVectorDescriptionTextEdit.setPlainText(vectorManager.vectors[self.vectorComboBoxConfiguration.itemText(0)].vectorDescription)
+            self.configurationVectorDescriptionTextEdit.setPlainText(self.clientHandler.vectorManager.vectors[self.vectorComboBoxConfiguration.itemText(0)].vectorDescription)
         self.verticalLayout.addWidget(self.tabWidget)
         PICK.setCentralWidget(self.mainWindow)
         self.setAllText(PICK)
@@ -805,12 +797,14 @@ class Ui_PICK(object):
         self.teamConfigurationLabel.setText("TEAM CONFIGURATION")
         self.teamConfigurationLabel.setText("TEAM CONFIGURATION")
         self.vectorDbLabel.setText("VECTOR DB CONFIGURATION")
-        self.connectionStatusLabel.setText("Connected with lead: " + str(self.connectionStatus))
         if self.isLead:
             self.approvalLabel.setText("Approval sync:")
         else:
             self.pullTableLabel.setText("Pulled Vector DB Table (Analyst):")
             self.pushTableLabel.setText("Pushed Vector DB Table (Analyst):")
+            self.connectionStatusLabel.setText("Connected with lead: " + str(self.connectionStatus))
+            self.pushButton.setText("Push Button")
+            self.pullButton.setText("Pull Button")
         self.eventConfigurationLabel.setText("EVENT CONFIGURATION")
         self.leadCheckBox.setText("Lead")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ingestionTab), "Ingestion")
@@ -847,8 +841,6 @@ class Ui_PICK(object):
         self.startEventConfigurationLabel.setText("Event start timestamp:")
         self.directoryConfigurationLabel.setText("DIRECTORY CONFIGURATION")
         self.vectorTableLabel.setText("Vector:")
-        self.pushButton.setText("Push Button")
-        self.pullButton.setText("Pull Button")
         self.configurationVectorDescriptionLabel.setText("Vector Description:")
         self.logEntryConfigurationLabel.setText("LOG ENTRY CONFIGURATION")
         self.saveEventButton.setText("Save Event")
@@ -915,7 +907,6 @@ class CheckableComboBox(QtWidgets.QComboBox):
         self.setModel(QtGui.QStandardItemModel(self))
 
     def handleItemPressed(self, index):
-        global vectorManager
         item = self.model().itemFromIndex(index)
         if item.checkState() == QtCore.Qt.Checked:
             item.setCheckState(QtCore.Qt.Unchecked)
@@ -925,7 +916,7 @@ class CheckableComboBox(QtWidgets.QComboBox):
         for i in range(self.count()):
             if self.model().item(i, 0).checkState() == QtCore.Qt.Checked:
                 newVectors.append(self.associationComboBox.itemText(i))
-        vectorManager.handleUpdateToLogEntry(self.logEntry.associatedVectors, newVectors, self.logEntry)
+        ui.clientHandler.vectorManager.handleUpdateToLogEntry(self.logEntry.associatedVectors, newVectors, self.logEntry)
 
 class IconComboBox(QtWidgets.QComboBox):
     def __init__(self, significantEvent):

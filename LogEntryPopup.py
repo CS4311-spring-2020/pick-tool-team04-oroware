@@ -1,10 +1,10 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import *
-from Globals import logEntryManager
 
 class LogEntryPopup(QWidget):
-    def __init__(self, logEntry, logEntryDescriptionWidget, associatedVectorsWidget):
+    def __init__(self, logEntry, logEntryDescriptionWidget, associatedVectorsWidget, clientHandler):
         super(LogEntryPopup, self).__init__()
+        self.clientHandler = clientHandler
         self.logEntryDescriptionWidget = logEntryDescriptionWidget
         self.associatedVectorsWidget = associatedVectorsWidget
         self.logEntry = logEntry
