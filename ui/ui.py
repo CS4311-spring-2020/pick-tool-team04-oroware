@@ -205,6 +205,11 @@ class Ui_PICK(object):
         self.updatePullTable(self.pulledVectorManager)
         self.updateVectorComboBoxes()
         self.updateLogTable()
+        self.updateVectorConfigurationTable()
+        if self.vectorComboBoxTable.count() > 0:
+            self.vectorDescriptionLabel.setText("Vector Description: " + self.clientHandler.vectorManager.vectors[self.vectorComboBoxTable.itemText(0)].vectorDescription)
+        if self.vectorComboBoxConfiguration.count() > 0:
+            self.configurationVectorDescriptionTextEdit.setPlainText(self.clientHandler.vectorManager.vectors[self.vectorComboBoxConfiguration.itemText(0)].vectorDescription)
         self.pullButton.clicked.disconnect(self.handlePull)
 
     def handlePush(self):
@@ -599,7 +604,6 @@ class Ui_PICK(object):
         self.vectorConfigurationTableWidget.setMinimumSize(1250, 1750)
         self.vectorConfigurationLayout.addWidget(self.vectorConfigurationTableWidget)
         self.tabWidget.addTab(self.vectorConfigurationTab, "")
-        self.tabWidget.currentChanged.connect(self.onTabChange)
 
     def setupIconConfigurationTab(self):
         self.iconConfigurationTab = QtWidgets.QWidget()
@@ -704,6 +708,10 @@ class Ui_PICK(object):
             self.vectorGraphWidget = GraphWidget(self.graphWidget, triggerHelper)
             self.vectorGraphWidget.setMinimumSize(QtCore.QSize(1500, 1500))
             self.graphLayout.addWidget(self.vectorGraphWidget)
+            self.zoomInButtonGraph.clicked.disconnect()
+            self.zoomOutButtonGraph.clicked.disconnect()
+            self.zoomInButtonGraph.clicked.connect(self.vectorGraphWidget.maximize)
+            self.zoomOutButtonGraph.clicked.connect(self.vectorGraphWidget.minimize)
             vectorName = self.vectorComboBoxTable.currentText()
             vector = self.clientHandler.vectorManager.vectors[vectorName]
             self.updateVectorTable(vector)

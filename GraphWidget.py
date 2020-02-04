@@ -192,7 +192,7 @@ class GraphWidget(QWidget):
                     elif self.vector.significantEvents[i].logEntry.creator == LogEntry.RED_TEAM:
                         self.nodeColors.append("red")
                     self.nodeSizes.append(self.nodeSize)
-        self.paint()
+            self.paint()
 
     def center(self):
         qr = self.frameGeometry()
