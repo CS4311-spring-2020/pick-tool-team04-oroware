@@ -46,7 +46,7 @@ class LogEntryPopup(QWidget):
         self.setWindowTitle("Log Entry Edit Popup")
 
     def onSaveClick(self):
-        logEntryManager = self.clientHandler.logEntryManager
+        global logEntryManager
         self.logEntryDescriptionWidget.setText(self.logEntryDescriptionTextEdit.toPlainText())
         self.logEntry.description = self.logEntryDescriptionTextEdit.toPlainText()
         newVectors = list()
