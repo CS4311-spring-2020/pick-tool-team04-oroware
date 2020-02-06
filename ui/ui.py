@@ -650,7 +650,8 @@ class Ui_PICK(object):
         self.tabWidget.addTab(self.iconConfigurationTab, "")
 
     def handleAddIcon(self):
-        self.addIconPopup = AddIconPopup(self.clientHandler)
+        triggerHelper = TriggerHelper()
+        self.addIconPopup = AddIconPopup(triggerHelper, self.clientHandler)
         self.addIconPopup.setGeometry(100, 200, 200, 200)
         self.addIconPopup.show()
 
@@ -907,9 +908,13 @@ class TriggerHelper(QObject):
     updateSearchLogTableEntryTrigger = pyqtSignal()
     updateRelationshipTableEntryTrigger = pyqtSignal()
     updateVectorTableTrigger = pyqtSignal()
+    updateIconTableTrigger = pyqtSignal()
 
     def connectRelationshipTableTrigger(self):
         self.updateRelationshipTableTrigger.connect(ui.handleRelationshipTableTrigger)
+
+    def connectIconTableTrigger(self):
+        self.updateIconTableTrigger.connect(ui.updateIconConfigurationTable)
 
     def connectVectorGraphTrigger(self):
         self.updateVectorGraphTrigger.connect(ui.handleVectorGraphTrigger)
@@ -925,6 +930,9 @@ class TriggerHelper(QObject):
 
     def connectRelationshipTableEntryTrigger(self, logEntry, vectorName):
         self.updateRelationshipTableEntryTrigger.connect(lambda: ui.handleRelationshipTableEntryUpdate(logEntry, vectorName))
+
+    def emitIconTableTrigger(self):
+        self.updateIconTableTrigger.emit()
 
     def emitVectorGraphTrigger(self):
         self.updateVectorGraphTrigger.emit()

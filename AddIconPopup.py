@@ -5,8 +5,10 @@ from Icon import Icon
 
 
 class AddIconPopup(QWidget):
-    def __init__(self, clientHandler):
+    def __init__(self, triggerHelper, clientHandler):
         super(AddIconPopup, self).__init__()
+        self.triggerHelper = triggerHelper
+        self.triggerHelper.connectIconTableTrigger()
         self.clientHandler = clientHandler
         self.layout = QVBoxLayout()
         self.nameLabel = QLabel()
@@ -29,3 +31,7 @@ class AddIconPopup(QWidget):
     def onSaveClick(self):
         icon = Icon()
         icon.name = self.nameTextEdit.toPlainText()
+        icon.source = self.fileDialog.selectedFiles()[0]
+        if self.clientHandler.iconManager.addIcon(icon):
+            self.triggerHelper.emitIconTableTrigger()
+            self.close()
