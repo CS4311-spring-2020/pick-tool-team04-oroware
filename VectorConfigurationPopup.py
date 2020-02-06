@@ -1,39 +1,36 @@
 from PyQt5.QtWidgets import *
 
+from Vector import Vector
+
 class VectorConfigurationPopup(QWidget):
-    def __init__(self, vector, vectorConfiguration, trigger):
+    def __init__(self, triggerHelper, clientHandler):
         super(VectorConfigurationPopup, self).__init__()
-        self.vector = vector
-        self.vectorConfiguration = vectorConfiguration
-        self.trigger = trigger
-        self.trigger.connectVectorTableTrigger()
-        layout = QVBoxLayout()
-        self.vectorConfigurationDescriptionLabel = QLabel()
-        self.vectorConfigurationDescriptionLabel.setText("Label:")
-        layout.addWidget(self.vectorConfigurationDescriptionLabel)
-        self.vectorConfigurationDescriptionTextEdit = QPlainTextEdit()
-        self.vectorConfigurationDescriptionTextEdit.setPlainText(self.vectorConfiguration.description)
-        layout.addWidget(self.vectorConfigurationDescriptionTextEdit)
-        self.deleteButtonVectorConfigurationPopup = QPushButton('Delete', self)
-        self.deleteButtonVectorConfigurationPopup.clicked.connect(self.delete)
-        layout.addWidget(self.deleteButtonVectorConfigurationPopup)
-        self.saveButtonVectorConfigurationPopup = QPushButton('Save Changes', self)
-        self.saveButtonVectorConfigurationPopup.clicked.connect(self.onSaveClick)
-        layout.addWidget(self.saveButtonVectorConfigurationPopup)
-        self.setLayout(layout)
-        self.setWindowTitle("Vector Configuration Popup")
+        self.triggerHelper = triggerHelper
+        self.triggerHelper.connectVectorConfigurationTableTrigger()
+        self.clientHandler = clientHandler
+        self.layout = QVBoxLayout()
+        self.vectorConfigurationLabel = QLabel()
+        self.vectorConfigurationLabel.setText("Vector Name:")
+        self.layout.addWidget(self.vectorConfigurationLabel)
+        self.vectorConfigurationEdit = QPlainTextEdit()
+        self.layout.addWidget(self.vectorConfigurationEdit)
+        self.vectorConfigurationDescription = QLabel()
+        self.vectorConfigurationDescription.setText("Vector Description: ")
+        self.layout.addWidget(self.vectorConfigurationDescription)
+        self.vectorConfigurationDescriptionEdit = QPlainTextEdit()
+        self.layout.addWidget(self.vectorConfigurationDescriptionEdit)
+        self.saveButton = QPushButton('Add Vector', self)
+        self.saveButton.clicked.connect(self.onSaveClick)
+        self.layout.addWidget(self.saveButton)
+        self.setLayout(self.layout)
+        self.setWindowTitle("Add Vector Popup")
 
     def onSaveClick(self):
-        self.vectorConfiguration.description = self.vectorConfigurationDescriptionTextEdit.toPlainText()
-        self.trigger.emitVectorConfigurationTableEntryTrigger()
-        self.trigger.emitVectorTableTrigger()
-        self.close()
+        vector = Vector()
+        vector.name = self.vectorConfigurationEdit.toPlainText()
+        vector.vectorDescription = self.vectorConfigurationDescriptionEdit.toPlainText()
+        if self.clientHandler.vectorManager.addVector(vector):
+            self.triggerHelper.emitVectorConfigurationTableTrigger()
+            self.close()
 
-    def delete(self):
-        self.vector.removeVectorConfiguration(self.vectorConfiguration.id)
-        logEntry = self.vectorConfiguration.logEntry
-        vectorIndex = logEntry.associatedVectors.index(self.vector.vectorName)
-        del logEntry.associatedVectors[vectorIndex]
-        self.trigger.emitVectorTableTrigger()
-        self.close()
 

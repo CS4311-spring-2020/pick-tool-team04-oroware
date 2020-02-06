@@ -56,5 +56,11 @@ class VectorManager:
             relationship.label = "causes"
         self.vectors[pulledVector2.vectorName] = pulledVector2
 
+    def addVector(self, vector):
+        if vector.name in self.vectors:
+            return False
+        self.vectors[vector.name] = vector
+        return True
+
 
 

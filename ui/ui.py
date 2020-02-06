@@ -336,8 +336,8 @@ class Ui_PICK(object):
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
             self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Description"), vectorDescriptionItem)
             rowNum += 1
-        self.vectorConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
-        #self.vectorConfigurationTableWidget.doubleClicked.connect(self.vectorConfigurationDoubleClicked())
+        # self.vectorConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        # self.vectorConfigurationTableWidget.doubleClicked.connect(self.vectorConfigurationDoubleClicked())
 
     def updatePullTable(self, pulledVectorManager):
         vectors = pulledVectorManager.vectors
@@ -361,6 +361,7 @@ class Ui_PICK(object):
             graphButton.setText("View Graph")
             self.pullTableWidget.setCellWidget(rowNum, self.colsPullTable.index("Vector Graph"), graphButton)
             rowNum += 1
+        self.pullTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.pushTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def updatePushTable(self, pushedVectorManager):
@@ -385,6 +386,7 @@ class Ui_PICK(object):
             graphButton.setText("View Graph")
             self.pushTableWidget.setCellWidget(rowNum, self.colsPushTable.index("Vector Graph"), graphButton)
             rowNum += 1
+        self.pushTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.pushTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def updateApproveTable(self, pushedVectors, pushedIps, pushedTimestamps, changeSummaries):
@@ -416,6 +418,7 @@ class Ui_PICK(object):
             approveButton = QtWidgets.QPushButton()
             approveButton.setText("Approve")
             self.approvalTableWidget.setCellWidget(rowNum, self.colsApproveTable.index("Approve"), approveButton)
+        self.approvalTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.approvalTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def updateIconConfigurationTable(self):
@@ -669,12 +672,19 @@ class Ui_PICK(object):
         self.vectorConfigurationLayout.addWidget(self.editVectorButton)
         self.addVectorButton = QtWidgets.QPushButton(self.vectorConfigurationTab)
         self.vectorConfigurationLayout.addWidget(self.addVectorButton)
+        self.addVectorButton.clicked.connect(self.handleAddVector)
         self.vectorConfigurationTableWidget = QtWidgets.QTableWidget(self.vectorConfigurationTab)
         self.vectorConfigurationTableWidget.setColumnCount(0)
         self.vectorConfigurationTableWidget.setRowCount(0)
         self.vectorConfigurationTableWidget.setMinimumSize(1250, 1750)
         self.vectorConfigurationLayout.addWidget(self.vectorConfigurationTableWidget)
         self.tabWidget.addTab(self.vectorConfigurationTab, "")
+
+    def handleAddVector(self):
+        triggerHelper = TriggerHelper()
+        self.vectorConfigurationPopup = VectorConfigurationPopup(triggerHelper, self.clientHandler)
+        self.vectorConfigurationPopup.setGeometry(100, 200, 200, 200)
+        self.vectorConfigurationPopup.show()
 
     def setupIconConfigurationTab(self):
         self.iconConfigurationTab = QtWidgets.QWidget()
@@ -951,9 +961,13 @@ class TriggerHelper(QObject):
     updateRelationshipTableEntryTrigger = pyqtSignal()
     updateVectorTableTrigger = pyqtSignal()
     updateIconTableTrigger = pyqtSignal()
+    updateVectorConfigurationTableTrigger = pyqtSignal()
 
     def connectRelationshipTableTrigger(self):
         self.updateRelationshipTableTrigger.connect(ui.handleRelationshipTableTrigger)
+
+    def connectVectorConfigurationTableTrigger(self):
+        self.updateVectorConfigurationTableTrigger.connect(ui.updateVectorConfigurationTable)
 
     def connectIconTableTrigger(self):
         self.updateIconTableTrigger.connect(ui.updateIconConfigurationTable)
@@ -993,6 +1007,9 @@ class TriggerHelper(QObject):
 
     def emitSearchLogTableEntryTrigger(self):
         self.updateSearchLogTableEntryTrigger.emit()
+
+    def emitVectorConfigurationTableTrigger(self):
+        self.updateVectorConfigurationTableTrigger.emit()
 
 class CheckableComboBox(QtWidgets.QComboBox):
     def __init__(self, logEntry):
