@@ -46,7 +46,6 @@ class LogEntryPopup(QWidget):
         self.setWindowTitle("Log Entry Edit Popup")
 
     def onSaveClick(self):
-        global logEntryManager
         self.logEntryDescriptionWidget.setText(self.logEntryDescriptionTextEdit.toPlainText())
         self.logEntry.description = self.logEntryDescriptionTextEdit.toPlainText()
         newVectors = list()
@@ -55,7 +54,7 @@ class LogEntryPopup(QWidget):
                 newVectors.append(self.associationComboBox.itemText(i))
             item = self.associatedVectorsWidget.model().item(i, 0)
             item.setCheckState(self.associationComboBox.model().item(i, 0).checkState())
-        logEntryManager.editLogEntryVectors(self.logEntry, newVectors)
+        self.clientHandler.editLogEntryVectors(self.logEntry, newVectors)
         self.close()
 
 class CheckableComboBox(QtWidgets.QComboBox):

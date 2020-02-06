@@ -2,7 +2,9 @@ import copy
 
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtWidgets import QTableWidgetItem, QVBoxLayout
+from PyQt5.QtWidgets import QTableWidgetItem, QVBoxLayout, QFileDialog
+
+from AddIconPopup import AddIconPopup
 from GraphWidget import GraphWidget
 import sys
 import datetime
@@ -26,12 +28,12 @@ class Ui_PICK(object):
     def setupTabWidget(self):
         self.tabWidget = QtWidgets.QTabWidget(self.mainWindow)
 
-    def setupIngestionTab(self):
-        self.ingestionTab = QtWidgets.QWidget()
-        self.ingestionTabLayout = QtWidgets.QVBoxLayout(self.ingestionTab)
+    def setupTeamTab(self):
+        self.teamConfigurationTab = QtWidgets.QWidget()
+        self.teamConfigurationTabLayout = QtWidgets.QVBoxLayout(self.teamConfigurationTab)
 
         # Initialize Team Configuration
-        self.teamConfiguration = QtWidgets.QFrame(self.ingestionTab)
+        self.teamConfiguration = QtWidgets.QFrame(self.teamConfigurationTab)
         self.teamConfiguration.setFrameShape(QtWidgets.QFrame.Box)
         self.teamConfigurationLayout = QtWidgets.QVBoxLayout(self.teamConfiguration)
         self.teamConfigurationLabel = QtWidgets.QLabel(self.teamConfiguration)
@@ -48,36 +50,10 @@ class Ui_PICK(object):
         self.teamConfigurationLayout.addWidget(self.numConnectionsLabel)
         self.connectButton = QtWidgets.QPushButton(self.teamConfiguration)
         self.teamConfigurationLayout.addWidget(self.connectButton)
-        self.ingestionTabLayout.addWidget(self.teamConfiguration)
-
-        # Intialize Directory Configuration
-        self.directoryConfiguration = QtWidgets.QFrame(self.ingestionTab)
-        self.directoryConfiguration.setFrameShape(QtWidgets.QFrame.Box)
-        self.directoryConfigurationLayout = QtWidgets.QVBoxLayout(self.directoryConfiguration)
-        self.directoryConfigurationLabel = QtWidgets.QLabel(self.directoryConfiguration)
-        self.directoryConfigurationLayout.addWidget(self.directoryConfigurationLabel)
-        self.rootLabel = QtWidgets.QLabel(self.directoryConfiguration)
-        self.directoryConfigurationLayout.addWidget(self.rootLabel)
-        self.rootTextEdit = QtWidgets.QTextEdit(self.directoryConfiguration)
-        self.directoryConfigurationLayout.addWidget(self.rootTextEdit)
-        self.redTeamLabel = QtWidgets.QLabel(self.directoryConfiguration)
-        self.directoryConfigurationLayout.addWidget(self.redTeamLabel)
-        self.redTeamEdit = QtWidgets.QTextEdit(self.directoryConfiguration)
-        self.directoryConfigurationLayout.addWidget(self.redTeamEdit)
-        self.blueTeamLabel = QtWidgets.QLabel(self.directoryConfiguration)
-        self.directoryConfigurationLayout.addWidget(self.blueTeamLabel)
-        self.blueTeamEdit = QtWidgets.QTextEdit(self.directoryConfiguration)
-        self.directoryConfigurationLayout.addWidget(self.blueTeamEdit)
-        self.whiteTeamLabel = QtWidgets.QLabel(self.directoryConfiguration)
-        self.directoryConfigurationLayout.addWidget(self.whiteTeamLabel)
-        self.whiteTeamEdit = QtWidgets.QTextEdit(self.directoryConfiguration)
-        self.directoryConfigurationLayout.addWidget(self.whiteTeamEdit)
-        self.ingestionButton = QtWidgets.QPushButton(self.directoryConfiguration)
-        self.directoryConfigurationLayout.addWidget(self.ingestionButton)
-        self.ingestionTabLayout.addWidget(self.directoryConfiguration)
+        self.teamConfigurationTabLayout.addWidget(self.teamConfiguration)
 
         # Initialize Event Configuration
-        self.eventConfiguration = QtWidgets.QFrame(self.ingestionTab)
+        self.eventConfiguration = QtWidgets.QFrame(self.teamConfigurationTab)
         self.eventConfiguration.setFrameShape(QtWidgets.QFrame.Box)
         self.eventConfigurationLayout = QtWidgets.QVBoxLayout(self.eventConfiguration)
         self.eventConfigurationLabel = QtWidgets.QLabel(self.eventConfiguration)
@@ -98,12 +74,65 @@ class Ui_PICK(object):
         self.eventConfigurationLayout.addWidget(self.endEventConfigurationLabel)
         self.endEventConfigurationDateEdit = QtWidgets.QDateTimeEdit(self.eventConfiguration)
         self.eventConfigurationLayout.addWidget(self.endEventConfigurationDateEdit)
-        self.ingestionTabLayout.addWidget(self.eventConfiguration)
+        self.teamConfigurationTabLayout.addWidget(self.eventConfiguration)
         self.saveEventButton = QtWidgets.QPushButton(self.eventConfiguration)
         self.eventConfigurationLayout.addWidget(self.saveEventButton)
 
         # Intialize Ingestion Tab
-        self.tabWidget.addTab(self.ingestionTab, "")
+        self.tabWidget.addTab(self.teamConfigurationTab, "")
+
+    def setupDirectoryTab(self):
+        self.directoryTab = QtWidgets.QWidget()
+        self.directoryTabLayout = QtWidgets.QVBoxLayout(self.directoryTab)
+
+        # Intialize Directory Configuration
+        self.rootConfiguration = QtWidgets.QFrame(self.directoryTab)
+        self.rootConfiguration.setFrameShape(QtWidgets.QFrame.Box)
+        self.rootConfigurationLayout = QtWidgets.QVBoxLayout(self.rootConfiguration)
+        self.directoryConfigurationLabel = QtWidgets.QLabel(self.rootConfiguration)
+        self.rootConfigurationLayout.addWidget(self.directoryConfigurationLabel)
+        self.rootLabel = QtWidgets.QLabel(self.rootConfiguration)
+        self.rootConfigurationLayout.addWidget(self.rootLabel)
+        self.rootDialog = QFileDialog()
+        self.rootDialog.setFileMode(QFileDialog.DirectoryOnly)
+        self.rootConfigurationLayout.addWidget(self.rootDialog)
+        self.directoryTabLayout.addWidget(self.rootConfiguration)
+
+        self.redTeamConfiguration = QtWidgets.QFrame(self.directoryTab)
+        self.redTeamConfiguration.setFrameShape(QtWidgets.QFrame.Box)
+        self.redTeamConfigurationLayout = QtWidgets.QVBoxLayout(self.redTeamConfiguration)
+        self.redTeamLabel = QtWidgets.QLabel(self.redTeamConfiguration)
+        self.redTeamConfigurationLayout.addWidget(self.redTeamLabel)
+        self.redTeamDialog = QFileDialog()
+        self.redTeamDialog.setFileMode(QFileDialog.DirectoryOnly)
+        self.redTeamConfigurationLayout.addWidget(self.redTeamDialog)
+        self.directoryTabLayout.addWidget(self.redTeamConfiguration)
+
+        self.blueTeamConfiguration = QtWidgets.QFrame(self.directoryTab)
+        self.blueTeamConfiguration.setFrameShape(QtWidgets.QFrame.Box)
+        self.blueTeamConfigurationLayout = QtWidgets.QVBoxLayout(self.blueTeamConfiguration)
+        self.blueTeamLabel = QtWidgets.QLabel(self.blueTeamConfiguration)
+        self.blueTeamConfigurationLayout.addWidget(self.blueTeamLabel)
+        self.blueTeamDialog = QFileDialog()
+        self.blueTeamDialog.setFileMode(QFileDialog.DirectoryOnly)
+        self.blueTeamConfigurationLayout.addWidget(self.blueTeamDialog)
+        self.directoryTabLayout.addWidget(self.blueTeamConfiguration)
+
+        self.whiteTeamConfiguration = QtWidgets.QFrame(self.directoryTab)
+        self.whiteTeamConfiguration.setFrameShape(QtWidgets.QFrame.Box)
+        self.whiteTeamConfigurationLayout = QtWidgets.QVBoxLayout(self.whiteTeamConfiguration)
+        self.whiteTeamLabel = QtWidgets.QLabel(self.whiteTeamConfiguration)
+        self.whiteTeamConfigurationLayout.addWidget(self.whiteTeamLabel)
+        self.whiteTeamDialog = QFileDialog()
+        self.whiteTeamDialog.setFileMode(QFileDialog.DirectoryOnly)
+        self.whiteTeamConfigurationLayout.addWidget(self.whiteTeamDialog)
+        self.ingestionButton = QtWidgets.QPushButton(self.whiteTeamConfiguration)
+        self.whiteTeamConfigurationLayout.addWidget(self.ingestionButton)
+        self.directoryTabLayout.addWidget(self.whiteTeamConfiguration)
+
+        # Intialize Ingestion Tab
+        self.tabWidget.addTab(self.directoryTab, "")
+
 
     def handleVectorComboBoxConfiguration(self, index):
         if self.vectorComboBoxConfiguration.count() > 0:
@@ -641,6 +670,7 @@ class Ui_PICK(object):
         self.iconConfigurationLabel = QtWidgets.QLabel(self.iconConfigurationTab)
         self.iconConfigurationLayout.addWidget(self.iconConfigurationLabel)
         self.addIconButton = QtWidgets.QPushButton(self.iconConfigurationTab)
+        self.addIconButton.clicked.connect(self.handleAddIcon)
         self.iconConfigurationLayout.addWidget(self.addIconButton)
         self.iconConfigurationTableWidget = QtWidgets.QTableWidget(self.iconConfigurationTab)
         self.iconConfigurationTableWidget.setColumnCount(0)
@@ -648,6 +678,12 @@ class Ui_PICK(object):
         self.iconConfigurationTableWidget.setMinimumSize(1250, 1750)
         self.iconConfigurationLayout.addWidget(self.iconConfigurationTableWidget)
         self.tabWidget.addTab(self.iconConfigurationTab, "")
+
+    def handleAddIcon(self):
+        triggerHelper = TriggerHelper()
+        self.addIconPopup = AddIconPopup(triggerHelper, self.clientHandler)
+        self.addIconPopup.setGeometry(100, 200, 200, 200)
+        self.addIconPopup.show()
 
     def handleExport(self):
         if self.vectorComboBoxTable.count() > 0:
@@ -802,7 +838,8 @@ class Ui_PICK(object):
 
         self.setupMainWindow(PICK)
         self.setupTabWidget()
-        self.setupIngestionTab()
+        self.setupTeamTab()
+        self.setupDirectoryTab()
         self.setupSearchLogsTab()
         self.setupVectorConfigurationTab()
         self.setupIconConfigurationTab()
@@ -845,9 +882,10 @@ class Ui_PICK(object):
             self.pullButton.setText("Pull Button")
         self.eventConfigurationLabel.setText("EVENT CONFIGURATION")
         self.leadCheckBox.setText("Lead")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.ingestionTab), "Ingestion")
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.teamConfigurationTab), "Team and Event Configuration")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.vectorConfigurationTab), "Vector Configuration")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.iconConfigurationTab), "Icon Configuration")
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.directoryTab), "Directory Configuration")
         self.keywordSearchLabel.setText("Keyword Search:")
         self.creatorSearchLabel.setText("Creator:")
         self.creatorBlueTeamCheckBox.setText("Blue Team")
@@ -900,9 +938,13 @@ class TriggerHelper(QObject):
     updateSearchLogTableEntryTrigger = pyqtSignal()
     updateRelationshipTableEntryTrigger = pyqtSignal()
     updateVectorTableTrigger = pyqtSignal()
+    updateIconTableTrigger = pyqtSignal()
 
     def connectRelationshipTableTrigger(self):
         self.updateRelationshipTableTrigger.connect(ui.handleRelationshipTableTrigger)
+
+    def connectIconTableTrigger(self):
+        self.updateIconTableTrigger.connect(ui.updateIconConfigurationTable)
 
     def connectVectorGraphTrigger(self):
         self.updateVectorGraphTrigger.connect(ui.handleVectorGraphTrigger)
@@ -918,6 +960,9 @@ class TriggerHelper(QObject):
 
     def connectRelationshipTableEntryTrigger(self, logEntry, vectorName):
         self.updateRelationshipTableEntryTrigger.connect(lambda: ui.handleRelationshipTableEntryUpdate(logEntry, vectorName))
+
+    def emitIconTableTrigger(self):
+        self.updateIconTableTrigger.emit()
 
     def emitVectorGraphTrigger(self):
         self.updateVectorGraphTrigger.emit()
