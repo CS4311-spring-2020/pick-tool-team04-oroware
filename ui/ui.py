@@ -151,6 +151,8 @@ class Ui_PICK(object):
         self.searchLogsLayout.addWidget(self.toDateTimeEditSearchLogs)
         self.searchButton = QtWidgets.QPushButton(self.searchLogsTab)
         self.searchLogsLayout.addWidget(self.searchButton)
+        # Connects Apply Filter button to method handleSearchButtonClicked
+        self.searchButton.clicked.connect(self.handleSearchButtonClicked)
         self.logEntryConfigurationLabel = QtWidgets.QLabel(self.searchLogsTab)
         self.searchLogsLayout.addWidget(self.logEntryConfigurationLabel)
         self.searchLogsTableWidget = QtWidgets.QTableWidget(self.searchLogsTab)
@@ -159,6 +161,34 @@ class Ui_PICK(object):
         self.searchLogsTableWidget.setMinimumSize(1250, 1750)
         self.searchLogsLayout.addWidget(self.searchLogsTableWidget)
         self.tabWidget.addTab(self.searchLogsTab, "")
+
+    def handleSearchButtonClicked(self):
+        validLogEntries = list()
+        for logEntryId, logEntry in self.clientHandler.logEntryManager.logEntries.items():
+            valid = True
+            if not (self.commandSearchTextEdit.toPlainText() in logEntry.description):
+                valid = False
+            if self.creatorBlueTeamCheckBox.isChecked() and ("Blue" not in logEntry.creator):
+                valid = False
+            if self.creatorWhiteTeamCheckBox.isChecked() and ("White" not in logEntry.creator):
+                valid = False
+            if self.creatorRedTeamCheckBox.isChecked() and ("Red" not in logEntry.creator):
+                valid = False
+            if self.eventTypeBlueTeamCheckBox.isChecked() and ("Blue" not in logEntry.eventType):
+                valid = False
+            if self.eventTypeWhiteTeamCheckBox.isChecked() and ("White" not in logEntry.eventType):
+                valid = False
+            if self.eventTypeRedTeamCheckBox.isChecked() and ("Red" not in logEntry.eventType):
+                valid = False
+            if self.fromDateTimeEditSearchLogs.text() < self.startEventConfigurationDateEdit.text():
+                valid = False
+            if self.toDateTimeEditSearchLogs.text() > self.endEventConfigurationDateEdit.text():
+                valid = False
+
+            if(valid):
+                validLogEntries.append(logEntry)
+        self.clientHandler.logEntryManager.logEntriesInTable = validLogEntries
+        self.updateLogTable()
 
     def setupVectorDbTab(self):
         self.vectorDbTab = QtWidgets.QWidget()
