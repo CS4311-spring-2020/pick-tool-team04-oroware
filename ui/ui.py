@@ -17,6 +17,7 @@ from ClientHandler import ClientHandler
 from LogEntryViewPopup import LogEntryViewPopup
 from RelationshipPopup import RelationshipPopup
 from SignificantEventPopup import SignificantEventPopup
+from VectorConfigurationPopup import VectorConfigurationPopup
 
 
 class Ui_PICK(object):
@@ -336,6 +337,7 @@ class Ui_PICK(object):
             self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Description"), vectorDescriptionItem)
             rowNum += 1
         self.vectorConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        #self.vectorConfigurationTableWidget.doubleClicked.connect(self.vectorConfigurationDoubleClicked())
 
     def updatePullTable(self, pulledVectorManager):
         vectors = pulledVectorManager.vectors
@@ -561,6 +563,16 @@ class Ui_PICK(object):
         self.editEventPopup = SignificantEventPopup(vector, significantEventToEdit, trigger)
         self.editEventPopup.setGeometry(100, 200, 200, 200)
         self.editEventPopup.show()
+
+    def vectorConfigurationDoubleClicked(self):
+        trigger = TriggerHelper()
+        #vectorConfigurationId = self.vectorConfigurationTableWidget.verticalHeaderItem(self.vectorConfigurationTableWidget.selectionModel().selectedIndexes()[0].row()).text()
+        #vectorName = self.vectorComboBoxTable.currentText()
+        #vector = self.clientHandler.vectorManager.vectors[vectorName]
+        #vectorConfigurationToEdit = vector.vectorConfiguration[int(vectorConfigurationId)]
+        #self.editVectorConfigurationPopup = VectorConfigurationPopup(vector, vectorConfigurationToEdit, trigger)
+        #self.editVectorConfigurationPopup.setGeometry(100, 200, 200, 200)
+        #self.editVectorConfigurationPopup.show()
 
     def relationshipTableDoubleClicked(self):
         trigger = TriggerHelper()
