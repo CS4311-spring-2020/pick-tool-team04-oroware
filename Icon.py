@@ -1,3 +1,6 @@
+from PyQt5 import QtGui
+from imageio import imread
+
 class Icon:
 
     DEFAULT = "Default"
@@ -5,7 +8,7 @@ class Icon:
         self.name = ""
         self.source = ""
         self.rowIndexInTable = -1
-        self.preview = None
+        self.pixmap = None
 
-    def getImageFromSource(self):
-        return None
+    def getPixmapFromSource(self):
+        self.pixmap = QtGui.QPixmap(self.source)

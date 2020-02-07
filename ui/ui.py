@@ -2,13 +2,17 @@ import copy
 
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtGui import QStandardItem, QImage
 from PyQt5.QtWidgets import QTableWidgetItem, QVBoxLayout, QFileDialog
+from matplotlib.backends.backend_template import FigureCanvas
+from matplotlib.figure import Figure
 
 from AddIconPopup import AddIconPopup
 from GraphWidget import GraphWidget
 import sys
 import datetime
 import xlwt
+import matplotlib.pyplot as plt
 
 from Icon import Icon
 from LogEntry import LogEntry
@@ -214,7 +218,6 @@ class Ui_PICK(object):
                 valid = False
             if self.toDateTimeEditSearchLogs.text() > self.endEventConfigurationDateEdit.text():
                 valid = False
-
             if(valid):
                 validLogEntries.append(logEntry)
         self.clientHandler.logEntryManager.logEntriesInTable = validLogEntries
@@ -293,13 +296,13 @@ class Ui_PICK(object):
             self.searchLogsTableWidget.setRowHeight(rowNum, 50)
             logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntries[rowNum].description)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Content"), logEntryDescriptionItem)
-            logEntryTeamItem = QtWidgets.QTableWidgetItem(self.clientHandler.logEntryManager.logEntries[rowNum].creator)
+            logEntryTeamItem = QtWidgets.QTableWidgetItem(logEntries[rowNum].creator)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Creator"), logEntryTeamItem)
-            logEntryArtifactItem = QtWidgets.QTableWidgetItem(self.clientHandler.logEntryManager.logEntries[rowNum].artifact)
+            logEntryArtifactItem = QtWidgets.QTableWidgetItem(logEntries[rowNum].artifact)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Artifact"), logEntryArtifactItem)
-            logEntryEventTypeItem = QtWidgets.QTableWidgetItem(self.clientHandler.logEntryManager.logEntries[rowNum].eventType)
+            logEntryEventTypeItem = QtWidgets.QTableWidgetItem(logEntries[rowNum].eventType)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Event Type"), logEntryEventTypeItem)
-            logEntryDateItem = QtWidgets.QTableWidgetItem(self.clientHandler.logEntryManager.logEntries[rowNum].date)
+            logEntryDateItem = QtWidgets.QTableWidgetItem(logEntries[rowNum].date)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Timestamp"), logEntryDateItem)
             logEntries[rowNum].rowIndexInTable = rowNum
             vectorComboBoxSearchTable = CheckableComboBox(logEntries[rowNum])
@@ -441,7 +444,7 @@ class Ui_PICK(object):
                                                iconNameItem)
             iconSourceItem = QtWidgets.QTableWidgetItem(icon.source)
             self.iconConfigurationTableWidget.setItem(rowNum, self.colsIconConfigurationTable.index("Icon Source"), iconSourceItem)
-            viewIconButton = QtWidgets.QPushButton()
+            viewIconButton = ViewIconButton(iconName, icon.pixmap)
             viewIconButton.setText("View Icon")
             self.iconConfigurationTableWidget.setCellWidget(rowNum, self.colsIconConfigurationTable.index("Icon Preview"),
                                                      viewIconButton)
@@ -547,6 +550,15 @@ class Ui_PICK(object):
         self.viewGraphWindow.setWindowTitle("View Graph Popup")
         self.viewGraphWindow.setGeometry(500, 500, 600, 600)
         self.viewGraphWindow.show()
+
+    def viewIconClicked(self, name, pixmap):
+        self.labelImageDisplay = QtWidgets.QLabel()
+        self.labelImageDisplay.setWindowTitle(name)
+        self.labelImageDisplay.setPixmap(pixmap)
+        self.labelImageDisplay.setAlignment(QtCore.Qt.AlignCenter)
+        self.labelImageDisplay.setScaledContents(True)
+        self.labelImageDisplay.setMinimumSize(1, 1)
+        self.labelImageDisplay.show()
 
     def searchTableDoubleClicked(self):
         logEntryId = self.searchLogsTableWidget.verticalHeaderItem(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row()).text()
@@ -1027,7 +1039,7 @@ class CheckableComboBox(QtWidgets.QComboBox):
         newVectors = list()
         for i in range(self.count()):
             if self.model().item(i, 0).checkState() == QtCore.Qt.Checked:
-                newVectors.append(self.associationComboBox.itemText(i))
+                newVectors.append(self.model().itemFromIndex(index).text())
         ui.clientHandler.vectorManager.handleUpdateToLogEntry(self.logEntry.associatedVectors, newVectors, self.logEntry)
 
 class IconComboBox(QtWidgets.QComboBox):
@@ -1072,6 +1084,16 @@ class ViewGraphButton(QtWidgets.QPushButton):
 
     def handleClick(self):
         ui.viewGraphClicked(self.vector)
+
+class ViewIconButton(QtWidgets.QPushButton):
+    def __init__(self, name, pixmap):
+        super(ViewIconButton, self).__init__()
+        self.name = name
+        self.pixmap = pixmap
+        self.clicked.connect(self.handleClick)
+
+    def handleClick(self):
+        ui.viewIconClicked(self.name, self.pixmap)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
