@@ -27,7 +27,7 @@ class VectorConfigurationPopup(QWidget):
 
     def onSaveClick(self):
         vector = Vector()
-        vector.name = self.vectorConfigurationEdit.toPlainText()
+        vector.vectorName = self.vectorConfigurationEdit.toPlainText()
         vector.vectorDescription = self.vectorConfigurationDescriptionEdit.toPlainText()
         if self.clientHandler.vectorManager.addVector(vector):
             self.triggerHelper.emitVectorConfigurationTableTrigger()

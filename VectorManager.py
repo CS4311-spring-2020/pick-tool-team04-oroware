@@ -57,9 +57,9 @@ class VectorManager:
         self.vectors[pulledVector2.vectorName] = pulledVector2
 
     def addVector(self, vector):
-        if vector.name in self.vectors:
+        if vector.vectorName in self.vectors:
             return False
-        self.vectors[vector.name] = vector
+        self.vectors[vector.vectorName] = vector
         return True
 
 

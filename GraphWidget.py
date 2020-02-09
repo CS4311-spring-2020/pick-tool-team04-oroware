@@ -11,6 +11,10 @@ class GraphWidget(QWidget):
     MINIMUM_NODE_SIZE = 1000
     STARTING_NODE_SIZE = 2000
     MAXIMIMUM_NODE_SIZE = 5000
+    MINIMUM_FONT_SIZE = 10
+    STARTING_FONT_SIZE = 12
+    MAXIMIMUM_FONT_SIZE = 20
+
     def __init__(self, parent, trigger, mutable=True):
         self.trigger = trigger
         super(GraphWidget, self).__init__(parent)
@@ -25,6 +29,7 @@ class GraphWidget(QWidget):
         self.node1 = None
         self.node2 = None
         self.nodeSize = GraphWidget.STARTING_NODE_SIZE
+        self.fontSize = GraphWidget.STARTING_FONT_SIZE
         self.vbox = QVBoxLayout()
         self.setLayout(self.vbox)
         self.figure = plt.figure()
@@ -39,6 +44,7 @@ class GraphWidget(QWidget):
         self.node1 = None
         self.node2 = None
         self.nodeSize = GraphWidget.STARTING_NODE_SIZE
+        self.fontSize = GraphWidget.STARTING_FONT_SIZE
         vbox = QVBoxLayout()
         self.setLayout(vbox)
         self.figure = plt.figure()
@@ -152,8 +158,8 @@ class GraphWidget(QWidget):
     def paint(self):
         self.figure.clf()
         nx.draw(self.vectorGraph, node_size=self.nodeSizes, node_color=self.nodeColors, pos=self.pos, font_color="black")
-        nx.draw_networkx_labels(self.vectorGraph, pos=self.pos, labels=self.nodeLabels)
-        nx.draw_networkx_edge_labels(self.vectorGraph, pos=self.pos, edge_labels=self.edgeLabels)
+        nx.draw_networkx_labels(self.vectorGraph, pos=self.pos, labels=self.nodeLabels, font_size=self.fontSize)
+        nx.draw_networkx_edge_labels(self.vectorGraph, pos=self.pos, edge_labels=self.edgeLabels, font_size=self.fontSize)
         self.canvas.draw_idle()
 
     def maximize(self):
@@ -161,6 +167,7 @@ class GraphWidget(QWidget):
             self.nodeSizes = list()
             self.nodeColors = list()
             self.nodeSize = (self.nodeSize + 300) if self.nodeSize < GraphWidget.MAXIMIMUM_NODE_SIZE else GraphWidget.MAXIMIMUM_NODE_SIZE
+            self.fontSize = (self.fontSize + 1) if self.fontSize < GraphWidget.MAXIMIMUM_FONT_SIZE else GraphWidget.MAXIMIMUM_FONT_SIZE
             for i in list(self.pos.keys()):
                 if i < 0:
                     self.nodeColors.append("white")
@@ -180,6 +187,7 @@ class GraphWidget(QWidget):
             self.nodeSizes = list()
             self.nodeColors = list()
             self.nodeSize = (self.nodeSize - 300) if self.nodeSize > GraphWidget.MINIMUM_NODE_SIZE else GraphWidget.MINIMUM_NODE_SIZE
+            self.fontSize = (self.fontSize - 1) if self.fontSize > GraphWidget.MINIMUM_FONT_SIZE else GraphWidget.MINIMUM_FONT_SIZE
             for i in list(self.pos.keys()):
                 if i < 0:
                     self.nodeColors.append("white")

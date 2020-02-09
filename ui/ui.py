@@ -279,6 +279,11 @@ class Ui_PICK(object):
         self.pushedVectorManager = copy.deepcopy(self.clientHandler.vectorManager)
         self.updatePushTable(self.pushedVectorManager)
 
+    def handleVectorConfigurationTableTrigger(self):
+        self.updateVectorConfigurationTable()
+        self.updateVectorComboBoxes()
+        self.updateLogTable()
+
     def updateLogTable(self):
         logEntries = self.clientHandler.logEntryManager.logEntriesInTable
         totalRows = len(logEntries)
@@ -308,6 +313,7 @@ class Ui_PICK(object):
             vectorComboBoxSearchTable = CheckableComboBox(logEntries[rowNum])
             counter = 0
             for vector in self.clientHandler.vectorManager.vectors.values():
+                print(vector.vectorName)
                 vectorComboBoxSearchTable.addItem(vector.vectorName)
                 item = vectorComboBoxSearchTable.model().item(counter, 0)
                 if vector.vectorName in logEntries[rowNum].associatedVectors:
@@ -979,7 +985,7 @@ class TriggerHelper(QObject):
         self.updateRelationshipTableTrigger.connect(ui.handleRelationshipTableTrigger)
 
     def connectVectorConfigurationTableTrigger(self):
-        self.updateVectorConfigurationTableTrigger.connect(ui.updateVectorConfigurationTable)
+        self.updateVectorConfigurationTableTrigger.connect(ui.handleVectorConfigurationTableTrigger)
 
     def connectIconTableTrigger(self):
         self.updateIconTableTrigger.connect(ui.updateIconConfigurationTable)
