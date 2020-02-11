@@ -146,6 +146,7 @@ class Ui_PICK(object):
     def handleVectorComboBoxTable(self, index):
         if self.vectorComboBoxTable.count() > 0:
             currentVector = self.clientHandler.vectorManager.vectors[index.data()]
+            self.vectorDescriptionLabel.setText("Vector Description: " + currentVector.vectorDescription)
             self.updateVectorTable(currentVector)
             self.updateRelationshipTable(currentVector)
             self.updateVectorGraph(currentVector)
@@ -313,7 +314,6 @@ class Ui_PICK(object):
             vectorComboBoxSearchTable = CheckableComboBox(logEntries[rowNum])
             counter = 0
             for vector in self.clientHandler.vectorManager.vectors.values():
-                print(vector.vectorName)
                 vectorComboBoxSearchTable.addItem(vector.vectorName)
                 item = vectorComboBoxSearchTable.model().item(counter, 0)
                 if vector.vectorName in logEntries[rowNum].associatedVectors:
@@ -1058,9 +1058,12 @@ class IconComboBox(QtWidgets.QComboBox):
     def handleItemPressed(self, index):
         newIconName = index.data()
         if newIconName == Icon.DEFAULT:
-            self.significantEvent.iconType = Icon.Default
+            self.significantEvent.iconType = Icon.DEFAULT
+            self.significantEvent.icon = None
         else:
-            self.significantEvent.iconType = newIconName
+            self.significantEvent.iconType = Icon.CUSTOM
+            self.significantEvent.icon = ui.clientHandler.iconManager.icons[newIconName]
+            ui.updateVectorGraph(ui.clientHandler.vectorManager.vectors[ui.vectorComboBoxTable.currentText()])
 
 class VisibilityCheckBox(QtWidgets.QCheckBox):
     def __init__(self, fieldName, vector):

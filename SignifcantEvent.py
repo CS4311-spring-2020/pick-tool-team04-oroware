@@ -6,6 +6,7 @@ class SignificantEvent:
         self.logEntry = None
         self.name = ""
         self.iconType = Icon.DEFAULT
+        self.icon = None
         self.description = ""
         self.position = None
         self.rowIndexInTable = -1

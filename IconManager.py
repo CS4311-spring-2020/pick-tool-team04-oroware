@@ -7,6 +7,7 @@ class IconManager:
         icon.name = "Blue Shield"
         icon.source = "C:/Users/marka/Desktop/software/pick-tool-team04-oroware/icons/blueshield.png"
         icon.getPixmapFromSource()
+        icon.getGraphImageFromSource()
         self.icons[icon.name] = icon
 
     def addIcon(self, icon):
@@ -14,4 +15,5 @@ class IconManager:
             return False
         self.icons[icon.name] = icon
         icon.getPixmapFromSource()
+        icon.getGraphImageFromSource()
         return True
