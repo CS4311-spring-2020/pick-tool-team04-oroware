@@ -615,7 +615,7 @@ class Ui_PICK(object):
         triggerHelper = TriggerHelper()
         triggerHelper.connectRelationshipTableTrigger()
         self.vectorGraphWidget = GraphWidget(self.graphWidget, triggerHelper)
-        self.vectorGraphWidget.setMinimumSize(QtCore.QSize(1500, 1500))
+        self.vectorGraphWidget.setMinimumSize(QtCore.QSize(500, 500))
         self.graphLayout.addWidget(self.vectorGraphWidget)
         self.graphFrame = QtWidgets.QFrame(self.graphWidget)
         self.graphFrame.setFrameShape(QtWidgets.QFrame.Box)
@@ -668,6 +668,25 @@ class Ui_PICK(object):
         self.editVectorLayout.addWidget(self.rightEditVectorWidget)
         self.tabWidget.addTab(self.editVectorTab, "")
         self.tabWidget.currentChanged.connect(self.onTabChange)
+
+    def setupLogFileConfigurationTab(self):
+        self.logFileConfigurationTab = QtWidgets.QWidget()
+        self.logFileConfigurationLayout = QtWidgets.QVBoxLayout(self.logFileConfigurationTab)
+        self.logFileTableLabel = QtWidgets.QLabel(self.logFileConfigurationTab)
+        self.logFileConfigurationLayout.addWidget(self.logFileTableLabel)
+        self.logFileTableWidget = QtWidgets.QTableWidget(self.logFileConfigurationTab)
+        self.logFileTableWidget.setColumnCount(0)
+        self.logFileTableWidget.setRowCount(0)
+        self.logFileTableWidget.setMinimumSize(1250, 1750)
+        self.logFileConfigurationLayout.addWidget(self.logFileTableWidget)
+        self.enforcementActionReportTableLabel = QtWidgets.QLabel(self.logFileConfigurationTab)
+        self.logFileConfigurationLayout.addWidget(self.enforcementActionReportTableLabel)
+        self.enforcementActionReportTableWidget = QtWidgets.QTableWidget(self.logFileConfigurationTab)
+        self.enforcementActionReportTableWidget.setColumnCount(0)
+        self.enforcementActionReportTableWidget.setRowCount(0)
+        self.enforcementActionReportTableWidget.setMinimumSize(1250, 1750)
+        self.logFileConfigurationLayout.addWidget(self.enforcementActionReportTableWidget)
+        self.tabWidget.addTab(self.logFileConfigurationTab, "")
 
     def setupVectorConfigurationTab(self):
         self.vectorConfigurationTab = QtWidgets.QWidget()
@@ -881,6 +900,7 @@ class Ui_PICK(object):
         self.setupTeamTab()
         self.setupDirectoryTab()
         self.setupSearchLogsTab()
+        self.setupLogFileConfigurationTab()
         self.setupVectorConfigurationTab()
         self.setupIconConfigurationTab()
         self.clientHandler.logEntryManager.searchLogEntryTableWidget = self.searchLogsTableWidget
@@ -903,6 +923,8 @@ class Ui_PICK(object):
 
     def setAllText(self, PICK):
         PICK.setWindowTitle("PICK Tool")
+        self.logFileTableLabel.setText("LOG FILE TABLE")
+        self.enforcementActionReportTableLabel.setText("ENFORCEMENT ACTION REPORT TABLE")
         self.vectorConfigurationLabel.setText("VECTOR CONFIGURATION")
         self.addVectorButton.setText("Add Vector")
         self.addIconButton.setText("Add Icon")
@@ -923,6 +945,7 @@ class Ui_PICK(object):
         self.eventConfigurationLabel.setText("EVENT CONFIGURATION")
         self.leadCheckBox.setText("Lead")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.teamConfigurationTab), "Team and Event Configuration")
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.logFileConfigurationTab), "Log File Configuration")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.vectorConfigurationTab), "Vector Configuration")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.iconConfigurationTab), "Icon Configuration")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.directoryTab), "Directory Configuration")
