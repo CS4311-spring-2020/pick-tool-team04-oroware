@@ -1,9 +1,12 @@
+import pickle
+
 from LogEntry import LogEntry
 from Vector import Vector
 
 class VectorManager:
     def __init__(self):
         self.vectors = dict()
+        self.filename = "vectors.pkl"
         self.logEntryManager = None
 
     def handleUpdateToLogEntry(self, oldVectorNames, newVectorNames, logEntry):
@@ -61,6 +64,14 @@ class VectorManager:
             return False
         self.vectors[vector.vectorName] = vector
         return True
+
+    def storeVectors(self):
+        with open(self.filename, 'wb') as pkl_file:
+            pickle.dump(self.vectors, pkl_file)
+
+    def retrieveLogEntries(self):
+        with open(self.filename, 'rb') as pkl_file:
+            self.vectors = pickle.load(pkl_file)
 
 
 

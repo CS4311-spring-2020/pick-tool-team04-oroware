@@ -1,14 +1,11 @@
+import pickle
+
 from Icon import Icon
 
 class IconManager:
     def __init__(self):
         self.icons = dict()
-        icon = Icon()
-        icon.name = "Blue Shield"
-        icon.source = "C:/Users/marka/Desktop/software/pick-tool-team04-oroware/icons/blueshield.png"
-        icon.getPixmapFromSource()
-        icon.getGraphImageFromSource()
-        self.icons[icon.name] = icon
+        self.filename = "icons.pkl"
 
     def addIcon(self, icon):
         if icon.name in self.icons:
@@ -17,3 +14,11 @@ class IconManager:
         icon.getPixmapFromSource()
         icon.getGraphImageFromSource()
         return True
+
+    def storeIcons(self):
+        with open(self.filename, 'wb') as pkl_file:
+            pickle.dump(self.icons, pkl_file)
+
+    def retrieveIcons(self):
+        with open(self.filename, 'rb') as pkl_file:
+            self.icons = pickle.load(pkl_file)

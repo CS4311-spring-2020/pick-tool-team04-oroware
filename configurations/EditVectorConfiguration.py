@@ -354,6 +354,7 @@ class IconComboBox(QtWidgets.QComboBox):
         if newIconName == Icon.DEFAULT:
             self.significantEvent.iconType = Icon.DEFAULT
             self.significantEvent.icon = None
+            self.updateVectorGraph(self.clientHandler.vectorManager.vectors[self.vectorName])
         else:
             self.significantEvent.iconType = Icon.CUSTOM
             self.significantEvent.icon = self.clientHandler.iconManager.icons[newIconName]

@@ -6,6 +6,7 @@ from configurations.DirectoryConfiguration import DirectoryConfiguration
 from configurations.EditVectorConfiguration import EditVectorConfiguration
 from configurations.IconConfiguration import IconConfiguration
 from configurations.LogEntryConfiguration import LogEntryConfiguration
+from configurations.LogFileConfiguration import LogFileConfiguration
 from configurations.TeamConfiguration import TeamConfiguration
 from configurations.VectorConfiguration import VectorConfiguration
 from configurations.VectorDbConfiguration import VectorDbConfiguration
@@ -49,22 +50,7 @@ class Ui_PICK(object):
         self.tabWidget.currentChanged.connect(self.onTabChange)
 
     def setupLogFileConfigurationTab(self):
-        self.logFileConfigurationTab = QtWidgets.QWidget()
-        self.logFileConfigurationLayout = QtWidgets.QVBoxLayout(self.logFileConfigurationTab)
-        self.logFileTableLabel = QtWidgets.QLabel(self.logFileConfigurationTab)
-        self.logFileConfigurationLayout.addWidget(self.logFileTableLabel)
-        self.logFileTableWidget = QtWidgets.QTableWidget(self.logFileConfigurationTab)
-        self.logFileTableWidget.setColumnCount(0)
-        self.logFileTableWidget.setRowCount(0)
-        self.logFileTableWidget.setMinimumSize(1250, 1750)
-        self.logFileConfigurationLayout.addWidget(self.logFileTableWidget)
-        self.enforcementActionReportTableLabel = QtWidgets.QLabel(self.logFileConfigurationTab)
-        self.logFileConfigurationLayout.addWidget(self.enforcementActionReportTableLabel)
-        self.enforcementActionReportTableWidget = QtWidgets.QTableWidget(self.logFileConfigurationTab)
-        self.enforcementActionReportTableWidget.setColumnCount(0)
-        self.enforcementActionReportTableWidget.setRowCount(0)
-        self.enforcementActionReportTableWidget.setMinimumSize(1250, 1750)
-        self.logFileConfigurationLayout.addWidget(self.enforcementActionReportTableWidget)
+        self.logFileConfigurationTab = LogFileConfiguration(self.clientHandler)
         self.tabWidget.addTab(self.logFileConfigurationTab, "")
 
     def setupVectorConfigurationTab(self):
