@@ -7,6 +7,10 @@ class ClientHandler():
         self.logEntryManager = LogEntryManager()
         self.vectorManager = VectorManager()
         self.iconManager = IconManager()
+        self.isLead = False
+        self.connectionStatus = False
+        self.establishedConnections = 0
+        self.numConnections = 0
 
     def editLogEntryVectors(self, logEntry, newVectors):
         oldVectors = logEntry.associatedVectors
