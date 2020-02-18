@@ -8,6 +8,8 @@ class ClientHandler():
         self.vectorManager = VectorManager()
         self.iconManager = IconManager()
         self.isLead = False
+        self.leadIP = None
+        self.serverIP = None
         self.connectionStatus = False
         self.establishedConnections = 0
         self.numConnections = 0

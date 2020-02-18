@@ -1,9 +1,12 @@
+import pickle
+
 from LogEntry import LogEntry
 
 class LogEntryManager:
     def __init__(self):
         self.logEntries = dict()
         self.logEntriesInTable = list()
+        self.filename = "logEntries.pkl"
         self.nextAvailableId = 5
         ids = [0, 1, 2, 3, 4]
         dates = ["1/31/2020 12:08 AM", "2/1/2020 11:43 PM", "2/2/2020 11:24 PM", "2/3/2020 11:01 AM", "2/4/2020 12:33 PM"]
@@ -28,5 +31,13 @@ class LogEntryManager:
             for significantEvent in list(vector.significantEvents.values()):
                 if significantEvent.logEntry.id in self.logEntries:
                     self.logEntries[significantEvent.logEntry.id].associatedVectors.append(vector.vectorName)
+
+    def storeLogEntries(self):
+        with open(self.filename, 'wb') as pkl_file:
+            pickle.dump(self.logEntries, pkl_file)
+
+    def retrieveLogEntries(self):
+        with open(self.filename, 'rb') as pkl_file:
+            self.logEntries = pickle.load(pkl_file)
 
 

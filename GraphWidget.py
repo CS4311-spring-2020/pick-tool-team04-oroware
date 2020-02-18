@@ -102,6 +102,8 @@ class GraphWidget(QWidget):
         self.pos = dict()
         self.nodeLabels = dict()
         self.iconLabels = dict()
+        self.axisMapping = dict()
+        self.iconMapping = dict()
         self.edgeLabels = dict()
         self.initializeHelperNodes()
         for significantEventId, significantEvent in vector.significantEvents.items():
@@ -221,7 +223,6 @@ class GraphWidget(QWidget):
             self.nodeSize = (self.nodeSize + 300) if self.nodeSize < GraphWidget.MAXIMUM_NODE_SIZE else GraphWidget.MAXIMUM_NODE_SIZE
             self.fontSize = (self.fontSize + 1) if self.fontSize < GraphWidget.MAXIMUM_FONT_SIZE else GraphWidget.MAXIMUM_FONT_SIZE
             self.iconSize = (self.iconSize + 0.01) if self.iconSize < GraphWidget.MAXIMUM_ICON_SIZE else GraphWidget.MAXIMUM_ICON_SIZE
-            print
             self.plotGraph()
 
     def minimize(self):
