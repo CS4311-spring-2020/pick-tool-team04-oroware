@@ -48,6 +48,25 @@ class Ui_PICK(object):
         self.tabWidget.addTab(self.editVectorTab, "")
         self.tabWidget.currentChanged.connect(self.onTabChange)
 
+    def setupLogFileConfigurationTab(self):
+        self.logFileConfigurationTab = QtWidgets.QWidget()
+        self.logFileConfigurationLayout = QtWidgets.QVBoxLayout(self.logFileConfigurationTab)
+        self.logFileTableLabel = QtWidgets.QLabel(self.logFileConfigurationTab)
+        self.logFileConfigurationLayout.addWidget(self.logFileTableLabel)
+        self.logFileTableWidget = QtWidgets.QTableWidget(self.logFileConfigurationTab)
+        self.logFileTableWidget.setColumnCount(0)
+        self.logFileTableWidget.setRowCount(0)
+        self.logFileTableWidget.setMinimumSize(1250, 1750)
+        self.logFileConfigurationLayout.addWidget(self.logFileTableWidget)
+        self.enforcementActionReportTableLabel = QtWidgets.QLabel(self.logFileConfigurationTab)
+        self.logFileConfigurationLayout.addWidget(self.enforcementActionReportTableLabel)
+        self.enforcementActionReportTableWidget = QtWidgets.QTableWidget(self.logFileConfigurationTab)
+        self.enforcementActionReportTableWidget.setColumnCount(0)
+        self.enforcementActionReportTableWidget.setRowCount(0)
+        self.enforcementActionReportTableWidget.setMinimumSize(1250, 1750)
+        self.logFileConfigurationLayout.addWidget(self.enforcementActionReportTableWidget)
+        self.tabWidget.addTab(self.logFileConfigurationTab, "")
+
     def setupVectorConfigurationTab(self):
         triggerHelper = TriggerHelper()
         self.vectorConfigurationTab = VectorConfiguration(self.clientHandler, triggerHelper)
@@ -99,6 +118,7 @@ class Ui_PICK(object):
         self.setupTeamTab()
         self.setupDirectoryTab()
         self.setupSearchLogsTab()
+        self.setupLogFileConfigurationTab()
         self.setupVectorConfigurationTab()
         self.setupIconConfigurationTab()
         self.setupEditVectorTab()
@@ -118,6 +138,7 @@ class Ui_PICK(object):
     def intializeText(self, PICK):
         PICK.setWindowTitle("PICK Tool")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.teamConfigurationTab), "Team and Event Configuration")
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.logFileConfigurationTab), "Log File Configuration")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.vectorConfigurationTab), "Vector Configuration")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.iconConfigurationTab), "Icon Configuration")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.directoryTab), "Directory Configuration")
