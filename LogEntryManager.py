@@ -1,6 +1,7 @@
 import pickle
 
 from LogEntry import LogEntry
+from pathlib import Path
 
 class LogEntryManager:
     def __init__(self):
@@ -37,7 +38,9 @@ class LogEntryManager:
             pickle.dump(self.logEntries, pkl_file)
 
     def retrieveLogEntries(self):
-        with open(self.filename, 'rb') as pkl_file:
-            self.logEntries = pickle.load(pkl_file)
+        filename_path = Path(self.filename)
+        if filename_path.exists():
+            with open(self.filename, 'rb') as pkl_file:
+                self.logEntries = pickle.load(pkl_file)
 
 

@@ -1,6 +1,6 @@
 import pickle
 
-from Icon import Icon
+from pathlib import Path
 
 class IconManager:
     def __init__(self):
@@ -20,5 +20,7 @@ class IconManager:
             pickle.dump(self.icons, pkl_file)
 
     def retrieveIcons(self):
-        with open(self.filename, 'rb') as pkl_file:
-            self.icons = pickle.load(pkl_file)
+        filename_path = Path(self.filename)
+        if filename_path.exists():
+            with open(self.filename, 'rb') as pkl_file:
+                self.icons = pickle.load(pkl_file)
