@@ -2,6 +2,7 @@ import pickle
 
 from LogEntry import LogEntry
 from Vector import Vector
+from pathlib import Path
 
 class VectorManager:
     def __init__(self):
@@ -69,9 +70,11 @@ class VectorManager:
         with open(self.filename, 'wb') as pkl_file:
             pickle.dump(self.vectors, pkl_file)
 
-    def retrieveLogEntries(self):
-        with open(self.filename, 'rb') as pkl_file:
-            self.vectors = pickle.load(pkl_file)
+    def retrieveVectors(self):
+        filename_path = Path(self.filename)
+        if filename_path.exists():
+            with open(self.filename, 'rb') as pkl_file:
+                self.vectors = pickle.load(pkl_file)
 
 
 

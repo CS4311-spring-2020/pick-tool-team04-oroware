@@ -33,5 +33,6 @@ class AddIconPopup(QWidget):
         icon.source = self.fileDialog.selectedFiles()[0]
         icon.location = self.fileDialog.selectedFiles()[0]
         if self.clientHandler.iconManager.addIcon(icon):
+            self.clientHandler.updateIcons()
             self.updateIconConfigurationTable()
             self.close()

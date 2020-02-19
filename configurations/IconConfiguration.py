@@ -1,4 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import QDataStream, QIODevice
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem
 
 from AddIconPopup import AddIconPopup
@@ -27,6 +29,10 @@ class IconConfiguration(QWidget):
         self.iconConfigurationLabel.setText("ICON CONFIGURATION")
         self.addIconButton.setText("Add Icon")
 
+    def onTabChange(self):
+        self.clientHandler.requestIcons()
+        self.updateIconConfigurationTable()
+
     def updateIconConfigurationTable(self):
         icons = self.clientHandler.iconManager.icons
         totalRows = len(icons)
@@ -47,7 +53,7 @@ class IconConfiguration(QWidget):
                                                iconNameItem)
             iconSourceItem = QtWidgets.QTableWidgetItem(icon.source)
             self.iconConfigurationTableWidget.setItem(rowNum, self.colsIconConfigurationTable.index("Icon Source"), iconSourceItem)
-            viewIconButton = ViewIconButton(iconName, icon.pixmap)
+            viewIconButton = ViewIconButton(iconName, icon.pixmapByteArray)
             viewIconButton.setText("View Icon")
             self.iconConfigurationTableWidget.setCellWidget(rowNum, self.colsIconConfigurationTable.index("Icon Preview"),
                                                      viewIconButton)
@@ -62,10 +68,12 @@ class IconConfiguration(QWidget):
 
 
 class ViewIconButton(QtWidgets.QPushButton):
-    def __init__(self, name, pixmap):
+    def __init__(self, name, pixmapByteArray):
         super(ViewIconButton, self).__init__()
         self.name = name
-        self.pixmap = pixmap
+        self.pixmap = QPixmap()
+        stream = QDataStream(pixmapByteArray, QIODevice.ReadOnly)
+        stream >> self.pixmap
         self.clicked.connect(self.handleClick)
 
     def viewIconClicked(self, name, pixmap):
