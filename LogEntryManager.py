@@ -26,7 +26,7 @@ class LogEntryManager:
             logEntry.eventType = teams[i]
             logEntry.id = ids[i]
             logEntry.artifact = artifacts[i]
-            logEntry.locations = locations[i]
+            logEntry.location = locations[i]
             self.logEntries[ids[i]] = logEntry
         self.logEntriesInTable = list(self.logEntries.values())
 
