@@ -160,6 +160,9 @@ class EditVectorConfiguration(QWidget):
             logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntry.description)
             self.searchLogsTableWidget.setItem(logEntry.rowIndexInTable, self.colsSearchLogsTable.index("Content"),
                                                    logEntryDescriptionItem)
+            logEntryLocationItem = QtWidgets.QTableWidgetItem(logEntry.location)
+            self.searchLogsTableWidget.setItem(logEntry.rowIndexInTable, self.colsSearchLogsTable.index("Location"),
+                                               logEntryLocationItem)
 
     def handleRelationshipTableTrigger(self):
         if self.vectorComboBoxTable.count() > 0:

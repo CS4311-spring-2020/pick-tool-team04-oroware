@@ -7,7 +7,7 @@ from LogEntryPopup import LogEntryPopup
 class LogEntryConfiguration(QWidget):
     def __init__(self, clientHandler):
         super(LogEntryConfiguration, self).__init__()
-        self.colsSearchLogsTable = ["Timestamp", "Content", "Artifact", "Creator", "Event Type", "Vectors"]
+        self.colsSearchLogsTable = ["Timestamp", "Content", "Artifact", "Creator", "Event Type", "Location", "Vectors"]
         self.clientHandler = clientHandler
         self.searchLogsTab = QtWidgets.QWidget()
         self.searchLogsLayout = QtWidgets.QVBoxLayout(self)
@@ -33,6 +33,12 @@ class LogEntryConfiguration(QWidget):
         self.searchLogsLayout.addWidget(self.eventTypeWhiteTeamCheckBox)
         self.eventTypeRedTeamCheckBox = QtWidgets.QCheckBox(self)
         self.searchLogsLayout.addWidget(self.eventTypeRedTeamCheckBox)
+        # Added Location search criteria
+        self.locationSearchLabel = QtWidgets.QLabel(self)
+        self.searchLogsLayout.addWidget(self.locationSearchLabel)
+        self.locationSearchTextEdit = QtWidgets.QPlainTextEdit(self)
+        self.searchLogsLayout.addWidget(self.locationSearchTextEdit)
+        # End Location variables
         self.fromSearchLabel = QtWidgets.QLabel(self)
         self.searchLogsLayout.addWidget(self.fromSearchLabel)
         self.fromDateTimeEditSearchLogs = QtWidgets.QDateTimeEdit(self)
@@ -67,6 +73,7 @@ class LogEntryConfiguration(QWidget):
         self.eventTypeWhiteTeamCheckBox.setText("White Team")
         self.eventTypeRedTeamCheckBox.setText("Red Team")
         self.eventTypeSearchLabel.setText("Event Type:")
+        self.locationSearchLabel.setText("Location:")
         self.fromSearchLabel.setText("Start Timestamp:")
         self.toSearchLabel.setText("End Timestamp:")
         self.searchButton.setText("Apply Filter")
@@ -100,6 +107,8 @@ class LogEntryConfiguration(QWidget):
                 valid = False
             if self.eventTypeRedTeamCheckBox.isChecked() and ("Red" not in logEntry.eventType):
                 valid = False
+            if not (self.locationSearchTextEdit.toPlainText() in logEntry.location):
+                valid = False
             if self.fromDateTimeEditSearchLogs.text() < self.fromDateTimeEditSearchLogs.text():
                 valid = False
             if self.toDateTimeEditSearchLogs.text() > self.toDateTimeEditSearchLogs.text():
@@ -132,6 +141,10 @@ class LogEntryConfiguration(QWidget):
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Artifact"), logEntryArtifactItem)
             logEntryEventTypeItem = QtWidgets.QTableWidgetItem(logEntries[rowNum].eventType)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Event Type"), logEntryEventTypeItem)
+            # Populate Location column
+            logEntryLocationItem = QtWidgets.QTableWidgetItem(logEntries[rowNum].location)
+            self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Location"), logEntryLocationItem)
+            # End populate Location column
             logEntryDateItem = QtWidgets.QTableWidgetItem(logEntries[rowNum].date)
             self.searchLogsTableWidget.setItem(rowNum, self.colsSearchLogsTable.index("Timestamp"), logEntryDateItem)
             logEntries[rowNum].rowIndexInTable = rowNum
