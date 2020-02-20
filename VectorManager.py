@@ -64,6 +64,7 @@ class VectorManager:
         if vector.vectorName in self.vectors:
             return False
         self.vectors[vector.vectorName] = vector
+        print()
         return True
 
     def deleteVector(self, vector):
