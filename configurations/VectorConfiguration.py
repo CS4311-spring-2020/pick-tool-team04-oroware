@@ -7,7 +7,7 @@ from VectorConfigurationPopup import VectorConfigurationPopup
 class VectorConfiguration(QWidget):
     def __init__(self, clientHandler, triggerHelper):
         super(VectorConfiguration, self).__init__()
-        self.colsVectorConfigurationTable = ["Vector Name", "Vector Description"]
+        self.colsVectorConfigurationTable = ["Vector Name", "Vector Description", ""]
         self.clientHandler = clientHandler
         self.triggerHelper = triggerHelper
         self.vectorConfigurationLayout = QtWidgets.QVBoxLayout(self)
@@ -23,10 +23,10 @@ class VectorConfiguration(QWidget):
         self.vectorConfigurationLayout.addWidget(self.configurationVectorDescriptionLabel)
         self.configurationVectorDescriptionTextEdit = QtWidgets.QPlainTextEdit(self)
         self.vectorConfigurationLayout.addWidget(self.configurationVectorDescriptionTextEdit)
-        self.deleteVectorButton = QtWidgets.QPushButton(self)
-        self.vectorConfigurationLayout.addWidget(self.deleteVectorButton)
-        self.editVectorButton = QtWidgets.QPushButton(self)
-        self.vectorConfigurationLayout.addWidget(self.editVectorButton)
+        # self.deleteVectorButton = QtWidgets.QPushButton(self)
+        # self.vectorConfigurationLayout.addWidget(self.deleteVectorButton)
+        #self.editVectorButton = QtWidgets.QPushButton(self)
+        #self.vectorConfigurationLayout.addWidget(self.editVectorButton)
         self.addVectorButton = QtWidgets.QPushButton(self)
         self.vectorConfigurationLayout.addWidget(self.addVectorButton)
         self.addVectorButton.clicked.connect(self.handleAddVector)
@@ -67,6 +67,11 @@ class VectorConfiguration(QWidget):
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
             self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Description"), vectorDescriptionItem)
             rowNum += 1
+            btn = QtWidgets.QPushButton('Delete')
+            # self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Delete"), btn)
+            btn.clicked.connect(self.deleteClicked)
+            self.vectorConfigurationTableWidget.setCellWidget(0, 2, btn)
+            selected = self.vectorConfigurationTableWidget.selectedItems()
         # self.vectorConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         # self.vectorConfigurationTableWidget.doubleClicked.connect(self.vectorConfigurationDoubleClicked())
 
@@ -75,11 +80,17 @@ class VectorConfiguration(QWidget):
         self.vectorConfigurationPopup.setGeometry(100, 200, 200, 200)
         self.vectorConfigurationPopup.show()
 
+    def deleteClicked(self):
+        button = self.sender()
+        if button:
+            row = self.vectorConfigurationTableWidget.indexAt(button.pos()).row()
+            self.vectorConfigurationTableWidget.removeRow(row)
+
     def intializeText(self):
         self.vectorConfigurationLabel.setText("VECTOR CONFIGURATION")
         self.addVectorButton.setText("Add Vector")
-        self.deleteVectorButton.setText("Delete Vector")
-        self.editVectorButton.setText("Edit Vector")
+        # self.deleteVectorButton.setText("Delete Vector")
+        #self.editVectorButton.setText("Edit Vector")
         self.configurationVectorDescriptionLabel.setText("Vector Description:")
         self.currentVectorConfigurationLabel.setText("Current vector:")
 
