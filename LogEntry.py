@@ -8,6 +8,7 @@ class LogEntry:
         self.creator = ""
         self.description = ""
         self.artifact = ""
+        self.location = ""
         self.eventType = ""
         self.id = ""
         self.rowIndexInTable = -1

@@ -16,6 +16,8 @@ class LogEntryManager:
                         "SQL Injection attack from Red Team.", "Cross-Site Scripting Attack from Red Team.",
                         "Blue Team Defender turns off computer."]
         artifacts = ["blue_log.csv", "white_recording.png", "red_attack.txt", "red_escalation.txt", "blue_response.csv"]
+        locations = ["Boulder, CO", "White Sands Missile Range", "UTEP Prospect Hall", "El Paso east side office",
+                     "Las Cruces, NM"]
         for i in range(len(descriptions)):
             logEntry = LogEntry()
             logEntry.date = dates[i]
@@ -24,6 +26,7 @@ class LogEntryManager:
             logEntry.eventType = teams[i]
             logEntry.id = ids[i]
             logEntry.artifact = artifacts[i]
+            logEntry.locations = locations[i]
             self.logEntries[ids[i]] = logEntry
         self.logEntriesInTable = list(self.logEntries.values())
 
