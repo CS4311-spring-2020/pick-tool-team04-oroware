@@ -68,10 +68,8 @@ class VectorConfiguration(QWidget):
             self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Description"), vectorDescriptionItem)
             rowNum += 1
             btn = QtWidgets.QPushButton('Delete')
-            # self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Delete"), btn)
             btn.clicked.connect(self.deleteClicked)
             self.vectorConfigurationTableWidget.setCellWidget(0, 2, btn)
-            selected = self.vectorConfigurationTableWidget.selectedItems()
         # self.vectorConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         # self.vectorConfigurationTableWidget.doubleClicked.connect(self.vectorConfigurationDoubleClicked())
 
@@ -85,6 +83,8 @@ class VectorConfiguration(QWidget):
         if button:
             row = self.vectorConfigurationTableWidget.indexAt(button.pos()).row()
             self.vectorConfigurationTableWidget.removeRow(row)
+            # self.clientHandler.vectorManager.deleteVector(FIX)
+
 
     def intializeText(self):
         self.vectorConfigurationLabel.setText("VECTOR CONFIGURATION")

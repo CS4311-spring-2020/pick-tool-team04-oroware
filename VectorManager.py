@@ -66,6 +66,13 @@ class VectorManager:
         self.vectors[vector.vectorName] = vector
         return True
 
+    def deleteVector(self, vector):
+        if vector.vectorName in self.vectors:
+            self.vectors[vector.vectorName] = None
+            return True
+        else:
+            return False
+
     def storeVectors(self):
         with open(self.filename, 'wb') as pkl_file:
             pickle.dump(self.vectors, pkl_file)
