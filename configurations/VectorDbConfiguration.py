@@ -26,8 +26,6 @@ class VectorDbConfiguration(QWidget):
             self.approvalTableWidget.setMinimumSize(1250, 1750)
             self.vectorDbLayout.addWidget(self.approvalTableWidget)
         else:
-            self.connectionStatusLabel = QtWidgets.QLabel(self)
-            self.vectorDbLayout.addWidget(self.connectionStatusLabel)
             self.pullTableLabel = QtWidgets.QLabel(self)
             self.vectorDbLayout.addWidget(self.pullTableLabel)
             self.pullTableWidget = QtWidgets.QTableWidget(self)
@@ -118,7 +116,6 @@ class VectorDbConfiguration(QWidget):
         else:
             self.pullTableLabel.setText("Pulled Vector DB Table (Analyst):")
             self.pushTableLabel.setText("Pushed Vector DB Table (Analyst):")
-            self.connectionStatusLabel.setText("Connected with lead: " + str(self.clientHandler.connectionStatus))
             self.pushButton.setText("Push Button")
             self.pullButton.setText("Pull Button")
 

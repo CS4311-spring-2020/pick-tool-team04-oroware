@@ -75,6 +75,7 @@ class Ui_PICK(object):
 
     def onTabChange(self):
         if self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.editVectorTab):
+            self.clientHandler.requestIcons()
             self.editVectorTab.onTabChange()
         elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.iconConfigurationTab):
             self.iconConfigurationTab.onTabChange()

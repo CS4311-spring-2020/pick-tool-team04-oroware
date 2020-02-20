@@ -1,6 +1,7 @@
 import struct
 import socket
 import pickle
+import uuid
 
 from LogEntryManager import LogEntryManager
 from VectorManager import VectorManager
@@ -12,10 +13,10 @@ class ClientHandler():
         self.vectorManager = VectorManager()
         self.iconManager = IconManager()
         self.isLead = False
-        self.leadIp = None
+        self.hasLead = False
         self.serverIp = '127.0.0.1'
         self.serverPort = 65432
-        self.connectionStatus = False
+        self.address = hex(uuid.getnode())
         self.establishedConnections = 0
         self.numConnections = 0
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -23,7 +24,10 @@ class ClientHandler():
         serverInformation = self.recvMsg()
         serverInformation = pickle.loads(serverInformation)
         serverInformation = list(serverInformation.values())[0]
-        self.leadIp = serverInformation["Lead"]
+        self.hasLead = serverInformation["Lead Address"] != None
+        if self.hasLead:
+            if serverInformation["Lead Address"] == self.address:
+                self.isLead = True
         self.establishedConnections = len(serverInformation["Connected Clients"])
         self.numConnections = self.establishedConnections
 
@@ -34,6 +38,26 @@ class ClientHandler():
     def updateIcons(self):
         self.sendMsg(pickle.dumps({"Icon Manager Update": self.iconManager.icons}))
         self.iconManager.icons = pickle.loads(self.recvMsg())
+
+    def editLogEntry(self, logEntry):
+        self.sendMsg(pickle.dumps({"Log Entry Update": logEntry}))
+        logEntry = pickle.loads(self.recvMsg())
+        if logEntry != None:
+            self.logEntryManager.updateLogEntry(logEntry)
+
+    def setLead(self):
+        self.sendMsg(pickle.dumps({"Set Lead": self.address}))
+        address = pickle.loads(self.recvMsg())
+        if self.address == address:
+            self.isLead = True
+            self.hasLead = True
+
+    def releaseLead(self, address):
+        self.sendMsg(pickle.dumps({"Release Lead": self.address}))
+        completed = pickle.loads(self.recvMsg())
+        if completed:
+            self.isLead = False
+            self.hasLead = False
 
     def sendMsg(self, msg):
         msg = struct.pack('>I', len(msg)) + msg
@@ -59,3 +83,8 @@ class ClientHandler():
         self.vectorManager.pullVectorDb()
         vectors = list(self.vectorManager.vectors.values())
         self.logEntryManager.updateLogEntries(vectors)
+
+    def editLogEntryVectors(self, logEntry, newVectors):
+        oldVectors = logEntry.associatedVectors
+        logEntry.associatedVectors = newVectors
+        self.vectorManager.handleUpdateToLogEntry(oldVectors, newVectors, logEntry)
