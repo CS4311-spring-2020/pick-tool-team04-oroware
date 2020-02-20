@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QWidget
 
 
@@ -16,6 +16,9 @@ class TeamConfiguration(QWidget):
         self.teamConfigurationLabel = QtWidgets.QLabel(self.teamConfiguration)
         self.teamConfigurationLayout.addWidget(self.teamConfigurationLabel)
         self.leadCheckBox = QtWidgets.QCheckBox(self.teamConfiguration)
+        if self.clientHandler.isLead:
+            self.leadCheckBox.setCheckState(QtCore.Qt.Checked)
+        self.leadCheckBox.clicked.connect(self.setLead)
         self.teamConfigurationLayout.addWidget(self.leadCheckBox)
         self.leadLabel = QtWidgets.QLabel(self.teamConfiguration)
         self.teamConfigurationLayout.addWidget(self.leadLabel)
@@ -55,6 +58,16 @@ class TeamConfiguration(QWidget):
         self.saveEventButton = QtWidgets.QPushButton(self.eventConfiguration)
         self.eventConfigurationLayout.addWidget(self.saveEventButton)
         self.intializeText()
+
+    def setLead(self):
+        if self.clientHandler.hasLead:
+            if self.clientHandler.isLead:
+                self.leadCheckBox.setCheckState(QtCore.Qt.Checked)
+                self.clientHandler.releaseLead()
+            else:
+                self.leadCheckBox.setCheckState(QtCore.Qt.Unchecked)
+        else:
+            self.clientHandler.setLead()
 
     def intializeText(self):
         self.eventNameLabel.setText("Event name: ")

@@ -43,4 +43,9 @@ class LogEntryManager:
             with open(self.filename, 'rb') as pkl_file:
                 self.logEntries = pickle.load(pkl_file)
 
+    def updateLogEntry(self, logEntry):
+        if logEntry.id in self.logEntries:
+            self.logEntries[logEntry.id] = logEntry
+            return True
+        return False
 

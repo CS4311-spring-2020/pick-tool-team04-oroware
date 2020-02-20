@@ -300,7 +300,7 @@ class EditVectorConfiguration(QWidget):
         vectorName = self.vectorComboBoxTable.currentText()
         vector = self.clientHandler.vectorManager.vectors[vectorName]
         significantEventToEdit = vector.significantEvents[int(significantEventId)]
-        self.editEventPopup = SignificantEventPopup(vector, significantEventToEdit, self.trigger)
+        self.editEventPopup = SignificantEventPopup(vector, significantEventToEdit, self.triggerHelper)
         self.editEventPopup.setGeometry(100, 200, 200, 200)
         self.editEventPopup.show()
 
@@ -309,7 +309,7 @@ class EditVectorConfiguration(QWidget):
         vectorName = self.vectorComboBoxTable.currentText()
         vector = self.clientHandler.vectorManager.vectors[vectorName]
         relationshipToEdit = vector.relationships[int(relationshipId)]
-        self.editRelationshipPopup = RelationshipPopup(vector, relationshipToEdit, self.trigger)
+        self.editRelationshipPopup = RelationshipPopup(vector, relationshipToEdit, self.triggerHelper)
         self.editRelationshipPopup.setGeometry(100, 200, 100, 100)
         self.editRelationshipPopup.show()
 

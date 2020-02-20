@@ -9,7 +9,6 @@ import socket
 import threading
 import pickle
 from threading import Thread
-from copy import deepcopy
 
 def synchronized_method(method):
     outer_lock = threading.Lock()
@@ -28,7 +27,7 @@ class ServerHandler():
     def __init__(self):
         self.host = '127.0.0.1'
         self.port = 65432
-        self.leadIp = None
+        self.leadAddress = None
         self.bind()
         self.logEntryManager = LogEntryManager()
         self.logEntryManager.retrieveLogEntries()
@@ -88,18 +87,46 @@ class ServerThread(Thread):
         self.serverHandler.iconManager.storeIcons()
         self.sendMsg(pickle.dumps(self.serverHandler.iconManager.icons))
 
+    @synchronized_method
+    def handleLogEntryUpdate(self, logEntry):
+        if self.serverHandler.logEntryManager.updateLogEntry(logEntry):
+            self.sendMsg(pickle.dumps(logEntry))
+        else:
+            self.sendMsg(pickle.dumps(None))
+
+    @synchronized_method
+    def handleSetLead(self, address):
+        if self.serverHandler.leadAddress == None:
+            self.serverHandler.leadAddress = address
+            self.sendMsg(pickle.dumps(address))
+        else:
+            self.sendMsg(pickle.dumps(self.serverHandler.leadAddress))
+
+    @synchronized_method
+    def handleReleaseLead(self, address):
+        if self.serverHandler.leadAddress == address:
+            self.serverHandler.leadAddress = None
+            self.sendMsg(pickle.dumps(True))
+        else:
+            self.sendMsg(pickle.dumps(False))
+
     def run(self):
         vector = Vector()
         vector.addSignificantEventFromLogEntry(LogEntry())
-        msg = pickle.dumps({"Server Information" : {"Lead" : self.serverHandler.leadIp, "Connected Clients" : self.serverHandler.clientsConnected}})
+        msg = pickle.dumps({"Server Information" : {"Lead Address" : self.serverHandler.leadAddress, "Connected Clients" : self.serverHandler.clientsConnected}})
         self.sendMsg(msg)
         while True:
             msg = pickle.loads(self.recvMsg())
+            print(msg)
             request = list(msg.keys())[0]
             if request == "Icon Manager Request":
                 self.handleIconManagerRequest()
             elif request == "Icon Manager Update":
                 self.handleIconManagerUpdate(list(msg.values())[0])
+            elif request == "Log Entry Update":
+                self.handleLogEntryUpdate(list(msg.values())[0])
+            elif request == "Set Lead":
+                self.handleSetLead(list(msg.values())[0])
 
 if __name__ == "__main__":
     serverHandler = ServerHandler()
