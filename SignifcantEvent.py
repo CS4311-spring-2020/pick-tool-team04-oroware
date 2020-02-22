@@ -10,3 +10,4 @@ class SignificantEvent:
         self.description = ""
         self.position = None
         self.rowIndexInTable = -1
+        self.visible = True

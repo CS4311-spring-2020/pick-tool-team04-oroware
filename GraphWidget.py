@@ -1,5 +1,3 @@
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -84,13 +82,13 @@ class GraphWidget(QWidget):
 
     def createNodeLabel(self, significantEvent):
         nodeLabel = " ID: " + str(significantEvent.id)
-        if self.vector.visibility["Node Name"]:
+        if self.vector.visibility["Name"]:
             nodeLabel += "\n Name: " + significantEvent.name
-        if self.vector.visibility["Node Description"]:
+        if self.vector.visibility["Description"]:
             nodeLabel += "\n Description: " + significantEvent.description
         if self.vector.visibility["Artifact"]:
             nodeLabel += "\n Artifact: " + significantEvent.logEntry.artifact
-        if self.vector.visibility["Node Timestamp"]:
+        if self.vector.visibility["Timestamp"]:
             nodeLabel += "\n Timestamp: " + significantEvent.logEntry.date
         if self.vector.visibility["Event Creator"]:
             nodeLabel += "\n Creator: " + significantEvent.logEntry.creator
@@ -107,17 +105,23 @@ class GraphWidget(QWidget):
         self.axisMapping = dict()
         self.iconMapping = dict()
         self.edgeLabels = dict()
+        self.invisibleSignificantEvents = set()
         self.initializeHelperNodes()
         for significantEventId, significantEvent in vector.significantEvents.items():
-            if significantEvent.iconType != Icon.DEFAULT:
-                self.iconMapping[significantEventId] = significantEvent.icon
-                self.iconLabels[significantEventId] = self.createNodeLabel(significantEvent)
-                self.nodeLabels[significantEventId] = ""
+            if significantEvent.visible:
+                if significantEvent.iconType != Icon.DEFAULT:
+                    self.iconMapping[significantEventId] = significantEvent.icon
+                    self.iconLabels[significantEventId] = self.createNodeLabel(significantEvent)
+                    self.nodeLabels[significantEventId] = ""
+                else:
+                    self.nodeLabels[significantEventId] = self.createNodeLabel(significantEvent)
+                self.vectorGraph.add_node(significantEventId)
+                self.pos[significantEventId] = significantEvent.position
             else:
-                self.nodeLabels[significantEventId] = self.createNodeLabel(significantEvent)
-            self.vectorGraph.add_node(significantEventId)
-            self.pos[significantEventId] = significantEvent.position
+                self.invisibleSignificantEvents.add(significantEventId)
         for relationship in list(vector.relationships.values()):
+            if relationship.sourceSignificantEventId in self.invisibleSignificantEvents or relationship.destSignificantEventId in self.invisibleSignificantEvents:
+                continue
             self.vectorGraph.add_edges_from([(relationship.sourceSignificantEventId, relationship.destSignificantEventId)])
             self.edgeLabels[(relationship.sourceSignificantEventId, relationship.destSignificantEventId)] = relationship.description
 
@@ -220,7 +224,6 @@ class GraphWidget(QWidget):
             ax.axis('off')
         self.canvas.draw_idle()
 
-    @pyqtSlot()
     def maximize(self):
         if self.vector:
             self.nodeSize = (self.nodeSize + 300) if self.nodeSize < GraphWidget.MAXIMUM_NODE_SIZE else GraphWidget.MAXIMUM_NODE_SIZE
@@ -228,7 +231,6 @@ class GraphWidget(QWidget):
             self.iconSize = (self.iconSize + 0.01) if self.iconSize < GraphWidget.MAXIMUM_ICON_SIZE else GraphWidget.MAXIMUM_ICON_SIZE
             self.plotGraph()
 
-    @pyqtSlot()
     def minimize(self):
         if self.vector:
             self.nodeSize = (self.nodeSize - 300) if self.nodeSize > GraphWidget.MINIMUM_NODE_SIZE else GraphWidget.MINIMUM_NODE_SIZE

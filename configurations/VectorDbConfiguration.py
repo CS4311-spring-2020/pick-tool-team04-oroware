@@ -61,7 +61,7 @@ class VectorDbConfiguration(QWidget):
         self.initializeText()
 
     def onTabChange(self):
-        self.initializeConfiguration()
+        print("here")
 
     def handlePull(self):
         self.clientHandler.pullVectorDb()
