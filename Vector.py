@@ -9,11 +9,12 @@ class Vector:
         self.vectorDescription = ""
         self.vectorDimensions = 5
         self.visibility = dict()
-        fields = ["Node Name", "Node Timestamp", "Node Description", "Event Creator", "Event Type", "Artifact"]
+        fields = ["Name", "Timestamp", "Description", "Event Creator", "Event Type", "Artifact"]
         for field in fields:
             self.visibility[field] = False
         self.significantEvents = dict()
         self.relationships = dict()
+        self.allVisible = True
 
     def addSignificantEventFromLogEntry(self, logEntry):
         if not self.isLogEntryEventInVector(logEntry.id):

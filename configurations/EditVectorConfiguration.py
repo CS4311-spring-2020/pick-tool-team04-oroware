@@ -20,7 +20,7 @@ class EditVectorConfiguration(QWidget):
         self.clientHandler = clientHandler
         self.triggerHelper = triggerHelper
         self.colsIconConfigurationTable = ["Icon Name", "Icon Source", "Icon Preview"]
-        self.colsVectorTable = ["Node Name", "Node Timestamp", "Node Description", "Reference", "Event Creator", "Event Type", "Icon Type", "Artifact"]
+        self.colsVectorTable = ["Visibility", "Name", "Timestamp", "Description", "Reference", "Event Creator", "Event Type", "Icon Type", "Artifact"]
         self.colsRelationshipTable = ["Parent", "Child", "Label"]
         self.editVectorLayout = QtWidgets.QHBoxLayout(self)
         self.leftEditVectorWidget = QtWidgets.QWidget(self)
@@ -104,6 +104,12 @@ class EditVectorConfiguration(QWidget):
             self.vectorTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.vectorTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorTable[colNum]))
+            if colNum == self.colsVectorTable.index("Visibility"):
+                nodeVisibilityCheckbox = NodeVisibilityCheckBox(self.updateVectorGraph, self.updateVectorTable, None, vector, True)
+                nodeVisibilityCheckbox.setCheckState(QtCore.Qt.Checked if vector.allVisible else QtCore.Qt.Unchecked)
+                nodeVisibilityCheckbox.setText("All")
+                self.vectorTableWidget.setCellWidget(0, colNum, nodeVisibilityCheckbox)
+                continue
             if colNum != self.colsVectorTable.index("Icon Type") and colNum != self.colsVectorTable.index("Reference"):
                 visibilityCheckbox = VisibilityCheckBox(self.colsVectorTable[colNum], self.updateVectorGraph, vector)
                 visibilityCheckbox.setCheckState(QtCore.Qt.Checked if vector.visibility[self.colsVectorTable[colNum]] else QtCore.Qt.Unchecked)
@@ -132,15 +138,18 @@ class EditVectorConfiguration(QWidget):
                     iconComboBox.addItem(iconName)
             self.vectorTableWidget.setCellWidget(rowNum, self.colsVectorTable.index("Icon Type"), iconComboBox)
             significantEventNameItem = QtWidgets.QTableWidgetItem(significantEvent.name)
-            self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Node Name"), significantEventNameItem)
+            self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Name"), significantEventNameItem)
             significantEventDateItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.date)
-            self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Node Timestamp"), significantEventDateItem)
+            self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Timestamp"), significantEventDateItem)
             significantEventCreatorItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.creator)
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Event Creator"), significantEventCreatorItem)
             significantEventDescriptionItem = QtWidgets.QTableWidgetItem(significantEvent.description)
-            self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Node Description"), significantEventDescriptionItem)
+            self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Description"), significantEventDescriptionItem)
             significantEventArtifactItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.artifact)
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Artifact"), significantEventArtifactItem)
+            nodeVisibilityCheckbox = NodeVisibilityCheckBox(self.updateVectorGraph, self.updateVectorTable, significantEvent, vector, False)
+            nodeVisibilityCheckbox.setCheckState(QtCore.Qt.Checked if significantEvent.visible else QtCore.Qt.Unchecked)
+            self.vectorTableWidget.setCellWidget(rowNum, self.colsVectorTable.index("Visibility"), nodeVisibilityCheckbox)
             significantEvent.rowIndexInTable = rowNum
             rowNum += 1
         self.vectorTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
@@ -355,6 +364,32 @@ class VisibilityCheckBox(QtWidgets.QCheckBox):
     def handleCheck(self):
         self.vector.visibility[self.fieldName] = not self.vector.visibility[self.fieldName]
         self.updateVectorGraph(self.vector)
+
+class NodeVisibilityCheckBox(QtWidgets.QCheckBox):
+    def __init__(self, updateVectorGraph, updateVectorTable, significantEvent, vector, allSelected):
+        super(NodeVisibilityCheckBox, self).__init__()
+        self.significantEvent = significantEvent
+        self.allSelected = allSelected
+        self.vector = vector
+        self.clicked.connect(self.handleCheck)
+        self.updateVectorGraph = updateVectorGraph
+        self.updateVectorTable = updateVectorTable
+
+    def handleCheck(self):
+        if self.allSelected:
+            if self.isChecked():
+                self.vector.allVisible = True
+                for significantEvent in list(self.vector.significantEvents.values()):
+                    significantEvent.visible = True
+            else:
+                self.vector.allVisible = False
+                for significantEvent in list(self.vector.significantEvents.values()):
+                    significantEvent.visible = False
+            self.updateVectorGraph(self.vector)
+            self.updateVectorTable(self.vector)
+        else:
+            self.significantEvent.visible = not self.significantEvent.visible
+            self.updateVectorGraph(self.vector)
 
 class IconComboBox(QtWidgets.QComboBox):
     def __init__(self, significantEvent, clientHandler, updateVectorGraph, vectorName):
