@@ -1,3 +1,5 @@
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -218,6 +220,7 @@ class GraphWidget(QWidget):
             ax.axis('off')
         self.canvas.draw_idle()
 
+    @pyqtSlot()
     def maximize(self):
         if self.vector:
             self.nodeSize = (self.nodeSize + 300) if self.nodeSize < GraphWidget.MAXIMUM_NODE_SIZE else GraphWidget.MAXIMUM_NODE_SIZE
@@ -225,6 +228,7 @@ class GraphWidget(QWidget):
             self.iconSize = (self.iconSize + 0.01) if self.iconSize < GraphWidget.MAXIMUM_ICON_SIZE else GraphWidget.MAXIMUM_ICON_SIZE
             self.plotGraph()
 
+    @pyqtSlot()
     def minimize(self):
         if self.vector:
             self.nodeSize = (self.nodeSize - 300) if self.nodeSize > GraphWidget.MINIMUM_NODE_SIZE else GraphWidget.MINIMUM_NODE_SIZE

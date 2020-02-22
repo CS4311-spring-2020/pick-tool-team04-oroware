@@ -2,7 +2,9 @@ import datetime
 
 import xlwt
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtWidgets import QWidget, QTableWidgetItem
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QShortcut
 
 from GraphWidget import GraphWidget
 from Icon import Icon
@@ -77,7 +79,19 @@ class EditVectorConfiguration(QWidget):
         self.relationshipTableWidget.setRowCount(0)
         self.rightEditVectorLayout.addWidget(self.relationshipTableWidget)
         self.editVectorLayout.addWidget(self.rightEditVectorWidget)
+        self.zoomInShortcut = QShortcut(QKeySequence("Ctrl+="), self)
+        self.zoomInShortcut.activated.connect(self.handleZoomInShortcut)
+        self.zoomOutShortcut = QShortcut(QKeySequence("Ctrl+-"), self)
+        self.zoomOutShortcut.activated.connect(self.handleZoomOutShortcut)
         self.intializeText()
+
+    @pyqtSlot()
+    def handleZoomInShortcut(self):
+       self.vectorGraphWidget.maximize()
+
+    @pyqtSlot()
+    def handleZoomOutShortcut(self):
+        self.vectorGraphWidget.minimize()
 
     def updateVectorTable(self, vector):
         significantEvents = list(vector.significantEvents.values())

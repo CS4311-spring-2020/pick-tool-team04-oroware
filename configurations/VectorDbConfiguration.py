@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QVBoxLayout
 from copy import deepcopy
 
 from GraphWidget import GraphWidget
+from VectorManager import VectorManager
 
 
 class VectorDbConfiguration(QWidget):
@@ -13,6 +14,13 @@ class VectorDbConfiguration(QWidget):
         self.colsPullTable = ["Vector Name", "Vector Description", "Vector Graph"]
         self.colsPushTable = ["Vector Name", "Vector Description", "Vector Graph"]
         self.colsApproveTable = ["Source IP", "Request Timestamp", "Vector Name", "Vector Description", "Graph", "Approve"]
+        self.pushedVectorManager = VectorManager()
+        self.pulledVectorManager = VectorManager()
+        self.pushedVectors = list()
+        self.changeSummaries = list()
+        self.initializeConfiguration()
+
+    def initializeConfiguration(self):
         self.vectorDbTab = QtWidgets.QWidget()
         self.vectorDbLayout = QtWidgets.QVBoxLayout(self)
         self.vectorDbLabel = QtWidgets.QLabel(self)
@@ -25,6 +33,7 @@ class VectorDbConfiguration(QWidget):
             self.approvalTableWidget.setRowCount(0)
             self.approvalTableWidget.setMinimumSize(1250, 1750)
             self.vectorDbLayout.addWidget(self.approvalTableWidget)
+            self.updateApproveTable(self.pushedVectors, self.changeSummaries)
         else:
             self.pullTableLabel = QtWidgets.QLabel(self)
             self.vectorDbLayout.addWidget(self.pullTableLabel)
@@ -47,7 +56,12 @@ class VectorDbConfiguration(QWidget):
             self.vectorDbLayout.addWidget(self.pushButton)
             self.pushButton.clicked.connect(self.handlePush)
             self.vectorDbLayout.addWidget(self.pushButton)
+            self.updatePullTable(self.pulledVectorManager)
+            self.updatePushTable(self.pushedVectorManager)
         self.initializeText()
+
+    def onTabChange(self):
+        self.initializeConfiguration()
 
     def handlePull(self):
         self.clientHandler.pullVectorDb()
@@ -119,8 +133,8 @@ class VectorDbConfiguration(QWidget):
             self.pushButton.setText("Push Button")
             self.pullButton.setText("Pull Button")
 
-    def updateApproveTable(self, pushedVectors, pushedIps, pushedTimestamps, changeSummaries):
-        self.colsApproveTable = ["Source IP", "Request Timestamp", "Vector Name", "Vector Description", "Graph", "Change Summary", "Approve"]
+    def updateApproveTable(self, pushedVectors, changeSummaries):
+        self.colsApproveTable = ["Vector Name", "Vector Description", "Graph", "Approve"]
         totalRows = len(pushedVectors)
         self.approvalTableWidget.setColumnCount(len(self.colsApproveTable))
         self.approvalTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
@@ -137,10 +151,6 @@ class VectorDbConfiguration(QWidget):
             self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Vector Name"), vectorNameItem)
             changeItem = QtWidgets.QTableWidgetItem(changeSummaries[rowNum])
             self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Change Summary"), changeItem)
-            timestampItem = QtWidgets.QTableWidgetItem(pushedTimestamps[rowNum])
-            self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Request Timestamp"), timestampItem)
-            sourceItem = QtWidgets.QTableWidgetItem(pushedIps[rowNum])
-            self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Source IP"), sourceItem)
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
             self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Vector Description"), vectorDescriptionItem)
             graphButton = ViewGraphButton(pushedVectors[rowNum])
