@@ -52,7 +52,7 @@ class ClientHandler():
             self.isLead = True
             self.hasLead = True
 
-    def releaseLead(self, address):
+    def releaseLead(self):
         self.sendMsg(pickle.dumps({"Release Lead": self.address}))
         completed = pickle.loads(self.recvMsg())
         if completed:

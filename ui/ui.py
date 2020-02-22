@@ -79,6 +79,8 @@ class Ui_PICK(object):
             self.editVectorTab.onTabChange()
         elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.iconConfigurationTab):
             self.iconConfigurationTab.onTabChange()
+        elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.vectorDbTab):
+            self.vectorDbTab.onTabChange()
 
     def handleRelationshipTableTrigger(self):
         self.editVectorTab.handleRelationshipTableTrigger()
