@@ -180,4 +180,4 @@ class CheckableComboBox(QtWidgets.QComboBox):
         for i in range(self.count()):
             if self.model().item(i, 0).checkState() == QtCore.Qt.Checked:
                 newVectors.append(self.model().itemFromIndex(index).text())
-        self.clientHandler.vectorManager.handleUpdateToLogEntry(self.logEntry.associatedVectors, newVectors, self.logEntry)
+        self.clientHandler.editLogEntryVectors(self.logEntry, newVectors)

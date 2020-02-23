@@ -8,7 +8,6 @@ class RelationshipPopup(QWidget):
         self.trigger = trigger
         self.trigger.connectVectorGraphTrigger()
         self.trigger.connectRelationshipTableTrigger()
-        self.trigger.connectRelationshipTableEntryTrigger(self.relationship, self.vector.vectorName)
         layout = QVBoxLayout()
         self.relationshipDescriptionLabel = QLabel()
         self.relationshipDescriptionLabel.setText("Label:")
@@ -33,7 +32,7 @@ class RelationshipPopup(QWidget):
 
     def onSaveClick(self):
         self.relationship.description = self.relationshipDescriptionTextEdit.toPlainText()
-        self.trigger.emitRelationshipTableEntryTrigger()
+        self.trigger.emitRelationshipTableTrigger()
         self.trigger.emitVectorGraphTrigger()
         self.close()
 

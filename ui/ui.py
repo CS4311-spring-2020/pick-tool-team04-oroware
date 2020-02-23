@@ -74,6 +74,7 @@ class Ui_PICK(object):
         self.editVectorTab.handleRelationshipTableEntryUpdate(relationship, vectorName)
 
     def onTabChange(self):
+        self.updateVectorComboBoxes()
         if self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.editVectorTab):
             self.clientHandler.requestIcons()
             self.editVectorTab.onTabChange()
@@ -103,6 +104,10 @@ class Ui_PICK(object):
         PICK.setMinimumSize(QtCore.QSize(0, 900))
 
         self.clientHandler = ClientHandler()
+        if self.clientHandler.isLead:
+            self.clientHandler.pullVectorDb()
+        else:
+            self.clientHandler.vectorManager.retrieveVectors()
 
         self.setupMainWindow(PICK)
         self.setupTabWidget()
@@ -116,8 +121,6 @@ class Ui_PICK(object):
         self.setupVectorDbTab()
 
         self.updateVectorComboBoxes()
-        self.editVectorTab.handleVectorComboBoxTable(0)
-        self.vectorConfigurationTab.handleVectorComboBoxConfiguration(0)
 
         self.verticalLayout.addWidget(self.tabWidget)
 

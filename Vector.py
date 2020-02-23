@@ -15,6 +15,7 @@ class Vector:
         self.significantEvents = dict()
         self.relationships = dict()
         self.allVisible = True
+        self.changeSummary = None
 
     def addSignificantEventFromLogEntry(self, logEntry):
         if not self.isLogEntryEventInVector(logEntry.id):
@@ -68,3 +69,29 @@ class Vector:
 
     def removeRelationship(self, relationshipId):
         del self.relationships[relationshipId]
+
+    def equals(self, vector):
+        if self.vectorName != vector.vectorName:
+            return False
+        if self.vectorDescription != vector.vectorDescription:
+            return False
+        if self.allVisible != vector.allVisible:
+            return False
+        if len(self.significantEvents) != len(vector.significantEvents):
+            return False
+        if len(self.relationships) != len(vector.relationships):
+            return False
+        for visibilityName in list(self.visibility.keys()):
+            if self.visibility[visibilityName] != vector.visibility[visibilityName]:
+                return False
+        for significantEventId in list(self.significantEvents.keys()):
+            if significantEventId not in vector.significantEvents:
+                return False
+            if not self.significantEvents[significantEventId].equals(vector.significantEvents[significantEventId]):
+                return False
+        for relationshipId in list(self.relationships.keys()):
+            if relationshipId not in vector.relationships:
+                return False
+            if not self.relationships[relationshipId].equals(vector.relationships[relationshipId]):
+                return False
+        return True
