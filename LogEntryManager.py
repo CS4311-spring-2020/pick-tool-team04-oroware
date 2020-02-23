@@ -36,6 +36,12 @@ class LogEntryManager:
                 if significantEvent.logEntry.id in self.logEntries:
                     self.logEntries[significantEvent.logEntry.id].associatedVectors.append(vector.vectorName)
 
+    def handleVectorDeleted(self, vector):
+        for significantEvent in list(vector.significantEvents.values()):
+            if significantEvent.logEntry.id in self.logEntries:
+                if vector.vectorName in self.logEntries[significantEvent.logEntry.id].associatedVectors:
+                    self.logEntries[significantEvent.logEntry.id].associatedVectors.remove(vector.vectorName)
+
     def storeLogEntries(self):
         with open(self.filename, 'wb') as pkl_file:
             pickle.dump(self.logEntries, pkl_file)

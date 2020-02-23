@@ -94,6 +94,9 @@ class EditVectorConfiguration(QWidget):
         self.vectorGraphWidget.minimize()
 
     def updateVectorTable(self, vector):
+        self.clientHandler.vectorManager.storeVectors()
+        if self.clientHandler.isLead:
+            self.clientHandler.updateVector(vector)
         significantEvents = list(vector.significantEvents.values())
         totalRows = len(significantEvents) + 1
         self.vectorTableWidget.setColumnCount(len(self.colsVectorTable))
@@ -165,7 +168,7 @@ class EditVectorConfiguration(QWidget):
         if self.vectorComboBoxTable.count() > 0:
             self.graphLayout.removeWidget(self.vectorGraphWidget)
             self.triggerHelper.connectRelationshipTableTrigger()
-            self.vectorGraphWidget = GraphWidget(self.graphWidget, self.triggerHelper)
+            self.vectorGraphWidget = GraphWidget(self.graphWidget, self.triggerHelper, self.clientHandler)
             self.vectorGraphWidget.setMinimumSize(QtCore.QSize(1500, 1500))
             self.graphLayout.addWidget(self.vectorGraphWidget)
             self.zoomInButtonGraph.clicked.disconnect()
@@ -206,6 +209,9 @@ class EditVectorConfiguration(QWidget):
                                                    significantEventDescriptionItem)
 
     def updateRelationshipTable(self, vector):
+        self.clientHandler.vectorManager.storeVectors()
+        if self.clientHandler.isLead:
+            self.clientHandler.updateVector(vector)
         relationships = list(vector.relationships.values())
         totalRows = len(relationships)
         self.relationshipTableWidget.setColumnCount(len(self.colsRelationshipTable))
@@ -303,6 +309,9 @@ class EditVectorConfiguration(QWidget):
         self.addNodeGraphButton.setText("Add Node")
 
     def updateVectorGraph(self, vector):
+        self.clientHandler.vectorManager.storeVectors()
+        if self.clientHandler.isLead:
+            self.clientHandler.updateVector(vector)
         self.vectorGraphWidget.initializeVector(vector)
         self.vectorGraphWidget.draw()
 

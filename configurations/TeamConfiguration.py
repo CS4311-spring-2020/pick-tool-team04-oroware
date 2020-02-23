@@ -62,7 +62,7 @@ class TeamConfiguration(QWidget):
     def setLead(self):
         if self.clientHandler.hasLead:
             if self.clientHandler.isLead:
-                self.leadCheckBox.setCheckState(QtCore.Qt.Checked)
+                self.leadCheckBox.setCheckState(QtCore.Qt.Unchecked)
                 self.clientHandler.releaseLead()
             else:
                 self.leadCheckBox.setCheckState(QtCore.Qt.Unchecked)

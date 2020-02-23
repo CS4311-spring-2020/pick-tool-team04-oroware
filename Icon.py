@@ -27,6 +27,13 @@ class Icon:
     def getGraphImageFromSource(self):
         self.graphImage = mpimg.imread(self.source)
 
+    def equals(self, icon):
+        if self.name != icon.name:
+            return False
+        if self.source != icon.source:
+            return False
+        return True
+
 class StoreQPixmap:
     def __init__(self):
         self._qpixmap = None

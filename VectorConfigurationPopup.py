@@ -31,6 +31,7 @@ class VectorConfigurationPopup(QWidget):
         vector.vectorDescription = self.vectorConfigurationDescriptionEdit.toPlainText()
         if self.clientHandler.vectorManager.addVector(vector):
             self.triggerHelper.emitVectorConfigurationTableTrigger()
+            self.clientHandler.vectorManager.storeVectors()
             self.close()
 
 

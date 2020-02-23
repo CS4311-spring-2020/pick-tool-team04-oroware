@@ -18,9 +18,10 @@ class GraphWidget(QWidget):
     STARTING_FONT_SIZE = 12
     MAXIMUM_FONT_SIZE = 20
 
-    def __init__(self, parent, trigger, mutable=True):
-        self.trigger = trigger
+    def __init__(self, parent, trigger, clientHandler=None, mutable=True):
         super(GraphWidget, self).__init__(parent)
+        self.trigger = trigger
+        self.clientHandler = clientHandler
         if mutable:
             self.initUI()
         else:
@@ -139,7 +140,6 @@ class GraphWidget(QWidget):
                 self.node1 = {key : self.node1}
                 break
 
-
     def onRelease(self, event):
         self.node2 = (event.xdata, event.ydata)
         self.axis2 = event.inaxes
@@ -155,6 +155,8 @@ class GraphWidget(QWidget):
                 node_name = list(self.node1.keys())[0]
                 self.pos[node_name] = (event.xdata, event.ydata)
                 self.vector.significantEvents[node_name].position = (event.xdata, event.ydata)
+                if self.clientHandler.isLead:
+                    self.clientHandler.updateVector(self.vector)
             elif type(self.node2) is dict and type(self.node1) is dict:
                 firstNodeName = list(self.node1.keys())[0]
                 secondNodeName = list(self.node2.keys())[0]
