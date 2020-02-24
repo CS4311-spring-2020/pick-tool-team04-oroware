@@ -38,8 +38,15 @@ class PDFLogFile(LogFile):
         if not self.cleansed:
             return False
         date = datetime.strptime(time.ctime(os.path.getctime(self.filename)), "%a %b %d %H:%M:%S %Y")
-        date = date.strftime("%m/%d/%Y %H:%M %p")
-        if date < eventStartTime or date > eventEndTime:
+        date = date.strftime("%m/%d/%Y %I:%M %p")
+        if date[0] == "0":
+            date = date[1:]
+        firstHalf = date[:date.index(" ") + 1]
+        secondHalf = date[date.index(" ") + 1:]
+        if secondHalf[0] == "0":
+            secondHalf = secondHalf[1:]
+        date = firstHalf + secondHalf
+        if datetime.strptime(date, "%m/%d/%Y %I:%M %p") < datetime.strptime(eventStartTime, "%m/%d/%Y %I:%M %p") or datetime.strptime(date, "%m/%d/%Y %I:%M %p") > datetime.strptime(eventEndTime, "%m/%d/%Y %I:%M %p"):
             self.invalidLine = "Whole File"
             self.invalidLineNumber = -1
             self.errorMessage = "Invalid date."
@@ -51,7 +58,14 @@ class PDFLogFile(LogFile):
         if self.validated:
             logEntries = list()
             date = datetime.strptime(time.ctime(os.path.getctime(self.filename)), "%a %b %d %H:%M:%S %Y")
-            date = date.strftime("%m/%d/%Y %H:%M %p")
+            date = date.strftime("%m/%d/%Y %I:%M %p")
+            if date[0] == "0":
+                date = date[1:]
+            firstHalf = date[:date.index(" ") + 1]
+            secondHalf = date[date.index(" ") + 1:]
+            if secondHalf[0] == "0":
+                secondHalf = secondHalf[1:]
+            date = firstHalf + secondHalf
             for line in self.lines:
                 logEntry = LogEntry()
                 logEntry.date = date
@@ -59,7 +73,7 @@ class PDFLogFile(LogFile):
                 logEntry.creator = creator
                 logEntry.eventType = eventType
                 logEntry.artifact = self.filename
-                self.logEntries.append(logEntry)
+                logEntries.append(logEntry)
             self.ingested = True
             return logEntries
         return None
