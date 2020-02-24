@@ -1,3 +1,4 @@
+import os
 import pickle
 from pathlib import Path
 
@@ -52,6 +53,12 @@ class VectorManager:
         if filename_path.exists():
             with open(self.filename, 'rb') as pkl_file:
                 self.vectors = pickle.load(pkl_file)
+
+    def deleteStoredVectors(self):
+        filename_path = Path(self.filename)
+        if filename_path.exists():
+            os.remove(filename_path)
+
 
 
 
