@@ -60,7 +60,7 @@ class LogFile:
         if self.validated:
             logEntries = list()
             dateRegex = re.compile(r'\d{1,2}/\d{1,2}/\d{4} \d{1,2}:\d{2} [A,P]M')
-            for line in self.logEntries:
+            for line in self.lines:
                 date = re.findall(dateRegex, line)[0]
                 logEntry = LogEntry()
                 logEntry.date = date
