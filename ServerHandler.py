@@ -138,6 +138,7 @@ class ServerThread(Thread):
     @synchronized_method
     def handleUpdateVector(self, vector):
         self.serverHandler.vectorManager.vectors[vector.vectorName] = vector
+        self.serverHandler.vectorManager.storeVectors()
         vectors = list(self.serverHandler.vectorManager.vectors.values())
         self.serverHandler.logEntryManager.updateLogEntries(vectors)
 
@@ -152,9 +153,11 @@ class ServerThread(Thread):
         if vector.changeSummary == "Deleted":
             if vector.vectorName in self.serverHandler.vectorManager.vectors:
                 del self.serverHandler.vectorManager.vectors[vector.vectorName]
+                self.serverHandler.vectorManager.storeVectors()
                 self.serverHandler.logEntryManager.handleVectorDeleted(vector)
         else:
-            self.serverHandler.vectorManager[vector.vectorName] = vector
+            self.serverHandler.vectorManager.vectors[vector.vectorName] = vector
+            self.serverHandler.vectorManager.storeVectors()
             vectors = list(self.serverHandler.vectorManager.vectors.values())
             self.serverHandler.logEntryManager.updateLogEntries(vectors)
 

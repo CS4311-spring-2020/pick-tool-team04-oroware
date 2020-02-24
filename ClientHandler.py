@@ -74,7 +74,7 @@ class ClientHandler():
                 del self.vectorManager.vectors[vector.vectorName]
                 self.logEntryManager.handleVectorDeleted(vector)
         else:
-            self.vectorManager[vector.vectorName] = vector
+            self.vectorManager.vectors[vector.vectorName] = vector
             vectors = list(self.vectorManager.vectors.values())
             self.logEntryManager.updateLogEntries(vectors)
         self.sendMsg(pickle.dumps({"Approve Vector" : [vectorKey, vector]}))
@@ -98,6 +98,9 @@ class ClientHandler():
         if completed:
             self.isLead = False
             self.hasLead = False
+            for vector in list(self.vectorManager.vectors.values()):
+                self.logEntryManager.handleVectorDeleted(vector)
+            self.vectorManager.deleteStoredVectors()
 
     def sendMsg(self, msg):
         msg = struct.pack('>I', len(msg)) + msg
