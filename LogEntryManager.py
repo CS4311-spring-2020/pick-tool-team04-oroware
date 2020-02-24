@@ -30,6 +30,10 @@ class LogEntryManager:
             self.logEntries[ids[i]] = logEntry
         self.logEntriesInTable = list(self.logEntries.values())
 
+    def addLogEntry(self, logEntry):
+        self.logEntries[self.nextAvailableId] = logEntry
+        self.nextAvailableId += 1
+
     def updateLogEntries(self, vectors):
         for vector in vectors:
             for significantEvent in list(vector.significantEvents.values()):
