@@ -1,35 +1,29 @@
 import os
-import re
 import time
-from copy import deepcopy
+import PyPDF2
+
 from datetime import datetime
-import speech_recognition as sr
-import moviepy.editor as mp
 
 from LogEntry import LogEntry
 from LogFile import LogFile
-from pydub import AudioSegment
 
 
-class VideoLogFile(LogFile):
+class PDFLogFile(LogFile):
 
     def __init__(self):
-        super(VideoLogFile, self).__init__()
+        super(PDFLogFile, self).__init__()
 
     def readLogFile(self):
-        clip = mp.VideoFileClip(self.filename)
-        clip.audio.write_audiofile("audio.mp3")
-        audio = AudioSegment.from_wav("audio.mp3")
-        segments = audio.dice(60)
-        for segment in segments:
-            segment.export('temp.wav', format="wav")
-            recognizer = sr.Recognizer()
-            with sr.AudioFile("temp.wav") as source:
-                audio = recognizer.record(source)
-                self.lines.append(recognizer.recognize_google(audio))
-        if len(segments) > 0:
-            os.remove("temp.wav")
-        os.remove("audio.mp3")
+        pdfFileObj = open(self.filename, 'rb')
+        pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+        line = ""
+
+        for pageNumber in range(pdfReader.numPages):
+            pageObj = pdfReader.getPage(pageNumber)
+            line = line + pageObj.extractText()
+
+        pdfFileObj.close()
+        self.lines.append(line)
 
     def cleanseLogFile(self):
         try:
@@ -69,4 +63,5 @@ class VideoLogFile(LogFile):
             self.ingested = True
             return logEntries
         return None
+
 

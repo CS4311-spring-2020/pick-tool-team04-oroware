@@ -30,6 +30,7 @@ class AudioLogFile(LogFile):
     def cleanseLogFile(self):
         try:
             self.readLogFile()
+            self.cleansed = True
             return True
         except Exception as e:
             print(e)
@@ -45,6 +46,7 @@ class AudioLogFile(LogFile):
             self.invalidLineNumber = -1
             self.errorMessage = "Invalid date."
             return False
+        self.validated = True
         return True
 
     def ingestLogFile(self, creator, eventType):

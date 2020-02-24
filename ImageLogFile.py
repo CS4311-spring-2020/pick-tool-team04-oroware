@@ -1,35 +1,23 @@
 import os
-import re
 import time
-from copy import deepcopy
+
 from datetime import datetime
-import speech_recognition as sr
-import moviepy.editor as mp
 
 from LogEntry import LogEntry
 from LogFile import LogFile
-from pydub import AudioSegment
+try:
+    from PIL import Image
+except ImportError:
+    import Image
+import pytesseract
 
-
-class VideoLogFile(LogFile):
+class ImageLogFile(LogFile):
 
     def __init__(self):
-        super(VideoLogFile, self).__init__()
+        super(ImageLogFile, self).__init__()
 
     def readLogFile(self):
-        clip = mp.VideoFileClip(self.filename)
-        clip.audio.write_audiofile("audio.mp3")
-        audio = AudioSegment.from_wav("audio.mp3")
-        segments = audio.dice(60)
-        for segment in segments:
-            segment.export('temp.wav', format="wav")
-            recognizer = sr.Recognizer()
-            with sr.AudioFile("temp.wav") as source:
-                audio = recognizer.record(source)
-                self.lines.append(recognizer.recognize_google(audio))
-        if len(segments) > 0:
-            os.remove("temp.wav")
-        os.remove("audio.mp3")
+        self.lines.append(pytesseract.image_to_string(Image.open(self.filename)))
 
     def cleanseLogFile(self):
         try:
@@ -69,4 +57,5 @@ class VideoLogFile(LogFile):
             self.ingested = True
             return logEntries
         return None
+
 
