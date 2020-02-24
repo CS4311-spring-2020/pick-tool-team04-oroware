@@ -167,8 +167,6 @@ class ServerThread(Thread):
         del self.serverHandler.pendingVectors[vectorKey]
 
     def run(self):
-        vector = Vector()
-        vector.addSignificantEventFromLogEntry(LogEntry())
         msg = pickle.dumps({"Server Information" : {"Lead Address" : self.serverHandler.leadAddress, "Connected Clients" : self.serverHandler.clientsConnected}})
         self.sendMsg(msg)
         while True:
