@@ -1,3 +1,4 @@
+from datetime import datetime
 import re
 from copy import deepcopy
 
@@ -15,12 +16,11 @@ class LogFile:
         self.invalidLineNumber = None
         self.errorMessage = None
         self.lines = list()
-        self.logEntries = list()
 
     def readLogFile(self):
         with open(self.filename) as file_pointer:
             for line in file_pointer:
-                self.lines.append(line)
+                self.lines.append(line.replace("\n", ""))
 
     def cleanseLogFile(self):
         try:
@@ -32,7 +32,8 @@ class LogFile:
                 index += 1
             self.cleansed = True
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def validateLogFile(self, eventStartTime, eventEndTime):
@@ -47,7 +48,9 @@ class LogFile:
                 self.errorMessage = "No date."
                 return False
             date = re.findall(dateRegex, line)[0]
-            if date < eventStartTime or date > eventEndTime:
+            if datetime.strptime(date, "%m/%d/%Y %I:%M %p") < datetime.strptime(eventStartTime,
+                                                                                "%m/%d/%Y %I:%M %p") or datetime.strptime(
+                    date, "%m/%d/%Y %I:%M %p") > datetime.strptime(eventEndTime, "%m/%d/%Y %I:%M %p"):
                 self.invalidLine = line
                 self.invalidLineNumber = lineNumber
                 self.errorMessage = "Invalid date."
@@ -68,7 +71,7 @@ class LogFile:
                 logEntry.creator = creator
                 logEntry.eventType = eventType
                 logEntry.artifact = self.filename
-                self.logEntries.append(logEntry)
+                logEntries.append(logEntry)
             self.ingested = True
             return logEntries
         return None
