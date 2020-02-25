@@ -4,20 +4,17 @@ import pickle
 import uuid
 
 from AudioLogFile import AudioLogFile
+from ImageLogFile import ImageLogFile
 from LogEntryManager import LogEntryManager
 from LogFile import LogFile
 from PDFLogFile import PDFLogFile
 from VectorManager import VectorManager
 from IconManager import IconManager
+from VideoLogFile import VideoLogFile
+
 
 class ClientHandler():
     def __init__(self):
-        logFile = AudioLogFile()
-        logFile.filename = "test_audio_log.wav"
-        logFile.cleanseLogFile()
-        logFile.validateLogFile("1/11/2020 12:00 AM", "1/14/2021 12:00 AM")
-        print(logFile.ingestLogFile("Blue Team", "Blue Team"))
-        input()
         self.logEntryManager = LogEntryManager()
         self.vectorManager = VectorManager()
         self.iconManager = IconManager()
