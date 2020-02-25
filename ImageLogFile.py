@@ -17,6 +17,7 @@ class ImageLogFile(LogFile):
         super(ImageLogFile, self).__init__()
 
     def readLogFile(self):
+        pytesseract.pytesseract.tesseract_cmd = "libraries/tesseract.exe"
         self.lines.append(pytesseract.image_to_string(Image.open(self.filename)))
 
     def cleanseLogFile(self):

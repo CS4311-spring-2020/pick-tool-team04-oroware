@@ -18,9 +18,13 @@ class VideoLogFile(LogFile):
 
     def readLogFile(self):
         clip = mp.VideoFileClip(self.filename)
-        clip.audio.write_audiofile("audio.mp3")
-        audio = AudioSegment.from_wav("audio.mp3")
-        segments = audio.dice(60)
+        clip.audio.write_audiofile("audio.wav")
+        audio = AudioSegment.from_wav("audio.wav")
+        segments = list()
+        offset = 0
+        while offset < len(audio):
+            segments.append(audio[offset: offset + (60 * 1000)])
+            offset += (60 * 1000)
         for segment in segments:
             segment.export('temp.wav', format="wav")
             recognizer = sr.Recognizer()
@@ -29,7 +33,7 @@ class VideoLogFile(LogFile):
                 self.lines.append(recognizer.recognize_google(audio))
         if len(segments) > 0:
             os.remove("temp.wav")
-        os.remove("audio.mp3")
+        os.remove("audio.wav")
 
     def cleanseLogFile(self):
         try:
