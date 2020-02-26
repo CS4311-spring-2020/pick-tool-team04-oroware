@@ -79,9 +79,9 @@ class EditVectorConfiguration(QWidget):
         self.relationshipTableWidget.setRowCount(0)
         self.rightEditVectorLayout.addWidget(self.relationshipTableWidget)
         self.editVectorLayout.addWidget(self.rightEditVectorWidget)
-        self.zoomInShortcut = QShortcut(QKeySequence("Ctrl+="), self)
+        self.zoomInShortcut = QShortcut(QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Up), self)
         self.zoomInShortcut.activated.connect(self.handleZoomInShortcut)
-        self.zoomOutShortcut = QShortcut(QKeySequence("Ctrl+-"), self)
+        self.zoomOutShortcut = QShortcut(QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Down), self)
         self.zoomOutShortcut.activated.connect(self.handleZoomOutShortcut)
         self.intializeText()
 
@@ -180,15 +180,6 @@ class EditVectorConfiguration(QWidget):
             self.updateVectorTable(vector)
             self.updateRelationshipTable(vector)
             self.updateVectorGraph(vector)
-
-    def handleSearchLogTableEntryUpdate(self, logEntry):
-        if logEntry.rowIndexInTable != -1:
-            logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntry.description)
-            self.searchLogsTableWidget.setItem(logEntry.rowIndexInTable, self.colsSearchLogsTable.index("Content"),
-                                                   logEntryDescriptionItem)
-            logEntryLocationItem = QtWidgets.QTableWidgetItem(logEntry.location)
-            self.searchLogsTableWidget.setItem(logEntry.rowIndexInTable, self.colsSearchLogsTable.index("Location"),
-                                               logEntryLocationItem)
 
     def handleRelationshipTableTrigger(self):
         if self.vectorComboBoxTable.count() > 0:
