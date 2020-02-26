@@ -1,13 +1,26 @@
 import struct
 import socket
 import pickle
+import threading
 import uuid
-from copy import deepcopy
 
 from LogEntryManager import LogEntryManager
 from LogFileManager import LogFileManager
 from VectorManager import VectorManager
 from IconManager import IconManager
+
+def synchronized_method(method):
+    outer_lock = threading.Lock()
+    lock_name = "__" + method.__name__ + "_lock" + "__"
+
+    def sync_method(self, *args, **kws):
+        with outer_lock:
+            if not hasattr(self, lock_name): setattr(self, lock_name, threading.Lock())
+            lock = getattr(self, lock_name)
+            with lock:
+                return method(self, *args, **kws)
+
+    return sync_method
 
 
 class ClientHandler():
@@ -35,20 +48,24 @@ class ClientHandler():
         self.establishedConnections = len(serverInformation["Connected Clients"])
         self.numConnections = self.establishedConnections
 
+    @synchronized_method
     def requestIcons(self):
         self.sendMsg(pickle.dumps({"Icon Manager Request": None}))
         self.iconManager.icons = pickle.loads(self.recvMsg())
 
+    @synchronized_method
     def updateIcons(self):
         self.sendMsg(pickle.dumps({"Icon Manager Update": self.iconManager.icons}))
         self.iconManager.icons = pickle.loads(self.recvMsg())
 
+    @synchronized_method
     def editLogEntry(self, logEntry):
         self.sendMsg(pickle.dumps({"Log Entry Update": logEntry}))
         logEntry = pickle.loads(self.recvMsg())
         if logEntry != None:
             self.logEntryManager.updateLogEntry(logEntry)
 
+    @synchronized_method
     def setLead(self):
         self.sendMsg(pickle.dumps({"Set Lead": self.address}))
         address = pickle.loads(self.recvMsg())
@@ -57,10 +74,12 @@ class ClientHandler():
             self.isLead = True
             self.hasLead = True
 
+    @synchronized_method
     def pushVectorDb(self, vectorManager):
         pushedVectors = list(vectorManager.vectors.values())
         self.sendMsg(pickle.dumps({"Push Vectors" : pushedVectors}))
 
+    @synchronized_method
     def pullVectorDb(self):
         self.sendMsg(pickle.dumps({"Pull Vectors": None}))
         newVectors = pickle.loads(self.recvMsg()).vectors
@@ -72,6 +91,7 @@ class ClientHandler():
         vectors = list(self.vectorManager.vectors.values())
         self.logEntryManager.updateLogEntries(vectors)
 
+    @synchronized_method
     def approveVector(self, vectorKey, vector):
         if vector.changeSummary == "Deleted":
             if vector.vectorName in self.vectorManager.vectors:
@@ -84,12 +104,15 @@ class ClientHandler():
         self.sendMsg(pickle.dumps({"Approve Vector" : [vectorKey, vector]}))
         return self.getPendingVectors()
 
+    @synchronized_method
     def updateVector(self, vector):
         self.sendMsg(pickle.dumps({"Update Vector": vector}))
 
+    @synchronized_method
     def sendLogEntries(self, logEntries):
         self.sendMsg(pickle.dumps({"Send Log Entries" : logEntries}))
 
+    @synchronized_method
     def searchLogEntries(self, commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch):
         self.sendMsg(pickle.dumps({"Search Logs" : [commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch]}))
         validLogEntries = pickle.loads(self.recvMsg())
@@ -104,15 +127,18 @@ class ClientHandler():
                         currentAssociatedVectors.append(vectorName)
             logEntry.associatedVectors = currentAssociatedVectors
 
+    @synchronized_method
     def rejectVector(self, vectorKey):
         self.sendMsg(pickle.dumps({"Reject Vector" : vectorKey}))
         return self.getPendingVectors()
 
+    @synchronized_method
     def getPendingVectors(self):
         self.sendMsg(pickle.dumps({"Get Pending Vectors" : None}))
         pendingVectors = pickle.loads(self.recvMsg())
         return pendingVectors
 
+    @synchronized_method
     def releaseLead(self):
         self.sendMsg(pickle.dumps({"Release Lead": self.address}))
         completed = pickle.loads(self.recvMsg())
@@ -123,10 +149,12 @@ class ClientHandler():
                 self.logEntryManager.handleVectorDeleted(vector)
             self.vectorManager.deleteStoredVectors()
 
+    @synchronized_method
     def sendMsg(self, msg):
         msg = struct.pack('>I', len(msg)) + msg
         self.socket.sendall(msg)
 
+    @synchronized_method
     def recvMsg(self):
         raw_msglen = self.recvAll(4)
         if not raw_msglen:
@@ -134,6 +162,7 @@ class ClientHandler():
         msglen = struct.unpack('>I', raw_msglen)[0]
         return self.recvAll(msglen)
 
+    @synchronized_method
     def recvAll(self, n):
         data = bytearray()
         while len(data) < n:
@@ -143,6 +172,7 @@ class ClientHandler():
             data.extend(packet)
         return data
 
+    @synchronized_method
     def editLogEntryVectors(self, logEntry, newVectors):
         oldVectors = logEntry.associatedVectors
         logEntry.associatedVectors = newVectors
