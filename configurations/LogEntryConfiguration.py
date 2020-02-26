@@ -90,32 +90,17 @@ class LogEntryConfiguration(QWidget):
         self.editPopup.show()
 
     def handleSearchButtonClicked(self):
-        validLogEntries = list()
-        for logEntryId, logEntry in self.clientHandler.logEntryManager.logEntries.items():
-            valid = True
-            if not (self.commandSearchTextEdit.toPlainText() in logEntry.description):
-                valid = False
-            if self.creatorBlueTeamCheckBox.isChecked() and ("Blue" not in logEntry.creator):
-                valid = False
-            if self.creatorWhiteTeamCheckBox.isChecked() and ("White" not in logEntry.creator):
-                valid = False
-            if self.creatorRedTeamCheckBox.isChecked() and ("Red" not in logEntry.creator):
-                valid = False
-            if self.eventTypeBlueTeamCheckBox.isChecked() and ("Blue" not in logEntry.eventType):
-                valid = False
-            if self.eventTypeWhiteTeamCheckBox.isChecked() and ("White" not in logEntry.eventType):
-                valid = False
-            if self.eventTypeRedTeamCheckBox.isChecked() and ("Red" not in logEntry.eventType):
-                valid = False
-            if not (self.locationSearchTextEdit.toPlainText() in logEntry.location):
-                valid = False
-            if self.fromDateTimeEditSearchLogs.text() < self.fromDateTimeEditSearchLogs.text():
-                valid = False
-            if self.toDateTimeEditSearchLogs.text() > self.toDateTimeEditSearchLogs.text():
-                valid = False
-            if(valid):
-                validLogEntries.append(logEntry)
-        self.clientHandler.logEntryManager.logEntriesInTable = validLogEntries
+        commandSearch = self.commandSearchTextEdit.toPlainText()
+        creatorBlueTeam = self.creatorBlueTeamCheckBox.isChecked()
+        creatorWhiteTeam = self.creatorWhiteTeamCheckBox.isChecked()
+        creatorRedTeam = self.creatorRedTeamCheckBox.isChecked()
+        eventTypeBlueTeam = self.eventTypeBlueTeamCheckBox.isChecked()
+        eventTypeWhiteTeam = self.eventTypeWhiteTeamCheckBox.isChecked()
+        eventTypeRedTeam = self.eventTypeRedTeamCheckBox.isChecked()
+        startTime = self.fromDateTimeEditSearchLogs.text()
+        endTime = self.toDateTimeEditSearchLogs.text()
+        locationSearch = self.locationSearchTextEdit.toPlainText()
+        self.clientHandler.searchLogEntries(commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch)
         self.updateLogTable()
 
     def updateLogTable(self):

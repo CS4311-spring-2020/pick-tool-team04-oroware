@@ -2,15 +2,12 @@ import struct
 import socket
 import pickle
 import uuid
+from copy import deepcopy
 
-from AudioLogFile import AudioLogFile
-from ImageLogFile import ImageLogFile
 from LogEntryManager import LogEntryManager
-from LogFile import LogFile
-from PDFLogFile import PDFLogFile
+from LogFileManager import LogFileManager
 from VectorManager import VectorManager
 from IconManager import IconManager
-from VideoLogFile import VideoLogFile
 
 
 class ClientHandler():
@@ -18,6 +15,7 @@ class ClientHandler():
         self.logEntryManager = LogEntryManager()
         self.vectorManager = VectorManager()
         self.iconManager = IconManager()
+        self.logFileManager = LogFileManager()
         self.isLead = False
         self.hasLead = False
         self.serverIp = '127.0.0.1'
@@ -88,6 +86,23 @@ class ClientHandler():
 
     def updateVector(self, vector):
         self.sendMsg(pickle.dumps({"Update Vector": vector}))
+
+    def sendLogEntries(self, logEntries):
+        self.sendMsg(pickle.dumps({"Send Log Entries" : logEntries}))
+
+    def searchLogEntries(self, commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch):
+        self.sendMsg(pickle.dumps({"Search Logs" : [commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch]}))
+        validLogEntries = pickle.loads(self.recvMsg())
+        self.logEntryManager.logEntries.clear()
+        self.logEntryManager.logEntriesInTable = validLogEntries
+        for logEntry in validLogEntries:
+            self.logEntryManager.logEntries[logEntry.id] = logEntry
+            currentAssociatedVectors = list()
+            for vectorName, vector in self.vectorManager.vectors.items():
+                for signficiantEventId, significantEvent in vector.significantEvents.items():
+                    if significantEvent.logEntry.id == logEntry.id:
+                        currentAssociatedVectors.append(vectorName)
+            logEntry.associatedVectors = currentAssociatedVectors
 
     def rejectVector(self, vectorKey):
         self.sendMsg(pickle.dumps({"Reject Vector" : vectorKey}))

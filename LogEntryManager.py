@@ -1,4 +1,5 @@
 import pickle
+from datetime import datetime
 
 from LogEntry import LogEntry
 from pathlib import Path
@@ -8,7 +9,9 @@ class LogEntryManager:
         self.logEntries = dict()
         self.logEntriesInTable = list()
         self.filename = "logEntries.pkl"
-        self.nextAvailableId = 5
+        self.nextAvailableId = 0
+
+    def initPlaceholderData(self):
         ids = [0, 1, 2, 3, 4]
         dates = ["1/31/2020 12:08 AM", "2/1/2020 11:43 PM", "2/2/2020 11:24 PM", "2/3/2020 11:01 AM", "2/4/2020 12:33 PM"]
         teams = [LogEntry.BLUE_TEAM, LogEntry.WHITE_TEAM, LogEntry.RED_TEAM, LogEntry.RED_TEAM, LogEntry.BLUE_TEAM]
@@ -28,7 +31,7 @@ class LogEntryManager:
             logEntry.artifact = artifacts[i]
             logEntry.location = locations[i]
             self.logEntries[ids[i]] = logEntry
-        self.logEntriesInTable = list(self.logEntries.values())
+        self.nextAvailableId = 5
 
     def addLogEntry(self, logEntry):
         self.logEntries[self.nextAvailableId] = logEntry
@@ -61,4 +64,30 @@ class LogEntryManager:
             self.logEntries[logEntry.id] = logEntry
             return True
         return False
+
+    def searchLogEntries(self, commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch):
+        validLogEntries = list()
+        for logEntryId, logEntry in self.logEntries.items():
+            valid = True
+            if not (commandSearch in logEntry.description):
+                valid = False
+            if creatorBlueTeam and ("Blue" not in logEntry.creator):
+                valid = False
+            if creatorWhiteTeam and ("White" not in logEntry.creator):
+                valid = False
+            if creatorRedTeam and ("Red" not in logEntry.creator):
+                valid = False
+            if eventTypeBlueTeam and ("Blue" not in logEntry.eventType):
+                valid = False
+            if eventTypeWhiteTeam and ("White" not in logEntry.eventType):
+                valid = False
+            if eventTypeRedTeam and ("Red" not in logEntry.eventType):
+                valid = False
+            if locationSearch not in logEntry.location:
+                valid = False
+            if datetime.strptime(logEntry.date, "%m/%d/%Y %I:%M %p") < datetime.strptime(startTime, "%m/%d/%Y %I:%M %p") or datetime.strptime(logEntry.date, "%m/%d/%Y %I:%M %p") > datetime.strptime(endTime, "%m/%d/%Y %I:%M %p"):
+                valid = False
+            if valid:
+                validLogEntries.append(logEntry)
+        return validLogEntries
 

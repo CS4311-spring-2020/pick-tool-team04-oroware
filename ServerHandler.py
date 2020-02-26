@@ -29,8 +29,8 @@ class ServerHandler():
         self.host = '127.0.0.1'
         self.port = 65432
         self.leadAddress = None
-        self.bind()
         self.logEntryManager = LogEntryManager()
+        self.logEntryManager.initPlaceholderData()
         self.logEntryManager.retrieveLogEntries()
         self.vectorManager = VectorManager()
         self.vectorManager.retrieveVectors()
@@ -40,6 +40,7 @@ class ServerHandler():
         self.pendingVectorFilename = "pendingVectors.pkl"
         self.retrievePendingVectors()
         self.clientsConnected = list()
+        self.bind()
 
     def bind(self):
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -166,6 +167,16 @@ class ServerThread(Thread):
         self.serverHandler.storePendingVectors()
         del self.serverHandler.pendingVectors[vectorKey]
 
+    @synchronized_method
+    def handleSendLogEntries(self, logEntries):
+        for logEntry in logEntries:
+            self.serverHandler.logEntryManager.addLogEntry(logEntry)
+
+    @synchronized_method
+    def handleSearchLogs(self, commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch):
+        logEntries = self.serverHandler.logEntryManager.searchLogEntries(commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch)
+        self.sendMsg(pickle.dumps(logEntries))
+
     def run(self):
         msg = pickle.dumps({"Server Information" : {"Lead Address" : self.serverHandler.leadAddress, "Connected Clients" : self.serverHandler.clientsConnected}})
         self.sendMsg(msg)
@@ -196,6 +207,21 @@ class ServerThread(Thread):
                 self.handlePullVectors()
             elif request == "Update Vector":
                 self.handleUpdateVector(list(msg.values())[0])
+            elif request == "Send Log Entries":
+                self.handleSendLogEntries(list(msg.values())[0])
+            elif request == "Search Logs":
+                searchCriteria = list(msg.values())[0]
+                commandSearch = searchCriteria[0]
+                creatorBlueTeam = searchCriteria[1]
+                creatorWhiteTeam = searchCriteria[2]
+                creatorRedTeam = searchCriteria[3]
+                eventTypeBlueTeam = searchCriteria[4]
+                eventTypeWhiteTeam = searchCriteria[5]
+                eventTypeRedTeam = searchCriteria[6]
+                startTime = searchCriteria[7]
+                endTime = searchCriteria[8]
+                locationSearch = searchCriteria[9]
+                self.handleSearchLogs(commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch)
 
 if __name__ == "__main__":
     serverHandler = ServerHandler()

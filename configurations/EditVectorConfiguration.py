@@ -322,8 +322,7 @@ class EditVectorConfiguration(QWidget):
             logEntry = LogEntry()
             logEntry.creator = logEntry.WHITE_TEAM
             logEntry.eventType = logEntry.WHITE_TEAM
-            logEntry.id = self.clientHandler.logEntryManager.nextAvailableId
-            self.clientHandler.logEntryManager.nextAvailableId += 1
+            logEntry.id = -1
             logEntry.date = (datetime.datetime.today()).strftime("%m/%d/%Y %I:%M %p").lstrip("0")
             logEntry.associatedVectors.append(self.vectorComboBoxTable.currentText())
             vector.addSignificantEventFromLogEntry(logEntry)
