@@ -67,7 +67,7 @@ class VideoLogFile(LogFile):
         return True
 
     def ingestLogFile(self):
-        if self.validated:
+        if self.validated and not self.ingested:
             logEntries = list()
             date = datetime.strptime(time.ctime(os.path.getctime(self.filename)), "%a %b %d %H:%M:%S %Y")
             date = date.strftime("%m/%d/%Y %I:%M %p")
