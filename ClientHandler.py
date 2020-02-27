@@ -31,6 +31,8 @@ class ClientHandler():
         self.logFileManager = LogFileManager()
         self.isLead = False
         self.hasLead = False
+        self.eventStartTime = None
+        self.eventEndTime = None
         self.serverIp = '127.0.0.1'
         self.serverPort = 65432
         self.address = hex(uuid.getnode())

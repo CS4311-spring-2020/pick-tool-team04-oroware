@@ -1,5 +1,7 @@
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import QRunnable, pyqtSlot, QThreadPool
 from PyQt5.QtWidgets import QFileDialog, QWidget
+import os
 
 
 class DirectoryConfiguration(QWidget):
@@ -62,3 +64,44 @@ class DirectoryConfiguration(QWidget):
         self.directoryConfigurationLabel.setText("DIRECTORY CONFIGURATION")
         self.redTeamLabel.setText("Red Team Folder: ")
         self.ingestionButton.setText("Start Data Ingestion")
+
+    def ingestLogs(self, root):
+        if self.clientHandler.eventStartTime != None and self.clientHandler.eventEndTime != None:
+            redTeamPath = root + "/red/"
+            blueTeamPath = root + "/blue/"
+            whiteTeamPath = root + "/white/"
+
+            for filename in os.listdir(redTeamPath):
+                self.clientHandler.logFileManager.createLogFile(filename, "Red Team", "Red Team")
+
+            for filename in os.listdir(blueTeamPath):
+                self.clientHandler.logFileManager.createLogFile(filename, "Blue Team", "Blue Team")
+
+            for filename in os.listdir(whiteTeamPath):
+                self.clientHandler.logFileManager.createLogFile(filename, "White Team", "White Team")
+
+            self.threadpool = QThreadPool()
+            ingestionWorker = IngestionWorker(self.clientHandler)
+            self.threadpool.start(ingestionWorker)
+
+class IngestionWorker(QRunnable):
+
+    def __init__(self, clientHandler):
+        super(IngestionWorker, self).__init__()
+        self.clientHandler = clientHandler
+
+    @pyqtSlot()
+    def run(self):
+        logFiles = list(self.clientHandler.logFileManager.files.values())
+        for logFile in logFiles:
+            logEntries = self.ingestLogFile(logFile, self.clientHandler.eventStartTime, self.clientHandler.eventEndTime)
+            if logEntries != None:
+                self.clientHandler.sendLogEntries(logEntries)
+
+    def ingestLogFile(self, logFile, eventStartTime, eventEndTime):
+        logEntries = list()
+        logFile.readLogFile()
+        if logFile.cleanseLogFile():
+            if logFile.validateLogFile(eventStartTime, eventEndTime):
+                logEntries = logFile.ingestLogFile()
+        return logEntries

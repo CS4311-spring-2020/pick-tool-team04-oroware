@@ -63,7 +63,7 @@ class AudioLogFile(LogFile):
         self.validated = True
         return True
 
-    def ingestLogFile(self, creator, eventType):
+    def ingestLogFile(self):
         if self.validated:
             logEntries = list()
             date = datetime.strptime(time.ctime(os.path.getctime(self.filename)), "%a %b %d %H:%M:%S %Y")
@@ -79,8 +79,8 @@ class AudioLogFile(LogFile):
                 logEntry = LogEntry()
                 logEntry.date = date
                 logEntry.description = line
-                logEntry.creator = creator
-                logEntry.eventType = eventType
+                logEntry.creator = self.creator
+                logEntry.eventType = self.eventType
                 logEntry.artifact = self.filename
                 logEntries.append(logEntry)
             self.ingested = True

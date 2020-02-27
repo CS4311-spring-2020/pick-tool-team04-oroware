@@ -69,10 +69,12 @@ class ServerThread(Thread):
         self.clientSocket = clientSocket
         self.serverHandler = serverHandler
 
+    @synchronized_method
     def sendMsg(self, msg):
         msg = struct.pack('>I', len(msg)) + msg
         self.clientSocket.sendall(msg)
 
+    @synchronized_method
     def recvMsg(self):
         raw_msglen = self.recvAll(4)
         if not raw_msglen:
@@ -80,6 +82,7 @@ class ServerThread(Thread):
         msglen = struct.unpack('>I', raw_msglen)[0]
         return self.recvAll(msglen)
 
+    @synchronized_method
     def recvAll(self, n):
         data = bytearray()
         while len(data) < n:
@@ -106,6 +109,7 @@ class ServerThread(Thread):
     def handleLogEntryUpdate(self, logEntry):
         if self.serverHandler.logEntryManager.updateLogEntry(logEntry):
             self.sendMsg(pickle.dumps(logEntry))
+            self.serverHandler.logEntryManager.storeLogEntries()
         else:
             self.sendMsg(pickle.dumps(None))
 
@@ -142,6 +146,7 @@ class ServerThread(Thread):
         self.serverHandler.vectorManager.storeVectors()
         vectors = list(self.serverHandler.vectorManager.vectors.values())
         self.serverHandler.logEntryManager.updateLogEntries(vectors)
+        self.serverHandler.logEntryManager.storeLogEntries()
 
     @synchronized_method
     def handlePendingVectors(self):
@@ -156,11 +161,13 @@ class ServerThread(Thread):
                 del self.serverHandler.vectorManager.vectors[vector.vectorName]
                 self.serverHandler.vectorManager.storeVectors()
                 self.serverHandler.logEntryManager.handleVectorDeleted(vector)
+                self.serverHandler.logEntryManager.storeLogEntries()
         else:
             self.serverHandler.vectorManager.vectors[vector.vectorName] = vector
             self.serverHandler.vectorManager.storeVectors()
             vectors = list(self.serverHandler.vectorManager.vectors.values())
             self.serverHandler.logEntryManager.updateLogEntries(vectors)
+            self.serverHandler.logEntryManager.storeLogEntries()
 
     @synchronized_method
     def handleRejectVector(self, vectorKey):
@@ -171,6 +178,7 @@ class ServerThread(Thread):
     def handleSendLogEntries(self, logEntries):
         for logEntry in logEntries:
             self.serverHandler.logEntryManager.addLogEntry(logEntry)
+        self.serverHandler.logEntryManager.storeLogEntries()
 
     @synchronized_method
     def handleSearchLogs(self, commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch):
