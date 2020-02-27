@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import QDateTime, QDate
 from PyQt5.QtWidgets import QWidget
 
 
@@ -56,8 +57,17 @@ class TeamConfiguration(QWidget):
         self.eventConfigurationLayout.addWidget(self.endEventConfigurationDateEdit)
         self.teamConfigurationTabLayout.addWidget(self.eventConfiguration)
         self.saveEventButton = QtWidgets.QPushButton(self.eventConfiguration)
+        self.saveEventButton.clicked.connect(self.handleSaveEvent)
         self.eventConfigurationLayout.addWidget(self.saveEventButton)
         self.intializeText()
+
+    def handleSaveEvent(self):
+        eventConfig = self.clientHandler.eventConfig
+        eventConfig.eventStartTime = self.startEventConfigurationDateEdit.text()
+        eventConfig.eventEndTime = self.endEventConfigurationDateEdit.text()
+        eventConfig.eventDescription = self.eventDescriptionTextEdit.toPlainText()
+        eventConfig.eventName = self.eventNameTextEdit.toPlainText()
+        self.clientHandler.updateEventConfig()
 
     def setLead(self):
         if self.clientHandler.hasLead:
@@ -84,3 +94,12 @@ class TeamConfiguration(QWidget):
         self.endEventConfigurationLabel.setText("Event end timestamp:")
         self.saveEventButton.setText("Save Event")
         self.eventDescriptionLabel.setText("Event description: ")
+        eventConfig = self.clientHandler.eventConfig
+        if eventConfig.eventEndTime != None:
+            self.endEventConfigurationDateEdit.setDateTime(QDateTime.fromString(eventConfig.eventEndTime, "d/M/yyyy h:mm A"))
+        if eventConfig.eventStartTime != None:
+            self.startEventConfigurationDateEdit.setDateTime(QDateTime.fromString(eventConfig.eventStartTime,"d/M/yyyy h:mm A"))
+        if eventConfig.eventName != None:
+            self.eventNameTextEdit.setText(eventConfig.eventName)
+        if eventConfig.eventDescription != None:
+            self.eventDescriptionTextEdit.setText(eventConfig.eventDescription)

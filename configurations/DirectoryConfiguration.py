@@ -92,9 +92,11 @@ class IngestionWorker(QRunnable):
 
     @pyqtSlot()
     def run(self):
+        eventStartTime = self.clientHandler.eventConfig.eventStartTime
+        eventEndTime = self.clientHandler.eventConfig.eventEndTime
         logFiles = list(self.clientHandler.logFileManager.files.values())
         for logFile in logFiles:
-            logEntries = self.ingestLogFile(logFile, self.clientHandler.eventStartTime, self.clientHandler.eventEndTime)
+            logEntries = self.ingestLogFile(logFile, eventStartTime, eventEndTime)
             if logEntries != None:
                 self.clientHandler.sendLogEntries(logEntries)
 

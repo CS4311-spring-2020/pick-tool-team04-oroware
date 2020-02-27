@@ -4,6 +4,7 @@ import pickle
 import threading
 import uuid
 
+from EventConfig import EventConfig
 from LogEntryManager import LogEntryManager
 from LogFileManager import LogFileManager
 from VectorManager import VectorManager
@@ -29,10 +30,9 @@ class ClientHandler():
         self.vectorManager = VectorManager()
         self.iconManager = IconManager()
         self.logFileManager = LogFileManager()
+        self.eventConfig = EventConfig()
         self.isLead = False
         self.hasLead = False
-        self.eventStartTime = None
-        self.eventEndTime = None
         self.serverIp = '127.0.0.1'
         self.serverPort = 65432
         self.address = hex(uuid.getnode())
@@ -49,11 +49,22 @@ class ClientHandler():
                 self.isLead = True
         self.establishedConnections = len(serverInformation["Connected Clients"])
         self.numConnections = self.establishedConnections
+        self.requestEventConfig()
 
     @synchronized_method
     def requestIcons(self):
         self.sendMsg(pickle.dumps({"Icon Manager Request": None}))
         self.iconManager.icons = pickle.loads(self.recvMsg())
+
+    @synchronized_method
+    def requestEventConfig(self):
+        self.sendMsg(pickle.dumps({"Request event config": None}))
+        self.eventConfig = pickle.loads(self.recvMsg())
+
+    @synchronized_method
+    def updateEventConfig(self):
+        self.sendMsg(pickle.dumps({"Update event config": self.eventConfig}))
+        self.eventConfig = pickle.loads(self.recvMsg())
 
     @synchronized_method
     def updateIcons(self):
