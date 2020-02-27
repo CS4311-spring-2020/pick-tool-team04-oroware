@@ -36,6 +36,7 @@ class LogFileManager:
             logFile.eventType = eventType
             self.addLogFile(logFile)
             return True
+
         return False
 
 

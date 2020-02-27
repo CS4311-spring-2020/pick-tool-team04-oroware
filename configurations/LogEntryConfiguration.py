@@ -58,8 +58,6 @@ class LogEntryConfiguration(QWidget):
         self.searchLogsTableWidget.setRowCount(0)
         self.searchLogsTableWidget.setMinimumSize(1250, 1750)
         self.searchLogsLayout.addWidget(self.searchLogsTableWidget)
-        self.clientHandler.logEntryManager.searchLogEntryTableWidget = self.searchLogsTableWidget
-        self.clientHandler.logEntryManager.colNamesInSearchLogsTable = self.colsSearchLogsTable
         self.intializeText()
         self.updateLogTable()
 

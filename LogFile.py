@@ -62,7 +62,7 @@ class LogFile:
         return True
 
     def ingestLogFile(self):
-        if self.validated:
+        if self.validated and not self.ingested:
             logEntries = list()
             dateRegex = re.compile(r'\d{1,2}/\d{1,2}/\d{4} \d{1,2}:\d{2} [A,P]M')
             for line in self.lines:

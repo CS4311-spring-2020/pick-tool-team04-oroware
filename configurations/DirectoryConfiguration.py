@@ -80,6 +80,8 @@ class DirectoryConfiguration(QWidget):
             for filename in os.listdir(whiteTeamPath):
                 self.clientHandler.logFileManager.createLogFile(filename, "White Team", "White Team")
 
+            self.clientHandler.logFileManager.storeLogFiles()
+
             self.threadpool = QThreadPool()
             ingestionWorker = IngestionWorker(self.clientHandler)
             self.threadpool.start(ingestionWorker)
@@ -99,6 +101,7 @@ class IngestionWorker(QRunnable):
             logEntries = self.ingestLogFile(logFile, eventStartTime, eventEndTime)
             if logEntries != None:
                 self.clientHandler.sendLogEntries(logEntries)
+                self.clientHandler.logFileManager.storeLogFiles()
 
     def ingestLogFile(self, logFile, eventStartTime, eventEndTime):
         logEntries = list()
