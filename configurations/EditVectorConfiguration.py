@@ -1,6 +1,7 @@
 import datetime
 
 import xlwt
+import csv
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QKeySequence
@@ -248,46 +249,38 @@ class EditVectorConfiguration(QWidget):
             self.updateVectorGraph(currentVector)
 
     def exportVectorTable(self, vectorName):
-        filename = vectorName + "_SignificantEventTable.xls"
-        wbk = xlwt.Workbook()
-        sheet = wbk.add_sheet("sheet", cell_overwrite_ok=True)
-        style = xlwt.XFStyle()
-        font = xlwt.Font()
-        font.bold = True
-        style.font = font
-        model = self.vectorTableWidget.model()
-        for column in range(model.columnCount()):
-            text = model.headerData(column, QtCore.Qt.Horizontal)
-            sheet.write(0, column + 1, text, style=style)
-        for row in range(model.rowCount()):
-            text = model.headerData(row, QtCore.Qt.Vertical)
-            sheet.write(row + 1, 0, text, style=style)
-        for column in range(model.columnCount()):
+        filename = vectorName + "_SignificantEventTable.csv"
+        with open(filename, 'w') as csv_file:
+            writer = csv.writer(csv_file, delimiter=",", lineterminator='\n')
+            model = self.vectorTableWidget.model()
+            row = list()
+            for column in range(model.columnCount()):
+                row.append(model.headerData(column, QtCore.Qt.Horizontal))
+            writer.writerow(row)
             for row in range(model.rowCount()):
-                text = model.data(model.index(row, column))
-                sheet.write(row + 1, column + 1, text)
-        wbk.save(filename)
+                row = list()
+                row.append(str(model.headerData(row, QtCore.Qt.Vertical)))
+                for column in range(model.columnCount()):
+                    text = model.data(model.index(row, column))
+                    row.append(text)
+                writer.writerow(row)
 
     def exportRelationshipTable(self, vectorName):
-        filename = vectorName + "_RelationshipTable.xls"
-        wbk = xlwt.Workbook()
-        sheet = wbk.add_sheet("sheet", cell_overwrite_ok=True)
-        style = xlwt.XFStyle()
-        font = xlwt.Font()
-        font.bold = True
-        style.font = font
-        model = self.relationshipTableWidget.model()
-        for column in range(model.columnCount()):
-            text = model.headerData(column, QtCore.Qt.Horizontal)
-            sheet.write(0, column + 1, text, style=style)
-        for row in range(model.rowCount()):
-            text = model.headerData(row, QtCore.Qt.Vertical)
-            sheet.write(row + 1, 0, text, style=style)
-        for column in range(model.columnCount()):
+        filename = vectorName + "_RelationshipTable.csv"
+        with open(filename, 'w') as csv_file:
+            writer = csv.writer(csv_file, delimiter=",", lineterminator='\n')
+            model = self.relationshipTableWidget.model()
+            row = list()
+            for column in range(model.columnCount()):
+                row.append(model.headerData(column, QtCore.Qt.Horizontal))
+            writer.writerow(row)
             for row in range(model.rowCount()):
-                text = model.data(model.index(row, column))
-                sheet.write(row + 1, column + 1, text)
-        wbk.save(filename)
+                row = list()
+                row.append(str(model.headerData(row, QtCore.Qt.Vertical)))
+                for column in range(model.columnCount()):
+                    text = model.data(model.index(row, column))
+                    row.append(text)
+                writer.writerow(row)
 
     def intializeText(self):
         self.addNodeTableButton.setText("Add Node")
