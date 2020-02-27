@@ -1,5 +1,6 @@
 import struct
 
+from EventConfig import EventConfig
 from IconManager import IconManager
 from LogEntry import LogEntry
 from LogEntryManager import LogEntryManager
@@ -36,6 +37,8 @@ class ServerHandler():
         self.vectorManager.retrieveVectors()
         self.iconManager = IconManager()
         self.iconManager.retrieveIcons()
+        self.eventConfig = EventConfig()
+        self.eventConfig.retrieveEventConfig()
         self.pendingVectors = dict()
         self.pendingVectorFilename = "pendingVectors.pkl"
         self.retrievePendingVectors()
@@ -185,6 +188,16 @@ class ServerThread(Thread):
         logEntries = self.serverHandler.logEntryManager.searchLogEntries(commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch)
         self.sendMsg(pickle.dumps(logEntries))
 
+    @synchronized_method
+    def handleRequestEventConfig(self):
+        self.sendMsg(pickle.dumps(self.serverHandler.eventConfig))
+
+    @synchronized_method
+    def handleUpdateEventConfig(self, eventConfig):
+        self.serverHandler.eventConfig = eventConfig
+        self.serverHandler.eventConfig.storeEventConfig()
+        self.sendMsg(pickle.dumps(self.serverHandler.eventConfig))
+
     def run(self):
         msg = pickle.dumps({"Server Information" : {"Lead Address" : self.serverHandler.leadAddress, "Connected Clients" : self.serverHandler.clientsConnected}})
         self.sendMsg(msg)
@@ -230,6 +243,10 @@ class ServerThread(Thread):
                 endTime = searchCriteria[8]
                 locationSearch = searchCriteria[9]
                 self.handleSearchLogs(commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch)
+            elif request == "Request event config":
+                self.handleRequestEventConfig()
+            elif request == "Update event config":
+                self.handleUpdateEventConfig(list(msg.values())[0])
 
 if __name__ == "__main__":
     serverHandler = ServerHandler()
