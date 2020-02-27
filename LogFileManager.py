@@ -1,6 +1,11 @@
 import pickle
 from pathlib import Path
 
+from AudioLogFile import AudioLogFile
+from ImageLogFile import ImageLogFile
+from LogFile import LogFile
+from VideoLogFile import VideoLogFile
+
 
 class LogFileManager:
     def __init__(self):
@@ -12,6 +17,27 @@ class LogFileManager:
             return False
         self.files[logFile.filename] = logFile
         return True
+
+    def createLogFile(self, filename, creator, eventType):
+        logFile = None
+
+        if ".csv" in filename or ".txt" in filename or ".tmux" in filename:
+            logFile = LogFile()
+        elif ".mp4" in filename:
+            logFile = VideoLogFile()
+        elif ".mp3" in filename or ".wav" in filename:
+            logFile = AudioLogFile()
+        elif ".tiff" in filename or ".png" in filename or ".jpeg" in filename:
+            logFile = ImageLogFile()
+
+        if logFile != None:
+            logFile.creator = creator
+            logFile.filename = filename
+            logFile.eventType = eventType
+            self.addLogFile(logFile)
+            return True
+        return False
+
 
     def storeLogFiles(self):
         with open(self.filename, 'wb') as pkl_file:

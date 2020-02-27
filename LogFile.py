@@ -15,6 +15,8 @@ class LogFile:
         self.invalidLine = None
         self.invalidLineNumber = None
         self.errorMessage = None
+        self.creator = None
+        self.eventType = None
         self.lines = list()
 
     def readLogFile(self):
@@ -59,7 +61,7 @@ class LogFile:
         self.validated = True
         return True
 
-    def ingestLogFile(self, creator, eventType):
+    def ingestLogFile(self):
         if self.validated:
             logEntries = list()
             dateRegex = re.compile(r'\d{1,2}/\d{1,2}/\d{4} \d{1,2}:\d{2} [A,P]M')
@@ -68,8 +70,8 @@ class LogFile:
                 logEntry = LogEntry()
                 logEntry.date = date
                 logEntry.description = line.replace(date, "").strip()
-                logEntry.creator = creator
-                logEntry.eventType = eventType
+                logEntry.creator = self.creator
+                logEntry.eventType = self.eventType
                 logEntry.artifact = self.filename
                 logEntries.append(logEntry)
             self.ingested = True
