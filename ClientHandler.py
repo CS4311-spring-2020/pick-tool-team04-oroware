@@ -1,8 +1,10 @@
+import os
 import struct
 import socket
 import pickle
 import threading
 import uuid
+from pathlib import Path
 
 from EventConfig import EventConfig
 from LogEntryManager import LogEntryManager
@@ -81,6 +83,9 @@ class ClientHandler():
     @synchronized_method
     def setLead(self):
         self.sendMsg(pickle.dumps({"Set Lead": self.address}))
+        self.vectorManager.deleteStoredVectors()
+        self.deletePulledVectors()
+        self.deletePushedVectors()
         address = pickle.loads(self.recvMsg())
         if self.address == address:
             self.pullVectorDb()
@@ -160,6 +165,7 @@ class ClientHandler():
             self.hasLead = False
             for vector in list(self.vectorManager.vectors.values()):
                 self.logEntryManager.handleVectorDeleted(vector)
+            self.vectorManager.vectors.clear()
             self.vectorManager.deleteStoredVectors()
 
     @synchronized_method
@@ -184,6 +190,18 @@ class ClientHandler():
                 return None
             data.extend(packet)
         return data
+
+    @synchronized_method
+    def deletePushedVectors(self):
+        filename_path = Path("pushedVectors.pkl")
+        if filename_path.exists():
+            os.remove(filename_path)
+
+    @synchronized_method
+    def deletePulledVectors(self):
+        filename_path = Path("pulledVectors.pkl")
+        if filename_path.exists():
+            os.remove(filename_path)
 
     @synchronized_method
     def editLogEntryVectors(self, logEntry, newVectors):

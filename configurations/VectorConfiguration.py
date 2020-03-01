@@ -75,6 +75,9 @@ class VectorConfiguration(QWidget):
         # self.vectorConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         # self.vectorConfigurationTableWidget.doubleClicked.connect(self.vectorConfigurationDoubleClicked())
 
+    def onTabChange(self):
+        self.updateVectorConfigurationTable()
+
     def handleAddVector(self):
         self.vectorConfigurationPopup = VectorConfigurationPopup(self.triggerHelper, self.clientHandler)
         self.vectorConfigurationPopup.setGeometry(100, 200, 200, 200)

@@ -155,6 +155,7 @@ class GraphWidget(QWidget):
                 node_name = list(self.node1.keys())[0]
                 self.pos[node_name] = (event.xdata, event.ydata)
                 self.vector.significantEvents[node_name].position = (event.xdata, event.ydata)
+                self.clientHandler.vectorManager.storeVectors()
                 if self.clientHandler.isLead:
                     self.clientHandler.updateVector(self.vector)
             elif type(self.node2) is dict and type(self.node1) is dict:
@@ -173,6 +174,9 @@ class GraphWidget(QWidget):
             if firstNodeName != secondNodeName:
                 self.vectorGraph.add_edges_from([(firstNodeName, secondNodeName)])
                 self.vector.addNewRelationship(firstNodeName, secondNodeName)
+                self.clientHandler.vectorManager.storeVectors()
+                if self.clientHandler.isLead:
+                    self.clientHandler.updateVector(self.vector)
                 self.trigger.emitRelationshipTableTrigger()
         self.axis1 = None
         self.axis2 = None

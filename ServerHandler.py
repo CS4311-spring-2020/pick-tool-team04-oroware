@@ -32,7 +32,8 @@ class ServerHandler():
         self.leadAddress = None
         self.logEntryManager = LogEntryManager()
         self.logEntryManager.initPlaceholderData()
-        self.logEntryManager.retrieveLogEntries()
+        # Uncomment when pipeline complete
+        # self.logEntryManager.retrieveLogEntries()
         self.vectorManager = VectorManager()
         self.vectorManager.retrieveVectors()
         self.iconManager = IconManager()

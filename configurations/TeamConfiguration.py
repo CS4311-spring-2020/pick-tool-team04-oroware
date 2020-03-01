@@ -96,9 +96,9 @@ class TeamConfiguration(QWidget):
         self.eventDescriptionLabel.setText("Event description: ")
         eventConfig = self.clientHandler.eventConfig
         if eventConfig.eventEndTime != None:
-            self.endEventConfigurationDateEdit.setDateTime(QDateTime.fromString(eventConfig.eventEndTime, "d/M/yyyy h:mm A"))
+            self.endEventConfigurationDateEdit.setDateTime(QDateTime.fromString(eventConfig.eventEndTime, "M/d/yyyy h:mm A"))
         if eventConfig.eventStartTime != None:
-            self.startEventConfigurationDateEdit.setDateTime(QDateTime.fromString(eventConfig.eventStartTime,"d/M/yyyy h:mm A"))
+            self.startEventConfigurationDateEdit.setDateTime(QDateTime.fromString(eventConfig.eventStartTime,"M/d/yyyy h:mm A"))
         if eventConfig.eventName != None:
             self.eventNameTextEdit.setText(eventConfig.eventName)
         if eventConfig.eventDescription != None:
