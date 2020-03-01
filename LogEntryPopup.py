@@ -48,6 +48,7 @@ class LogEntryPopup(QWidget):
     def onSaveClick(self):
         self.logEntryDescriptionWidget.setText(self.logEntryDescriptionTextEdit.toPlainText())
         self.logEntry.description = self.logEntryDescriptionTextEdit.toPlainText()
+        self.clientHandler.editLogEntry(self.logEntry)
         newVectors = list()
         for i in range(self.associationComboBox.count()):
             if self.associationComboBox.model().item(i, 0).checkState() == QtCore.Qt.Checked:

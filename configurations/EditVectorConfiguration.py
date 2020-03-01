@@ -181,6 +181,18 @@ class EditVectorConfiguration(QWidget):
             self.updateVectorTable(vector)
             self.updateRelationshipTable(vector)
             self.updateVectorGraph(vector)
+        else:
+            self.graphLayout.removeWidget(self.vectorGraphWidget)
+            self.triggerHelper.connectRelationshipTableTrigger()
+            self.vectorGraphWidget = GraphWidget(self.graphWidget, self.triggerHelper, self.clientHandler)
+            self.vectorGraphWidget.setMinimumSize(QtCore.QSize(1500, 1500))
+            self.graphLayout.addWidget(self.vectorGraphWidget)
+            self.zoomInButtonGraph.clicked.disconnect()
+            self.zoomOutButtonGraph.clicked.disconnect()
+            self.zoomInButtonGraph.clicked.connect(self.vectorGraphWidget.maximize)
+            self.zoomOutButtonGraph.clicked.connect(self.vectorGraphWidget.minimize)
+            self.vectorTableWidget.clear()
+            self.relationshipTableWidget.clear()
 
     def handleRelationshipTableTrigger(self):
         if self.vectorComboBoxTable.count() > 0:
@@ -254,15 +266,16 @@ class EditVectorConfiguration(QWidget):
             writer = csv.writer(csv_file, delimiter=",", lineterminator='\n')
             model = self.vectorTableWidget.model()
             row = list()
-            for column in range(model.columnCount()):
-                row.append(model.headerData(column, QtCore.Qt.Horizontal))
+            row.append("ID")
+            for col_num in range(model.columnCount()):
+                row.append(model.headerData(col_num, QtCore.Qt.Horizontal))
             writer.writerow(row)
-            for row in range(model.rowCount()):
+            for row_num in range(model.rowCount()):
                 row = list()
-                row.append(str(model.headerData(row, QtCore.Qt.Vertical)))
-                for column in range(model.columnCount()):
-                    text = model.data(model.index(row, column))
-                    row.append(text)
+                row.append(str(model.headerData(row_num, QtCore.Qt.Vertical)))
+                for col_num in range(model.columnCount()):
+                    text = model.data(model.index(row_num, col_num))
+                    row.append(str(text))
                 writer.writerow(row)
 
     def exportRelationshipTable(self, vectorName):
@@ -271,15 +284,16 @@ class EditVectorConfiguration(QWidget):
             writer = csv.writer(csv_file, delimiter=",", lineterminator='\n')
             model = self.relationshipTableWidget.model()
             row = list()
-            for column in range(model.columnCount()):
-                row.append(model.headerData(column, QtCore.Qt.Horizontal))
+            row.append("ID")
+            for col_num in range(model.columnCount()):
+                row.append(model.headerData(col_num, QtCore.Qt.Horizontal))
             writer.writerow(row)
-            for row in range(model.rowCount()):
+            for row_num in range(model.rowCount()):
                 row = list()
-                row.append(str(model.headerData(row, QtCore.Qt.Vertical)))
-                for column in range(model.columnCount()):
-                    text = model.data(model.index(row, column))
-                    row.append(text)
+                row.append(str(model.headerData(row_num, QtCore.Qt.Vertical)))
+                for col_num in range(model.columnCount()):
+                    text = model.data(model.index(row_num, col_num))
+                    row.append(str(text))
                 writer.writerow(row)
 
     def intializeText(self):
