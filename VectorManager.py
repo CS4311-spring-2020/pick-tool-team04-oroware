@@ -34,12 +34,11 @@ class VectorManager:
         if vector.vectorName in self.vectors:
             return False
         self.vectors[vector.vectorName] = vector
-        print()
         return True
 
-    def deleteVector(self, vector):
-        if vector.vectorName in self.vectors:
-            self.vectors[vector.vectorName] = None
+    def deleteVector(self, vectorName):
+        if vectorName in self.vectors:
+            del self.vectors[vectorName]
             return True
         else:
             return False

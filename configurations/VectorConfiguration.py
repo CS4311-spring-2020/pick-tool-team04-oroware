@@ -1,8 +1,8 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem
+from functools import partial
 
 from VectorConfigurationPopup import VectorConfigurationPopup
-
 
 class VectorConfiguration(QWidget):
     def __init__(self, clientHandler, triggerHelper):
@@ -23,10 +23,6 @@ class VectorConfiguration(QWidget):
         self.vectorConfigurationLayout.addWidget(self.configurationVectorDescriptionLabel)
         self.configurationVectorDescriptionTextEdit = QtWidgets.QPlainTextEdit(self)
         self.vectorConfigurationLayout.addWidget(self.configurationVectorDescriptionTextEdit)
-        # self.deleteVectorButton = QtWidgets.QPushButton(self)
-        # self.vectorConfigurationLayout.addWidget(self.deleteVectorButton)
-        #self.editVectorButton = QtWidgets.QPushButton(self)
-        #self.vectorConfigurationLayout.addWidget(self.editVectorButton)
         self.addVectorButton = QtWidgets.QPushButton(self)
         self.vectorConfigurationLayout.addWidget(self.addVectorButton)
         self.addVectorButton.clicked.connect(self.handleAddVector)
@@ -57,8 +53,7 @@ class VectorConfiguration(QWidget):
         for colNum in range(len(self.colsVectorConfigurationTable)):
             self.vectorConfigurationTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
-            self.vectorConfigurationTableWidget.setHorizontalHeaderItem(colNum,
-                                                               QTableWidgetItem(self.colsVectorConfigurationTable[colNum]))
+            self.vectorConfigurationTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorConfigurationTable[colNum]))
         rowNum = 0
         for vectorName, vector in vectors.items():
             self.vectorConfigurationTableWidget.setRowHeight(rowNum, 50)
@@ -66,10 +61,12 @@ class VectorConfiguration(QWidget):
             self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Name"), vectorNameItem)
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
             self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Description"), vectorDescriptionItem)
+            self.btn = QtWidgets.QPushButton(self)
+            self.btn.setCursor(QtCore.Qt.ArrowCursor)
+            self.btn.setText("Delete")
+            self.btn.clicked.connect(partial(self.deleteClicked, vectorName))
+            self.vectorConfigurationTableWidget.setCellWidget(rowNum, 2, self.btn)
             rowNum += 1
-            btn = QtWidgets.QPushButton('Delete')
-            btn.clicked.connect(self.deleteClicked)
-            self.vectorConfigurationTableWidget.setCellWidget(0, 2, btn)
         # self.vectorConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         # self.vectorConfigurationTableWidget.doubleClicked.connect(self.vectorConfigurationDoubleClicked())
 
@@ -81,19 +78,18 @@ class VectorConfiguration(QWidget):
         self.vectorConfigurationPopup.setGeometry(100, 200, 200, 200)
         self.vectorConfigurationPopup.show()
 
-    def deleteClicked(self):
+    def deleteClicked(self, vectorName):
+        print(vectorName)
         button = self.sender()
         if button:
             row = self.vectorConfigurationTableWidget.indexAt(button.pos()).row()
             self.vectorConfigurationTableWidget.removeRow(row)
-            # self.clientHandler.vectorManager.deleteVector(FIX)
+            self.clientHandler.vectorManager.deleteVector(vectorName)
 
 
     def intializeText(self):
         self.vectorConfigurationLabel.setText("VECTOR CONFIGURATION")
         self.addVectorButton.setText("Add Vector")
-        # self.deleteVectorButton.setText("Delete Vector")
-        #self.editVectorButton.setText("Edit Vector")
         self.configurationVectorDescriptionLabel.setText("Vector Description:")
         self.currentVectorConfigurationLabel.setText("Current vector:")
 
