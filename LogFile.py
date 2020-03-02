@@ -9,14 +9,17 @@ class LogFile:
 
     def __init__(self):
         self.filename = None
+        self.source = None
         self.cleansed = False
-        self.validated = False
+        self.validated = None
         self.ingested = False
-        self.invalidLine = None
+        self.acknowledged = False # optional, according to SRS
         self.invalidLineNumber = None
         self.errorMessage = None
-        self.creator = None
-        self.eventType = None
+        # The following 3 lines are not currently being used
+        # self.invalidLine = None
+        # self.creator = None
+        # self.eventType = None
         self.lines = list()
 
     def readLogFile(self):
