@@ -75,8 +75,9 @@ class VectorDbConfiguration(QWidget):
         self.triggerHelper.connectVectorConfigurationTableTrigger()
         self.triggerHelper.emitVectorConfigurationTableTrigger()
         self.pulledVectorManager = deepcopy(self.clientHandler.vectorManager)
+        self.pulledVectorManager.filename = "pulledVectors.pkl"
+        self.pulledVectorManager.storeVectors()
         self.updatePullTable(self.pulledVectorManager)
-        self.pullButton.clicked.disconnect(self.handlePull)
 
     def handlePush(self):
         self.pushedVectorManager = deepcopy(self.clientHandler.vectorManager)
