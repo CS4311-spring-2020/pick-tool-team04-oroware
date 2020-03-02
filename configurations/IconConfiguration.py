@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QDataStream, QIODevice
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem
+from functools import partial
 
 from AddIconPopup import AddIconPopup
 
@@ -10,7 +11,7 @@ class IconConfiguration(QWidget):
 
     def __init__(self, clientHandler):
         super(IconConfiguration, self).__init__()
-        self.colsIconConfigurationTable = ["Icon Name", "Icon Source", "Icon Preview"]
+        self.colsIconConfigurationTable = ["Icon Name", "Icon Source", "Icon Preview", ""]
         self.iconConfigurationLayout = QtWidgets.QVBoxLayout(self)
         self.iconConfigurationLabel = QtWidgets.QLabel(self)
         self.iconConfigurationLayout.addWidget(self.iconConfigurationLabel)
@@ -43,21 +44,28 @@ class IconConfiguration(QWidget):
         for colNum in range(len(self.colsIconConfigurationTable)):
             self.iconConfigurationTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
-            self.iconConfigurationTableWidget.setHorizontalHeaderItem(colNum,
-                                                               QTableWidgetItem(self.colsIconConfigurationTable[colNum]))
+            self.iconConfigurationTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(
+                self.colsIconConfigurationTable[colNum]))
         rowNum = 0
         for iconName, icon in icons.items():
             self.iconConfigurationTableWidget.setRowHeight(rowNum, 50)
             iconNameItem = QtWidgets.QTableWidgetItem(iconName)
             self.iconConfigurationTableWidget.setItem(rowNum, self.colsIconConfigurationTable.index("Icon Name"),
-                                               iconNameItem)
+                                                      iconNameItem)
             iconSourceItem = QtWidgets.QTableWidgetItem(icon.source)
-            self.iconConfigurationTableWidget.setItem(rowNum, self.colsIconConfigurationTable.index("Icon Source"), iconSourceItem)
+            self.iconConfigurationTableWidget.setItem(rowNum, self.colsIconConfigurationTable.index("Icon Source"),
+                                                      iconSourceItem)
             viewIconButton = ViewIconButton(iconName, icon.pixmapByteArray)
             viewIconButton.setText("View Icon")
-            self.iconConfigurationTableWidget.setCellWidget(rowNum, self.colsIconConfigurationTable.index("Icon Preview"),
-                                                     viewIconButton)
+            self.iconConfigurationTableWidget.setCellWidget(rowNum,
+                                                            self.colsIconConfigurationTable.index("Icon Preview"),
+                                                            viewIconButton)
             icon.rowIndexInTable = rowNum
+            self.btn = QtWidgets.QPushButton(self)
+            self.btn.setCursor(QtCore.Qt.ArrowCursor)
+            self.btn.setText("Delete")
+            self.btn.clicked.connect(partial(self.deleteClicked, iconName))
+            self.iconConfigurationTableWidget.setCellWidget(rowNum, 3, self.btn)
             rowNum += 1
         self.iconConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
@@ -65,6 +73,13 @@ class IconConfiguration(QWidget):
         self.addIconPopup = AddIconPopup(self.updateIconConfigurationTable, self.clientHandler)
         self.addIconPopup.setGeometry(100, 200, 200, 200)
         self.addIconPopup.show()
+
+    def deleteClicked(self, iconName):
+        button = self.sender()
+        if button:
+            row = self.iconConfigurationTableWidget.indexAt(button.pos()).row()
+            self.iconConfigurationTableWidget.removeRow(row)
+            self.clientHandler.iconManager.deleteIcon(iconName)
 
 
 class ViewIconButton(QtWidgets.QPushButton):
