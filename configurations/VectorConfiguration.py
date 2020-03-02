@@ -76,7 +76,6 @@ class VectorConfiguration(QWidget):
         self.vectorConfigurationPopup.show()
 
     def deleteClicked(self, vectorName):
-        print(vectorName)
         button = self.sender()
         if button:
             row = self.vectorConfigurationTableWidget.indexAt(button.pos()).row()

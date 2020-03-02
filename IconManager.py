@@ -15,6 +15,13 @@ class IconManager:
         icon.getGraphImageFromSource()
         return True
 
+    def deleteIcon(self, iconName):
+        if iconName in self.icons:
+            del self.icons[iconName]
+            return True
+        else:
+            return False
+
     def storeIcons(self):
         with open(self.filename, 'wb') as pkl_file:
             pickle.dump(self.icons, pkl_file)
