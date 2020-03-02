@@ -23,7 +23,6 @@ class LogFileConfiguration(QWidget):
         self.logFileTableWidget = QtWidgets.QTableWidget(self.logFileTableContainer)
         self.logFileTableWidget.setColumnCount(0)
         self.logFileTableWidget.setRowCount(0)
-        self.logFileTableWidget.setMinimumSize(1250, 1750)
         self.logFileTableContainerLayout.addWidget(self.logFileTableWidget)
 
         self.logFileConfigurationLayout.addWidget(self.logFileTableContainer)
@@ -35,10 +34,9 @@ class LogFileConfiguration(QWidget):
         self.enfActRepTableLabel = QtWidgets.QLabel(self.enfActRepTableContainer)
         self.enfActRepTableContainerLayout.addWidget(self.enfActRepTableLabel)
 
-        self.enfActRepTableWidget = QtWidgets.QTableWidget(self)
+        self.enfActRepTableWidget = QtWidgets.QTableWidget(self.enfActRepTableContainer)
         self.enfActRepTableWidget.setColumnCount(0)
         self.enfActRepTableWidget.setRowCount(0)
-        self.enfActRepTableWidget.setMinimumSize(1250, 1750)
         self.enfActRepTableContainerLayout.addWidget(self.enfActRepTableWidget)
 
         self.logFileConfigurationLayout.addWidget(self.enfActRepTableContainer)
@@ -108,10 +106,10 @@ class LogFileConfiguration(QWidget):
         self.enfActRepTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.enfActRepTableWidget.setRowCount(totalRows)
 
-        header = self.logFileTableWidget.horizontalHeader()
+        header = self.enfActRepTableWidget.horizontalHeader()
 
         for col in range(len(self.colsEnfActRepTable)):
-            self.enfActRepTableWidget.setColumnWidth(col, 365)
+            self.enfActRepTableWidget.setColumnWidth(col, 200)
             header.setSectionResizeMode(col, QtWidgets.QHeaderView.Stretch)
             self.enfActRepTableWidget.setHorizontalHeaderItem(col, QTableWidgetItem(self.colsEnfActRepTable[col]))
 
