@@ -2,10 +2,11 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import *
 
 class LogEntryPopup(QWidget):
-    def __init__(self, logEntry, logEntryDescriptionWidget, associatedVectorsWidget, clientHandler):
+    def __init__(self, logEntry, logEntryDescriptionWidget, logEntryLocationWidget, associatedVectorsWidget, clientHandler):
         super(LogEntryPopup, self).__init__()
         self.clientHandler = clientHandler
         self.logEntryDescriptionWidget = logEntryDescriptionWidget
+        self.logEntryLocationWidget = logEntryLocationWidget
         self.associatedVectorsWidget = associatedVectorsWidget
         self.logEntry = logEntry
         self.layout = QVBoxLayout()
@@ -15,6 +16,12 @@ class LogEntryPopup(QWidget):
         self.logEntryDescriptionTextEdit = QPlainTextEdit()
         self.logEntryDescriptionTextEdit.setPlainText(logEntryDescriptionWidget.text())
         self.layout.addWidget(self.logEntryDescriptionTextEdit)
+        self.locationLabel = QLabel()
+        self.locationLabel.setText("Location:")
+        self.layout.addWidget(self.locationLabel)
+        self.locationTextEdit = QPlainTextEdit()
+        self.locationTextEdit.setPlainText(logEntryLocationWidget.text())
+        self.layout.addWidget(self.locationTextEdit)
         self.creatorLabel = QLabel()
         self.creatorLabel.setText("Creator: " + self.logEntry.creator)
         self.layout.addWidget(self.creatorLabel)
@@ -47,7 +54,9 @@ class LogEntryPopup(QWidget):
 
     def onSaveClick(self):
         self.logEntryDescriptionWidget.setText(self.logEntryDescriptionTextEdit.toPlainText())
+        self.logEntryLocationWidget.setText(self.locationTextEdit.toPlainText())
         self.logEntry.description = self.logEntryDescriptionTextEdit.toPlainText()
+        self.logEntry.location = self.locationTextEdit.toPlainText()
         self.clientHandler.editLogEntry(self.logEntry)
         newVectors = list()
         for i in range(self.associationComboBox.count()):
