@@ -18,7 +18,7 @@ class Vector:
         self.changeSummary = None
 
     def addSignificantEventFromLogEntry(self, logEntry):
-        if not self.isLogEntryEventInVector(logEntry.id):
+        if logEntry.id == -1 or not self.isLogEntryEventInVector(logEntry.id):
             event = SignificantEvent()
             event.logEntry = logEntry
             if len(self.significantEvents) == 0:

@@ -7,6 +7,7 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QShortcut
 
+from ExportPopup import ExportPopup
 from GraphWidget import GraphWidget
 from Icon import Icon
 from LogEntry import LogEntry
@@ -242,9 +243,9 @@ class EditVectorConfiguration(QWidget):
 
     def handleExport(self):
         if self.vectorComboBoxTable.count() > 0:
-            self.vectorGraphWidget.export()
-            self.exportVectorTable(self.vectorComboBoxTable.currentText())
-            self.exportRelationshipTable(self.vectorComboBoxTable.currentText())
+            self.exportPopup = ExportPopup(self.vectorComboBoxTable.currentText(), self.vectorTableWidget, self.relationshipTableWidget, self.vectorGraphWidget.figure)
+            self.exportPopup.setGeometry(100, 200, 200, 200)
+            self.exportPopup.show()
 
     def updateComboBox(self):
         vectorNames = (self.clientHandler.vectorManager.vectors.keys())
@@ -259,42 +260,6 @@ class EditVectorConfiguration(QWidget):
             self.updateVectorTable(currentVector)
             self.updateRelationshipTable(currentVector)
             self.updateVectorGraph(currentVector)
-
-    def exportVectorTable(self, vectorName):
-        filename = vectorName + "_SignificantEventTable.csv"
-        with open(filename, 'w') as csv_file:
-            writer = csv.writer(csv_file, delimiter=",", lineterminator='\n')
-            model = self.vectorTableWidget.model()
-            row = list()
-            row.append("ID")
-            for col_num in range(model.columnCount()):
-                row.append(model.headerData(col_num, QtCore.Qt.Horizontal))
-            writer.writerow(row)
-            for row_num in range(model.rowCount()):
-                row = list()
-                row.append(str(model.headerData(row_num, QtCore.Qt.Vertical)))
-                for col_num in range(model.columnCount()):
-                    text = model.data(model.index(row_num, col_num))
-                    row.append(str(text))
-                writer.writerow(row)
-
-    def exportRelationshipTable(self, vectorName):
-        filename = vectorName + "_RelationshipTable.csv"
-        with open(filename, 'w') as csv_file:
-            writer = csv.writer(csv_file, delimiter=",", lineterminator='\n')
-            model = self.relationshipTableWidget.model()
-            row = list()
-            row.append("ID")
-            for col_num in range(model.columnCount()):
-                row.append(model.headerData(col_num, QtCore.Qt.Horizontal))
-            writer.writerow(row)
-            for row_num in range(model.rowCount()):
-                row = list()
-                row.append(str(model.headerData(row_num, QtCore.Qt.Vertical)))
-                for col_num in range(model.columnCount()):
-                    text = model.data(model.index(row_num, col_num))
-                    row.append(str(text))
-                writer.writerow(row)
 
     def intializeText(self):
         self.addNodeTableButton.setText("Add Node")
