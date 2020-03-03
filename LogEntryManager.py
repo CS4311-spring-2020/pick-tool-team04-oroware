@@ -1,4 +1,5 @@
 import pickle
+import re
 from datetime import datetime
 
 from LogEntry import LogEntry
@@ -69,7 +70,7 @@ class LogEntryManager:
         validLogEntries = list()
         for logEntryId, logEntry in self.logEntries.items():
             valid = True
-            if not (commandSearch in logEntry.description):
+            if not self.validWithCommandSearch(commandSearch, logEntry.description):
                 valid = False
             if creatorBlueTeam and ("Blue" not in logEntry.creator):
                 valid = False
@@ -91,3 +92,15 @@ class LogEntryManager:
                 validLogEntries.append(logEntry)
         return validLogEntries
 
+    def validWithCommandSearch(self, commandSearch, description):
+        mandatoryCommandSearchList = re.split("AND", commandSearch)
+        for search in mandatoryCommandSearchList:
+            searchList = re.split("OR", search)
+            valid = False
+            for subsearch in searchList:
+                subsearch = subsearch.strip()
+                if re.search(subsearch, description):
+                    valid = True
+            if not valid:
+                return False
+        return True
