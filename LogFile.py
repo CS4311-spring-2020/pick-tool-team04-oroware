@@ -16,10 +16,9 @@ class LogFile:
         self.acknowledged = False # optional, according to SRS
         self.invalidLineNumber = None
         self.errorMessage = None
-        # The following 3 lines are not currently being used
-        # self.invalidLine = None
-        # self.creator = None
-        # self.eventType = None
+        self.invalidLine = None
+        self.creator = None
+        self.eventType = None
         self.lines = list()
 
     def readLogFile(self):
@@ -33,7 +32,7 @@ class LogFile:
             index = 0
             for line in deepcopy(self.lines):
                 if len(line) == 0:
-                    self.lines.remove(0)
+                    self.lines.remove(index)
                 index += 1
             self.cleansed = True
             return True
