@@ -88,6 +88,8 @@ class Ui_PICK(object):
             self.clientHandler.requestEventConfig()
         elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.searchLogsTab):
             self.searchLogsTab.updateLogTable()
+        elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.logFileConfigurationTab):
+            self.logFileConfigurationTab.updateLogFileTable()
 
     def handleRelationshipTableTrigger(self):
         self.editVectorTab.handleRelationshipTableTrigger()

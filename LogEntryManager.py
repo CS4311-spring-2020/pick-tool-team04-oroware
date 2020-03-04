@@ -35,6 +35,7 @@ class LogEntryManager:
         self.nextAvailableId = 5
 
     def addLogEntry(self, logEntry):
+        logEntry.id = self.nextAvailableId
         self.logEntries[self.nextAvailableId] = logEntry
         self.nextAvailableId += 1
 

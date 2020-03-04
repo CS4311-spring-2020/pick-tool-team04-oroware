@@ -22,6 +22,7 @@ class LogFile:
         self.lines = list()
 
     def readLogFile(self):
+        self.lines = list()
         with open(self.filename) as file_pointer:
             for line in file_pointer:
                 self.lines.append(line.replace("\n", ""))

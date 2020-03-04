@@ -66,19 +66,19 @@ class DirectoryConfiguration(QWidget):
         self.ingestionButton.setText("Start Data Ingestion")
 
     def ingestLogs(self, root):
-        if self.clientHandler.eventStartTime != None and self.clientHandler.eventEndTime != None:
+        if self.clientHandler.eventConfig.eventStartTime != None and self.clientHandler.eventConfig.eventEndTime != None and self.root != None:
             redTeamPath = root + "/red/"
             blueTeamPath = root + "/blue/"
             whiteTeamPath = root + "/white/"
 
             for filename in os.listdir(redTeamPath):
-                self.clientHandler.logFileManager.createLogFile(filename, "Red Team", "Red Team")
+                self.clientHandler.logFileManager.createLogFile(redTeamPath + filename, "Red Team", "Red Team")
 
             for filename in os.listdir(blueTeamPath):
-                self.clientHandler.logFileManager.createLogFile(filename, "Blue Team", "Blue Team")
+                self.clientHandler.logFileManager.createLogFile(blueTeamPath + filename, "Blue Team", "Blue Team")
 
             for filename in os.listdir(whiteTeamPath):
-                self.clientHandler.logFileManager.createLogFile(filename, "White Team", "White Team")
+                self.clientHandler.logFileManager.createLogFile(whiteTeamPath + filename, "White Team", "White Team")
 
             self.clientHandler.logFileManager.storeLogFiles()
 
@@ -105,7 +105,6 @@ class IngestionWorker(QRunnable):
 
     def ingestLogFile(self, logFile, eventStartTime, eventEndTime):
         logEntries = list()
-        logFile.readLogFile()
         if logFile.cleanseLogFile():
             if logFile.validateLogFile(eventStartTime, eventEndTime):
                 logEntries = logFile.ingestLogFile()
