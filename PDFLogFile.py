@@ -23,6 +23,7 @@ class PDFLogFile(LogFile):
             line = line + pageObj.extractText()
 
         pdfFileObj.close()
+        self.lines = list()
         self.lines.append(line)
 
     def cleanseLogFile(self):

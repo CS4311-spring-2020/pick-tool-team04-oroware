@@ -32,6 +32,7 @@ class ClientHandler():
         self.vectorManager = VectorManager()
         self.iconManager = IconManager()
         self.logFileManager = LogFileManager()
+        self.logFileManager.retrieveLogFiles()
         self.eventConfig = EventConfig()
         self.isLead = False
         self.hasLead = False

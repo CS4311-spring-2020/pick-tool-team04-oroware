@@ -25,6 +25,7 @@ class VideoLogFile(LogFile):
         while offset < len(audio):
             segments.append(audio[offset: offset + (60 * 1000)])
             offset += (60 * 1000)
+        self.lines = list()
         for segment in segments:
             segment.export('temp.wav', format="wav")
             recognizer = sr.Recognizer()
