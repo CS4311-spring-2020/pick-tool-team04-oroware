@@ -13,6 +13,7 @@ class LogFileManager:
     def __init__(self):
         self.files = dict()
         self.filename = "logfiles.pkl"
+        self.rootPath = None
 
     def addLogFile(self, logFile):
         if logFile.filename in self.files:
@@ -45,10 +46,11 @@ class LogFileManager:
 
     def storeLogFiles(self):
         with open(self.filename, 'wb') as pkl_file:
-            pickle.dump(self.files, pkl_file)
+            pickle.dump([self.files, self.rootPath], pkl_file)
 
     def retrieveLogFiles(self):
         filename_path = Path(self.filename)
         if filename_path.exists():
             with open(self.filename, 'rb') as pkl_file:
-                self.files = pickle.load(pkl_file)
+                self.files = pickle.load(pkl_file)[0]
+                self.rootPath = pickle.load(pkl_file)[1]
