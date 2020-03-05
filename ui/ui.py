@@ -104,7 +104,6 @@ class Ui_PICK(object):
     def setupUi(self, PICK):
         PICK.resize(3500, 2000)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        PICK.setGeometry(0,0,1880, 1900)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(PICK.sizePolicy().hasHeightForWidth())
