@@ -133,8 +133,9 @@ class ServerThread(Thread):
 
     @synchronized_method
     def handlePushedVectors(self, pushedVectors):
-        key = 0 if len(self.serverHandler.pendingVectors.keys()) == 0 else (max(self.serverHandler.pendingVectors.keys()) + 1)
+        print(pushedVectors)
         for vector in pushedVectors:
+            key = 0 if len(self.serverHandler.pendingVectors.keys()) == 0 else (max(self.serverHandler.pendingVectors.keys()) + 1)
             self.serverHandler.pendingVectors[key] = vector
         self.serverHandler.storePendingVectors()
 
