@@ -6,7 +6,7 @@ from configurations.DirectoryConfiguration import DirectoryConfiguration
 from configurations.EditVectorConfiguration import EditVectorConfiguration
 from configurations.IconConfiguration import IconConfiguration
 from configurations.LogEntryConfiguration import LogEntryConfiguration
-from configurations.LogFileConfiguration import LogFileConfiguration
+from configurations.IngestionConfiguration import IngestionConfiguration
 from configurations.TeamConfiguration import TeamConfiguration
 from configurations.VectorConfiguration import VectorConfiguration
 from configurations.VectorDbConfiguration import VectorDbConfiguration
@@ -49,9 +49,9 @@ class Ui_PICK(object):
         self.tabWidget.addTab(self.editVectorTab, "")
         self.tabWidget.currentChanged.connect(self.onTabChange)
 
-    def setupLogFileConfigurationTab(self):
-        self.logFileConfigurationTab = LogFileConfiguration(self.clientHandler)
-        self.tabWidget.addTab(self.logFileConfigurationTab, "")
+    def setupIngestionConfigurationTab(self):
+        self.IngestionConfigurationTab = IngestionConfiguration(self.clientHandler)
+        self.tabWidget.addTab(self.IngestionConfigurationTab, "")
 
     def setupVectorConfigurationTab(self):
         triggerHelper = TriggerHelper()
@@ -88,8 +88,8 @@ class Ui_PICK(object):
             self.clientHandler.requestEventConfig()
         elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.searchLogsTab):
             self.searchLogsTab.updateLogTable()
-        elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.logFileConfigurationTab):
-            self.logFileConfigurationTab.updateLogFileTable()
+        elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.IngestionConfigurationTab):
+            self.IngestionConfigurationTab.updateLogFileTable()
 
     def handleRelationshipTableTrigger(self):
         self.editVectorTab.handleRelationshipTableTrigger()
@@ -103,8 +103,8 @@ class Ui_PICK(object):
 
     def setupUi(self, PICK):
         PICK.resize(3500, 2000)
+        # PICK.setGeometry(0, 0, 1900, 970)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        PICK.setGeometry(0,0,1880, 1900)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(PICK.sizePolicy().hasHeightForWidth())
@@ -121,9 +121,9 @@ class Ui_PICK(object):
         self.setupMainWindow(PICK)
         self.setupTabWidget()
         self.setupTeamTab()
-        self.setupDirectoryTab()
+        self.setupIngestionConfigurationTab()
+        # self.setupDirectoryTab()
         self.setupSearchLogsTab()
-        self.setupLogFileConfigurationTab()
         self.setupVectorConfigurationTab()
         self.setupIconConfigurationTab()
         self.setupEditVectorTab()
@@ -141,10 +141,10 @@ class Ui_PICK(object):
     def intializeText(self, PICK):
         PICK.setWindowTitle("PICK Tool")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.teamConfigurationTab), "Team and Event Configuration")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.logFileConfigurationTab), "Log File Configuration")
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.IngestionConfigurationTab), "Ingestion Configuration")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.vectorConfigurationTab), "Vector Configuration")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.iconConfigurationTab), "Icon Configuration")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.directoryTab), "Directory Configuration")
+        # self.tabWidget.setTabText(self.tabWidget.indexOf(self.directoryTab), "Directory Configuration")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.editVectorTab), "Edit Vector")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.searchLogsTab), "Search Logs")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.vectorDbTab), "Vector DB Configuration")

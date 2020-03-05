@@ -1,18 +1,51 @@
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QWidget, QTableWidgetItem
+from PyQt5.QtCore import QRunnable, pyqtSlot, QThreadPool
+from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QFileDialog
+
+import os
 
 
-class LogFileConfiguration(QWidget):
+class IngestionConfiguration(QWidget):
     def __init__(self, clientHandler):
-        super(LogFileConfiguration, self).__init__()
+        super(IngestionConfiguration, self).__init__()
         self.clientHandler = clientHandler
+        self.ingestionTabLayout = QtWidgets.QVBoxLayout(self)
+
+        # Initialize Directory Configuration
+        self.directoryConfigurationFrame = QtWidgets.QFrame(self)
+        self.directoryConfigurationFrame.setFrameShape(QtWidgets.QFrame.Box)
+
+        self.directoryConfigurationLayout = QtWidgets.QVBoxLayout(self.directoryConfigurationFrame)
+        self.directoryConfigurationLabel = QtWidgets.QLabel(self.directoryConfigurationFrame)
+        self.directoryConfigurationLayout.addWidget(self.directoryConfigurationLabel)
+
+        self.rootPathLabel = QtWidgets.QLabel(self.directoryConfigurationFrame)
+        self.directoryConfigurationLayout.addWidget(self.rootPathLabel)
+        self.rootPathField = QtWidgets.QLineEdit(self.directoryConfigurationFrame)
+        self.rootPathField.setEnabled(False)
+        self.directoryConfigurationLayout.addWidget(self.rootPathField)
+        self.setRootPathButton = QtWidgets.QPushButton(self)
+        self.setRootPathButton.clicked.connect(self.handleSetRootPath)
+
+        self.directoryConfigurationLayout.addWidget(self.setRootPathButton)
+        self.ingestionButton = QtWidgets.QPushButton(self)
+        self.ingestionButton.clicked.connect(self.ingestLogsClicked)
+        self.directoryConfigurationLayout.addWidget(self.ingestionButton)
+        self.ingestionTabLayout.addWidget(self.directoryConfigurationFrame)
+
+        # Initialize Log File Configuration
         # --------------------------------------------------------------------------------------------------------------
         # Log File Table
         self.colsLogFileTable = ["Filename", "Source", "Cleansing Status", "Validation Status", "Ingestion Status",
                                  "View Enforcement Action Report"]
         self.colsEnfActRepTable = ["Filename", "Line Number", "Error Message", "Validate", "Cancel"]
 
-        self.logFileConfigurationLayout = QtWidgets.QVBoxLayout(self)
+        self.logFileConfigurationFrame = QtWidgets.QFrame(self)
+        self.logFileConfigurationFrame.setFrameShape(QtWidgets.QFrame.Box)
+
+        self.logFileConfigurationLayout = QtWidgets.QVBoxLayout(self.logFileConfigurationFrame)
+        self.logFileConfigurationLabel = QtWidgets.QLabel(self.logFileConfigurationFrame)
+        self.logFileConfigurationLayout.addWidget(self.logFileConfigurationLabel)
 
         self.logFileTableContainer = QtWidgets.QWidget(self)
         self.logFileTableContainerLayout = QtWidgets.QVBoxLayout(self.logFileTableContainer)
@@ -40,6 +73,7 @@ class LogFileConfiguration(QWidget):
         self.enfActRepTableContainerLayout.addWidget(self.enfActRepTableWidget)
 
         self.logFileConfigurationLayout.addWidget(self.enfActRepTableContainer)
+        self.ingestionTabLayout.addWidget(self.logFileConfigurationFrame)
         # --------------------------------------------------------------------------------------------------------------
         self.initializeText()
         self.updateLogFileTable()
@@ -54,6 +88,41 @@ class LogFileConfiguration(QWidget):
     def initializeText(self):
         self.enfActRepTableLabel.setText("Enforcement Action Report Table")
         self.logFileTableLabel.setText("Log File Table")
+        self.logFileConfigurationLabel.setText("LOG FILE CONFIGURATION")
+        self.directoryConfigurationLabel.setText("DIRECTORY CONFIGURATION")
+        self.ingestionButton.setText("Start Data Ingestion")
+        self.setRootPathButton.setText("Change Root Path")
+        self.rootPathField.setText(self.clientHandler.logFileManager.rootPath)
+        self.rootPathLabel.setText("Current Root Directory:")
+
+    def handleSetRootPath(self):
+        self.fileDialog = QFileDialog()
+        self.clientHandler.logFileManager.rootPath = self.fileDialog.getExistingDirectory()
+        self.rootPathField.setText(self.clientHandler.logFileManager.rootPath)
+
+    def ingestLogsClicked(self):
+        if self.clientHandler.logFileManager.rootPath != None:
+            self.ingestLogs(self.clientHandler.logFileManager.rootPath)
+
+    def ingestLogs(self, root):
+        if self.clientHandler.eventConfig.eventStartTime != None and self.clientHandler.eventConfig.eventEndTime != None and root != None:
+            redTeamPath = root + "/red/"
+            blueTeamPath = root + "/blue/"
+            whiteTeamPath = root + "/white/"
+
+            for filename in os.listdir(redTeamPath):
+                self.clientHandler.logFileManager.createLogFile(redTeamPath + filename, "Red Team", "Red Team")
+            for filename in os.listdir(blueTeamPath):
+                self.clientHandler.logFileManager.createLogFile(blueTeamPath + filename, "Blue Team", "Blue Team")
+
+            for filename in os.listdir(whiteTeamPath):
+                self.clientHandler.logFileManager.createLogFile(whiteTeamPath + filename, "White Team", "White Team")
+
+            self.clientHandler.logFileManager.storeLogFiles()
+
+            self.threadpool = QThreadPool()
+            ingestionWorker = IngestionWorker(self.clientHandler)
+            self.threadpool.start(ingestionWorker)
 
     def updateLogFileTable(self):
         logFiles = self.clientHandler.logFileManager.files
@@ -136,3 +205,28 @@ class LogFileConfiguration(QWidget):
                                               reportFileCancelItem)
 
             counter += 1
+
+
+class IngestionWorker(QRunnable):
+
+    def __init__(self, clientHandler):
+        super(IngestionWorker, self).__init__()
+        self.clientHandler = clientHandler
+
+    @pyqtSlot()
+    def run(self):
+        eventStartTime = self.clientHandler.eventConfig.eventStartTime
+        eventEndTime = self.clientHandler.eventConfig.eventEndTime
+        logFiles = list(self.clientHandler.logFileManager.files.values())
+        for logFile in logFiles:
+            logEntries = self.ingestLogFile(logFile, eventStartTime, eventEndTime)
+            if logEntries != None:
+                self.clientHandler.sendLogEntries(logEntries)
+                self.clientHandler.logFileManager.storeLogFiles()
+
+    def ingestLogFile(self, logFile, eventStartTime, eventEndTime):
+        logEntries = list()
+        if logFile.cleanseLogFile():
+            if logFile.validateLogFile(eventStartTime, eventEndTime):
+                logEntries = logFile.ingestLogFile()
+        return logEntries
