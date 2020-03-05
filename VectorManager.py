@@ -39,6 +39,7 @@ class VectorManager:
     def deleteVector(self, vectorName):
         if vectorName in self.vectors:
             del self.vectors[vectorName]
+            self.storeVectors()
             return True
         else:
             return False
@@ -57,7 +58,4 @@ class VectorManager:
         filename_path = Path(self.filename)
         if filename_path.exists():
             os.remove(filename_path)
-
-
-
 

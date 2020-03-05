@@ -6,7 +6,6 @@ from functools import partial
 
 from AddIconPopup import AddIconPopup
 
-
 class IconConfiguration(QWidget):
 
     def __init__(self, clientHandler):
@@ -67,7 +66,7 @@ class IconConfiguration(QWidget):
             self.btn.clicked.connect(partial(self.deleteClicked, iconName))
             self.iconConfigurationTableWidget.setCellWidget(rowNum, 3, self.btn)
             rowNum += 1
-        self.iconConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        # self.iconConfigurationTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def handleAddIcon(self):
         self.addIconPopup = AddIconPopup(self.updateIconConfigurationTable, self.clientHandler)
@@ -80,6 +79,7 @@ class IconConfiguration(QWidget):
             row = self.iconConfigurationTableWidget.indexAt(button.pos()).row()
             self.iconConfigurationTableWidget.removeRow(row)
             self.clientHandler.iconManager.deleteIcon(iconName)
+            self.clientHandler.iconManager.storeIcons()
 
 
 class ViewIconButton(QtWidgets.QPushButton):

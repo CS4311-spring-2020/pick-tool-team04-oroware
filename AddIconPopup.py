@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import *
 
 from Icon import Icon
 
-
 class AddIconPopup(QWidget):
     def __init__(self, updateIconConfigurationTable, clientHandler):
         super(AddIconPopup, self).__init__()
@@ -27,6 +26,7 @@ class AddIconPopup(QWidget):
         self.setLayout(self.layout)
         self.setWindowTitle("Add Icon Popup")
 
+
     def onSaveClick(self):
         icon = Icon()
         icon.name = self.nameTextEdit.toPlainText()
@@ -35,4 +35,5 @@ class AddIconPopup(QWidget):
         if self.clientHandler.iconManager.addIcon(icon):
             self.clientHandler.updateIcons()
             self.updateIconConfigurationTable()
+            self.clientHandler.iconManager.storeIcons()
             self.close()

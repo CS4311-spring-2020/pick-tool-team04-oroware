@@ -1,3 +1,4 @@
+import os
 import pickle
 
 from pathlib import Path
@@ -18,6 +19,7 @@ class IconManager:
     def deleteIcon(self, iconName):
         if iconName in self.icons:
             del self.icons[iconName]
+            self.storeIcons()
             return True
         else:
             return False
@@ -31,3 +33,8 @@ class IconManager:
         if filename_path.exists():
             with open(self.filename, 'rb') as pkl_file:
                 self.icons = pickle.load(pkl_file)
+
+    def deleteStoredIcons(self):
+        filename_path = Path(self.filename)
+        if filename_path.exists():
+            os.remove(filename_path)
