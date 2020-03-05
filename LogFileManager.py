@@ -52,5 +52,6 @@ class LogFileManager:
         filename_path = Path(self.filename)
         if filename_path.exists():
             with open(self.filename, 'rb') as pkl_file:
-                self.files = pickle.load(pkl_file)[0]
-                self.rootPath = pickle.load(pkl_file)[1]
+                output = pickle.load(pkl_file)
+                self.files = output[0]
+                self.rootPath = output[1]
