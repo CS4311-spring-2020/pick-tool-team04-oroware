@@ -113,11 +113,17 @@ class IngestionConfiguration(QWidget):
             whiteTeamPath = root + "/white/"
 
             for filename in os.listdir(redTeamPath):
+                self.updateLogFileTable()
+                self.updateEnfActRepTable()
                 self.clientHandler.logFileManager.createLogFile(redTeamPath + filename, "Red Team", "Red Team")
             for filename in os.listdir(blueTeamPath):
+                self.updateLogFileTable()
+                self.updateEnfActRepTable()
                 self.clientHandler.logFileManager.createLogFile(blueTeamPath + filename, "Blue Team", "Blue Team")
 
             for filename in os.listdir(whiteTeamPath):
+                self.updateLogFileTable()
+                self.updateEnfActRepTable()
                 self.clientHandler.logFileManager.createLogFile(whiteTeamPath + filename, "White Team", "White Team")
 
             self.clientHandler.logFileManager.storeLogFiles()
@@ -141,7 +147,7 @@ class IngestionConfiguration(QWidget):
             header.setSectionResizeMode(col, QtWidgets.QHeaderView.Stretch)
             self.logFileTableWidget.setHorizontalHeaderItem(col, QTableWidgetItem(self.colsLogFileTable[col]))
 
-        counter = 0;
+        counter = 0
         for filename, logFile in logFiles.items():
             logFileFilenameItem = QtWidgets.QTableWidgetItem(filename)
             self.logFileTableWidget.setItem(counter, self.colsLogFileTable.index("Filename"), logFileFilenameItem)

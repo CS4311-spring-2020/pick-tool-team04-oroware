@@ -72,7 +72,11 @@ class ClientHandler():
     @synchronized_method
     def updateIcons(self):
         self.sendMsg(pickle.dumps({"Icon Manager Update": self.iconManager.icons}))
-        # self.iconManager.icons = pickle.loads(self.recvMsg())
+        self.iconManager.icons = pickle.loads(self.recvMsg())
+
+    @synchronized_method
+    def deleteIcon(self, iconName):
+        self.sendMsg(pickle.dumps({"Delete Icon": iconName}))
 
     @synchronized_method
     def editLogEntry(self, logEntry):

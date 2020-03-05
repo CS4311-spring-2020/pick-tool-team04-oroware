@@ -30,7 +30,7 @@ class IconConfiguration(QWidget):
         self.addIconButton.setText("Add Icon")
 
     def onTabChange(self):
-        # self.clientHandler.requestIcons()
+        self.clientHandler.requestIcons()
         self.updateIconConfigurationTable()
 
     def updateIconConfigurationTable(self):
@@ -79,8 +79,7 @@ class IconConfiguration(QWidget):
             row = self.iconConfigurationTableWidget.indexAt(button.pos()).row()
             self.iconConfigurationTableWidget.removeRow(row)
             self.clientHandler.iconManager.deleteIcon(iconName)
-            self.clientHandler.iconManager.storeIcons()
-
+            self.clientHandler.deleteIcon(iconName)
 
 class ViewIconButton(QtWidgets.QPushButton):
     def __init__(self, name, pixmapByteArray):

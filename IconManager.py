@@ -19,7 +19,6 @@ class IconManager:
     def deleteIcon(self, iconName):
         if iconName in self.icons:
             del self.icons[iconName]
-            self.storeIcons()
             return True
         else:
             return False

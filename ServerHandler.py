@@ -201,6 +201,11 @@ class ServerThread(Thread):
         self.serverHandler.eventConfig.storeEventConfig()
         self.sendMsg(pickle.dumps(self.serverHandler.eventConfig))
 
+    @synchronized_method
+    def handleDeleteIcon(self, iconName):
+        self.serverHandler.iconManager.deleteIcon(iconName)
+        self.serverHandler.iconManager.storeIcons()
+
     def run(self):
         msg = pickle.dumps({"Server Information" : {"Lead Address" : self.serverHandler.leadAddress, "Connected Clients" : self.serverHandler.clientsConnected}})
         self.sendMsg(msg)
@@ -218,6 +223,8 @@ class ServerThread(Thread):
                 self.handleSetLead(list(msg.values())[0])
             elif request == "Release Lead":
                 self.handleReleaseLead(list(msg.values())[0])
+            elif request == "Delete Icon":
+                self.handleDeleteIcon(list(msg.values())[0])
             elif request == "Push Vectors":
                 self.handlePushedVectors(list(msg.values())[0])
             elif request == "Get Pending Vectors":
