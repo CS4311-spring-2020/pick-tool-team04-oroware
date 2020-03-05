@@ -85,6 +85,7 @@ class ClientHandler():
     def setLead(self):
         self.sendMsg(pickle.dumps({"Set Lead": self.address}))
         self.vectorManager.deleteStoredVectors()
+        self.iconManager.deleteStoredIcons()
         self.deletePulledVectors()
         self.deletePushedVectors()
         address = pickle.loads(self.recvMsg())
@@ -168,6 +169,7 @@ class ClientHandler():
                 self.logEntryManager.handleVectorDeleted(vector)
             self.vectorManager.vectors.clear()
             self.vectorManager.deleteStoredVectors()
+            self.iconManager.deleteStoredIcons()
 
     @synchronized_method
     def sendMsg(self, msg):

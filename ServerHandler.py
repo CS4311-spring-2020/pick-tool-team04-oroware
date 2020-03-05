@@ -151,6 +151,9 @@ class ServerThread(Thread):
         self.serverHandler.logEntryManager.updateLogEntries(vectors)
         self.serverHandler.logEntryManager.storeLogEntries()
 
+    # def h
+    #     self.serverHandler.logEntryManager.handleVectorDeleted()
+
     @synchronized_method
     def handlePendingVectors(self):
         self.sendMsg(pickle.dumps(self.serverHandler.pendingVectors))
