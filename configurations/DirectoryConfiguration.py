@@ -24,7 +24,7 @@ class DirectoryConfiguration(QWidget):
         self.initializeText()
 
     def initializeText(self):
-        self.directoryLabel.setText("DIRECTORY CONFIGURATION")
+        self.directoryLabel.setText("Current Root Path: " + str(self.clientHandler.logFileManager.rootPath))
         self.ingestionButton.setText("Start Data Ingestion")
         self.setRootPathButton.setText('Change Root Path')
 
@@ -51,6 +51,8 @@ class DirectoryConfiguration(QWidget):
     def handleSetRootPath(self):
         self.fileDialog = QFileDialog()
         self.clientHandler.logFileManager.rootPath = self.fileDialog.getExistingDirectory()
+        self.clientHandler.logFileManager.storeLogFiles()
+        self.initializeText()
 
     def ingestLogsClicked(self):
         if self.clientHandler.logFileManager.rootPath != None:
