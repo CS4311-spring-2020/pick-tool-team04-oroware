@@ -95,6 +95,26 @@ class EditVectorConfiguration(QWidget):
     def handleZoomOutShortcut(self):
         self.vectorGraphWidget.minimize()
 
+    def clearVectorTable(self):
+        self.vectorTableWidget.setColumnCount(len(self.colsVectorTable))
+        self.vectorTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.vectorTableWidget.setRowCount(0)
+        header = self.vectorTableWidget.horizontalHeader()
+        for colNum in range(len(self.colsVectorTable)):
+            self.vectorTableWidget.setColumnWidth(colNum, 200)
+            header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
+            self.vectorTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorTable[colNum]))
+
+    def clearRelationshipTable(self):
+        self.relationshipTableWidget.setColumnCount(len(self.colsRelationshipTable))
+        self.relationshipTableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.relationshipTableWidget.setRowCount(0)
+        header = self.relationshipTableWidget.horizontalHeader()
+        for colNum in range(len(self.colsRelationshipTable)):
+            self.relationshipTableWidget.setColumnWidth(colNum, 200)
+            header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
+            self.relationshipTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsRelationshipTable[colNum]))
+
     def updateVectorTable(self, vector):
         self.clientHandler.vectorManager.storeVectors()
         if self.clientHandler.isLead:
@@ -192,8 +212,8 @@ class EditVectorConfiguration(QWidget):
             self.zoomOutButtonGraph.clicked.disconnect()
             self.zoomInButtonGraph.clicked.connect(self.vectorGraphWidget.maximize)
             self.zoomOutButtonGraph.clicked.connect(self.vectorGraphWidget.minimize)
-            self.vectorTableWidget.clear()
-            self.relationshipTableWidget.clear()
+            self.clearVectorTable()
+            self.clearRelationshipTable()
 
     def handleRelationshipTableTrigger(self):
         if self.vectorComboBoxTable.count() > 0:
@@ -290,6 +310,7 @@ class EditVectorConfiguration(QWidget):
             logEntry.associatedVectors.append(self.vectorComboBoxTable.currentText())
             vector.addSignificantEventFromLogEntry(logEntry)
             self.updateVectorTable(vector)
+            self.updateVectorGraph(vector)
             self.updateVectorGraph(vector)
 
     def vectorTableDoubleClicked(self):
