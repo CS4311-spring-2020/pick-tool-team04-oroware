@@ -12,7 +12,7 @@ class VectorDbConfiguration(QWidget):
         self.clientHandler = clientHandler
         self.triggerHelper = triggerHelper
         self.colsPullTable = ["Vector Name", "Vector Description", "Vector Graph"]
-        self.colsPushTable = ["Vector Name", "Vector Description", "Vector Graph"]
+        self.colsPushTable = ["Vector Name", "Vector Description", "Change Summary", "Vector Graph"]
         self.colsApproveTable = ["Source IP", "Request Timestamp", "Vector Name", "Vector Description", "Graph", "Approve"]
         self.pushedVectorManager = VectorManager()
         self.pushedVectorManager.filename = "pushedVectors.pkl"
@@ -88,11 +88,12 @@ class VectorDbConfiguration(QWidget):
         self.updatePushTable(self.pushedVectorManager)
 
     def determineVectorsToPush(self):
+        pushedVectors = list(self.pushedVectorManager.vectors.values())
         for vector in list(self.pulledVectorManager.vectors.values()):
             if vector.vectorName not in self.pushedVectorManager.vectors:
                 self.pushedVectorManager.vectors[vector.vectorName] = deepcopy(self.pulledVectorManager.vectors[vector.vectorName])
                 self.pushedVectorManager.vectors[vector.vectorName].changeSummary = "Deleted"
-        for vector in list(self.pushedVectorManager.vectors.values()):
+        for vector in pushedVectors:
             if vector.vectorName in self.pulledVectorManager.vectors:
                 if vector.equals(self.pulledVectorManager.vectors[vector.vectorName]):
                     del self.pushedVectorManager.vectors[vector.vectorName]
@@ -141,6 +142,8 @@ class VectorDbConfiguration(QWidget):
             self.pushTableWidget.setRowHeight(rowNum, 50)
             vectorNameItem = QtWidgets.QTableWidgetItem(vectorName)
             self.pushTableWidget.setItem(rowNum, self.colsPushTable.index("Vector Name"), vectorNameItem)
+            vectorChangeSummaryItem = QtWidgets.QTableWidgetItem(vector.changeSummary)
+            self.pushTableWidget.setItem(rowNum, self.colsPushTable.index("Change Summary"), vectorChangeSummaryItem)
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
             self.pushTableWidget.setItem(rowNum, self.colsPushTable.index("Vector Description"), vectorDescriptionItem)
             graphButton = ViewGraphButton(vector)

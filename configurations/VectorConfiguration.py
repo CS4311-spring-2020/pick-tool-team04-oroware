@@ -84,7 +84,7 @@ class VectorConfiguration(QWidget):
             row = self.vectorConfigurationTableWidget.indexAt(button.pos()).row()
             self.vectorConfigurationTableWidget.removeRow(row)
             self.clientHandler.vectorManager.deleteVector(vectorName)
-
+            self.clientHandler.vectorManager.storeVectors()
 
     def intializeText(self):
         self.vectorConfigurationLabel.setText("VECTOR CONFIGURATION")
