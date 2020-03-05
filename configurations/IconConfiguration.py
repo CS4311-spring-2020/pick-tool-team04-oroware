@@ -11,6 +11,7 @@ class IconConfiguration(QWidget):
     def __init__(self, clientHandler):
         super(IconConfiguration, self).__init__()
         self.colsIconConfigurationTable = ["Icon Name", "Icon Source", "Icon Preview", ""]
+        self.clientHandler = clientHandler
         self.iconConfigurationLayout = QtWidgets.QVBoxLayout(self)
         self.iconConfigurationLabel = QtWidgets.QLabel(self)
         self.iconConfigurationLayout.addWidget(self.iconConfigurationLabel)
@@ -22,7 +23,6 @@ class IconConfiguration(QWidget):
         self.iconConfigurationTableWidget.setRowCount(0)
         self.iconConfigurationTableWidget.setMinimumSize(1250, 1750)
         self.iconConfigurationLayout.addWidget(self.iconConfigurationTableWidget)
-        self.clientHandler = clientHandler
         self.intializeText()
 
     def intializeText(self):
@@ -30,7 +30,7 @@ class IconConfiguration(QWidget):
         self.addIconButton.setText("Add Icon")
 
     def onTabChange(self):
-        self.clientHandler.requestIcons()
+        # self.clientHandler.requestIcons()
         self.updateIconConfigurationTable()
 
     def updateIconConfigurationTable(self):
