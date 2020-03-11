@@ -1,0 +1,5 @@
+2/2/2020 11:24 PM Buffer overflow attack from Red Team.
+2/2/2020 11:25 PM Code injection attack from Red Team.
+2/2/2020 11:26 PM Cyrptographic attack from Red Team.
+2/2/2020 11:27 PM Kernel errors started by Red Team.
+2/2/2020 11:28 PM Distributed denial of service from Red Team.

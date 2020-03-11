@@ -7,7 +7,7 @@ from LogEntry import LogEntry
 
 class LogFile:
 
-    def __init__(self):
+    def __init__(self, splunkInterface=None):
         self.filename = None
         self.source = None
         self.cleansed = False
@@ -19,13 +19,12 @@ class LogFile:
         self.invalidLine = None
         self.creator = None
         self.eventType = None
+        self.splunkInterface = splunkInterface
         self.lines = list()
 
     def readLogFile(self):
-        self.lines = list()
-        with open(self.filename) as file_pointer:
-            for line in file_pointer:
-                self.lines.append(line.replace("\n", ""))
+        self.splunkInterface.ingestLogFiles(self.filename)
+        self.lines = self.splunkInterface.retrieveLogEntries(self.filename)
 
     def cleanseLogFile(self):
         try:

@@ -1,11 +1,11 @@
 import pickle
 from pathlib import Path
-from random import randint
 
 from AudioLogFile import AudioLogFile
 from ImageLogFile import ImageLogFile
 from LogFile import LogFile
 from PDFLogFile import PDFLogFile
+from SplunkInterface import SplunkInterface
 from VideoLogFile import VideoLogFile
 
 
@@ -13,6 +13,7 @@ class LogFileManager:
     def __init__(self):
         self.files = dict()
         self.filename = "logfiles.pkl"
+        self.splunkInterface = SplunkInterface()
         self.rootPath = None
 
     def addLogFile(self, logFile):
@@ -25,7 +26,7 @@ class LogFileManager:
         logFile = None
 
         if ".csv" in filename or ".txt" in filename or ".tmux" in filename:
-            logFile = LogFile()
+            logFile = LogFile(SplunkInterface)
         elif ".pdf" in filename:
             logFile = PDFLogFile()
         elif ".mp4" in filename:
