@@ -2,11 +2,10 @@ import splunklib.client as client
 import splunklib.results as results
 
 class SplunkInterface:
-    def __init__(self):
-        self.service = client.connect(host="localhost", port=8089, username="admin")
 
     def deleteLogFiles(self, source):
-        saved_searches = self.service.saved_searches
+        service = client.connect(host="localhost", port=8089, username="admin")
+        saved_searches = service.saved_searches
         saved_searches.create('my_saved_search',
                               'source="' + source + '" | delete')
         assert 'my_saved_search' in saved_searches
@@ -14,14 +13,16 @@ class SplunkInterface:
         assert 'my_saved_search' not in saved_searches
 
     def ingestLogFiles(self, source):
+        service = client.connect(host="localhost", port=8089, username="admin")
         if len(self.retrieveLogEntries(source)) > 0:
             return True
-        inputs = self.service.inputs
+        inputs = service.inputs
         inputs.create(source, "monitor")
         return False
 
     def retrieveLogEntries(self, source):
-        jobs = self.service.jobs
+        service = client.connect(host="localhost", port=8089, username="admin")
+        jobs = service.jobs
         logEntries = list()
 
         kwargs_blockingsearch = {"exec_mode": "blocking"}

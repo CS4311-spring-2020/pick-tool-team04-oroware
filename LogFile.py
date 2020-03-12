@@ -23,6 +23,7 @@ class LogFile:
         self.lines = list()
 
     def readLogFile(self):
+        print(self.filename)
         self.splunkInterface.ingestLogFiles(self.filename)
         self.lines = self.splunkInterface.retrieveLogEntries(self.filename)
 

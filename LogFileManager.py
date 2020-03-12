@@ -26,7 +26,7 @@ class LogFileManager:
         logFile = None
 
         if ".csv" in filename or ".txt" in filename or ".tmux" in filename:
-            logFile = LogFile(SplunkInterface)
+            logFile = LogFile(self.splunkInterface)
         elif ".pdf" in filename:
             logFile = PDFLogFile()
         elif ".mp4" in filename:
@@ -43,7 +43,6 @@ class LogFileManager:
             return True
 
         return False
-
 
     def storeLogFiles(self):
         with open(self.filename, 'wb') as pkl_file:
