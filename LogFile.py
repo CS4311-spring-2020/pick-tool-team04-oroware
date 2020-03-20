@@ -1,6 +1,7 @@
 from datetime import datetime
-import re
+import unicodedata, re
 from copy import deepcopy
+import string
 
 from LogEntry import LogEntry
 
@@ -21,20 +22,37 @@ class LogFile:
         self.eventType = None
         self.splunkInterface = splunkInterface
         self.lines = list()
+        self.timestamps = list()
+
+    def cleanLine(self, line):
+        control_chars = ''.join(map(chr, list(range(0, 32)) + list(range(127, 160))))
+        control_char_re = re.compile('[%s]' % re.escape(control_chars))
+        return control_char_re.sub('', line)
+
+    def cleanFile(self, filename):
+        lines = list()
+        with open(filename, "r") as file_object:
+            for line in file_object:
+                lines.append(line)
+        with open(filename, "w") as file_object:
+            for line in lines:
+                file_object.write(self.cleanLine(line))
+                file_object.write("\n")
 
     def readLogFile(self):
-        print(self.filename)
+        self.cleanFile(self.filename)
         self.splunkInterface.ingestLogFiles(self.filename)
-        self.lines = self.splunkInterface.retrieveLogEntries(self.filename)
+        self.lines, self.timestamps = self.splunkInterface.retrieveLogEntries(self.filename)
 
     def cleanseLogFile(self):
         try:
             self.readLogFile()
-            index = 0
-            for line in deepcopy(self.lines):
-                if len(line) == 0:
-                    self.lines.remove(index)
-                index += 1
+            emptyLineIndexes = list()
+            for i in range(len(self.lines)):
+                if len(self.lines[i]) == 0:
+                    emptyLineIndexes.append(i)
+            for index in emptyLineIndexes:
+                self.lines.remove(index)
             self.cleansed = True
             return True
         except Exception as e:
@@ -44,18 +62,10 @@ class LogFile:
     def validateLogFile(self, eventStartTime, eventEndTime):
         if not self.cleansed:
             return False
-        dateRegex = re.compile(r'\d{1,2}/\d{1,2}/\d{4} \d{1,2}:\d{2} [A,P]M')
         lineNumber = 0
         for line in self.lines:
-            if not dateRegex.search(line):
-                self.invalidLine = line
-                self.invalidLineNumber = lineNumber
-                self.errorMessage = "No date."
-                return False
-            date = re.findall(dateRegex, line)[0]
-            if datetime.strptime(date, "%m/%d/%Y %I:%M %p") < datetime.strptime(eventStartTime,
-                                                                                "%m/%d/%Y %I:%M %p") or datetime.strptime(
-                    date, "%m/%d/%Y %I:%M %p") > datetime.strptime(eventEndTime, "%m/%d/%Y %I:%M %p"):
+            timestamp = self.timestamps[lineNumber]
+            if datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S") < datetime.strptime(eventStartTime, "%m/%d/%Y %I:%M %p") or datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S") > datetime.strptime(eventEndTime, "%m/%d/%Y %I:%M %p"):
                 self.invalidLine = line
                 self.invalidLineNumber = lineNumber
                 self.errorMessage = "Invalid date."
@@ -67,16 +77,19 @@ class LogFile:
     def ingestLogFile(self):
         if self.validated and not self.ingested:
             logEntries = list()
-            dateRegex = re.compile(r'\d{1,2}/\d{1,2}/\d{4} \d{1,2}:\d{2} [A,P]M')
+            lineNumber = 0
             for line in self.lines:
-                date = re.findall(dateRegex, line)[0]
                 logEntry = LogEntry()
-                logEntry.date = date
-                logEntry.description = line.replace(date, "").strip()
+                timestamp = self.timestamps[lineNumber]
+                timestampAsDate = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+                formattedDate = timestampAsDate.strftime("%m/%d/%Y %I:%M %p")
+                logEntry.date = formattedDate
+                logEntry.description = line
                 logEntry.creator = self.creator
                 logEntry.eventType = self.eventType
                 logEntry.artifact = self.filename
                 logEntries.append(logEntry)
+                lineNumber += 1
             self.ingested = True
             return logEntries
         return None

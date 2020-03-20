@@ -32,15 +32,6 @@ class AudioLogFile(LogFile):
         if len(segments) > 0:
             os.remove("temp.wav")
 
-    def cleanseLogFile(self):
-        try:
-            self.readLogFile()
-            self.cleansed = True
-            return True
-        except Exception as e:
-            print(e)
-            return False
-
     def validateLogFile(self, eventStartTime, eventEndTime):
         if not self.cleansed:
             return False

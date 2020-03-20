@@ -36,15 +36,6 @@ class VideoLogFile(LogFile):
             os.remove("temp.wav")
         os.remove("audio.wav")
 
-    def cleanseLogFile(self):
-        try:
-            self.readLogFile()
-            self.cleansed = True
-            return True
-        except Exception as e:
-            print(e)
-            return False
-
     def validateLogFile(self, eventStartTime, eventEndTime):
         if not self.cleansed:
             return False

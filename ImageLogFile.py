@@ -21,15 +21,6 @@ class ImageLogFile(LogFile):
         self.lines = list()
         self.lines.append(pytesseract.image_to_string(Image.open(self.filename)))
 
-    def cleanseLogFile(self):
-        try:
-            self.readLogFile()
-            self.cleansed = True
-            return True
-        except Exception as e:
-            print(e)
-            return False
-
     def validateLogFile(self, eventStartTime, eventEndTime):
         if not self.cleansed:
             return False

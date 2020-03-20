@@ -25,9 +25,7 @@ class LogFileManager:
     def createLogFile(self, filename, creator, eventType):
         logFile = None
 
-        if ".csv" in filename or ".txt" in filename or ".tmux" in filename:
-            logFile = LogFile(self.splunkInterface)
-        elif ".pdf" in filename:
+        if ".pdf" in filename:
             logFile = PDFLogFile()
         elif ".mp4" in filename:
             logFile = VideoLogFile()
@@ -35,6 +33,8 @@ class LogFileManager:
             logFile = AudioLogFile()
         elif ".tiff" in filename or ".PNG" in filename or ".JPG" in filename:
             logFile = ImageLogFile()
+        else:
+            logFile = LogFile(self.splunkInterface)
         if logFile != None:
             logFile.creator = creator
             logFile.filename = filename
