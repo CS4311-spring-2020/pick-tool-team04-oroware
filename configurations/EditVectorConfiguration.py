@@ -30,22 +30,7 @@ class EditVectorConfiguration(QWidget):
         self.graphWidget = QtWidgets.QWidget(self.leftEditVectorWidget)
         self.graphLayout = QtWidgets.QVBoxLayout(self.graphWidget)
         self.vectorGraphWidget = GraphWidget(self.graphWidget, triggerHelper)
-        self.vectorGraphWidget.setMinimumSize(QtCore.QSize(1500, 1500))
         self.graphLayout.addWidget(self.vectorGraphWidget)
-        self.graphFrame = QtWidgets.QFrame(self.graphWidget)
-        self.graphFrame.setFrameShape(QtWidgets.QFrame.Box)
-        self.graphFrame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.filterGraphLayout = QtWidgets.QVBoxLayout(self.graphFrame)
-        self.addNodeGraphButton = QtWidgets.QPushButton(self.graphFrame)
-        self.addNodeGraphButton.clicked.connect(self.handleAddNode)
-        self.filterGraphLayout.addWidget(self.addNodeGraphButton)
-        self.zoomInButtonGraph = QtWidgets.QPushButton(self.graphFrame)
-        self.zoomInButtonGraph.clicked.connect(self.vectorGraphWidget.maximize)
-        self.filterGraphLayout.addWidget(self.zoomInButtonGraph)
-        self.zoomOutButtonGraph = QtWidgets.QPushButton(self.graphFrame)
-        self.zoomOutButtonGraph.clicked.connect(self.vectorGraphWidget.minimize)
-        self.filterGraphLayout.addWidget(self.zoomOutButtonGraph)
-        self.graphLayout.addWidget(self.graphFrame)
         self.leftEditVectorLayout.addWidget(self.graphWidget)
         self.editVectorLayout.addWidget(self.leftEditVectorWidget)
         self.rightEditVectorWidget = QtWidgets.QWidget(self)
@@ -101,7 +86,6 @@ class EditVectorConfiguration(QWidget):
         self.vectorTableWidget.setRowCount(0)
         header = self.vectorTableWidget.horizontalHeader()
         for colNum in range(len(self.colsVectorTable)):
-            self.vectorTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.vectorTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorTable[colNum]))
 
@@ -111,7 +95,6 @@ class EditVectorConfiguration(QWidget):
         self.relationshipTableWidget.setRowCount(0)
         header = self.relationshipTableWidget.horizontalHeader()
         for colNum in range(len(self.colsRelationshipTable)):
-            self.relationshipTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.relationshipTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsRelationshipTable[colNum]))
 
@@ -126,7 +109,6 @@ class EditVectorConfiguration(QWidget):
         self.vectorTableWidget.setRowCount(totalRows)
         header = self.vectorTableWidget.horizontalHeader()
         for colNum in range(len(self.colsVectorTable)):
-            self.vectorTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.vectorTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorTable[colNum]))
             if colNum == self.colsVectorTable.index("Visibility"):
@@ -191,12 +173,7 @@ class EditVectorConfiguration(QWidget):
             self.graphLayout.removeWidget(self.vectorGraphWidget)
             self.triggerHelper.connectRelationshipTableTrigger()
             self.vectorGraphWidget = GraphWidget(self.graphWidget, self.triggerHelper, self.clientHandler)
-            self.vectorGraphWidget.setMinimumSize(QtCore.QSize(1500, 1500))
             self.graphLayout.addWidget(self.vectorGraphWidget)
-            self.zoomInButtonGraph.clicked.disconnect()
-            self.zoomOutButtonGraph.clicked.disconnect()
-            self.zoomInButtonGraph.clicked.connect(self.vectorGraphWidget.maximize)
-            self.zoomOutButtonGraph.clicked.connect(self.vectorGraphWidget.minimize)
             vectorName = self.vectorComboBoxTable.currentText()
             vector = self.clientHandler.vectorManager.vectors[vectorName]
             self.updateVectorTable(vector)
@@ -206,12 +183,7 @@ class EditVectorConfiguration(QWidget):
             self.graphLayout.removeWidget(self.vectorGraphWidget)
             self.triggerHelper.connectRelationshipTableTrigger()
             self.vectorGraphWidget = GraphWidget(self.graphWidget, self.triggerHelper, self.clientHandler)
-            self.vectorGraphWidget.setMinimumSize(QtCore.QSize(1500, 1500))
             self.graphLayout.addWidget(self.vectorGraphWidget)
-            self.zoomInButtonGraph.clicked.disconnect()
-            self.zoomOutButtonGraph.clicked.disconnect()
-            self.zoomInButtonGraph.clicked.connect(self.vectorGraphWidget.maximize)
-            self.zoomOutButtonGraph.clicked.connect(self.vectorGraphWidget.minimize)
             self.clearVectorTable()
             self.clearRelationshipTable()
 
@@ -244,7 +216,6 @@ class EditVectorConfiguration(QWidget):
         self.relationshipTableWidget.setRowCount(totalRows)
         header = self.relationshipTableWidget.horizontalHeader()
         for colNum in range(len(self.colsRelationshipTable)):
-            self.relationshipTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.relationshipTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsRelationshipTable[colNum]))
         for rowNum in range(totalRows):
@@ -285,11 +256,8 @@ class EditVectorConfiguration(QWidget):
         self.addNodeTableButton.setText("Add Node")
         self.nodeTableLabel.setText("Nodes:")
         self.relationshipTableLabel.setText("Relationships:")
-        self.zoomInButtonGraph.setText("Zoom In")
-        self.zoomOutButtonGraph.setText("Zoom Out")
         self.vectorTableLabel.setText("Vector:")
         self.exportTableButton.setText("Export Vector")
-        self.addNodeGraphButton.setText("Add Node")
 
     def updateVectorGraph(self, vector):
         self.clientHandler.vectorManager.storeVectors()

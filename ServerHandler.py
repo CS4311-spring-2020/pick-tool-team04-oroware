@@ -207,7 +207,7 @@ class ServerThread(Thread):
         self.serverHandler.iconManager.storeIcons()
 
     def run(self):
-        msg = pickle.dumps({"Server Information" : {"Lead Address" : self.serverHandler.leadAddress, "Connected Clients" : self.serverHandler.clientsConnected}})
+        msg = pickle.dumps({"Server Information" : {"Lead Address" : self.serverHandler.leadAddress}})
         self.sendMsg(msg)
         while True:
             msg = pickle.loads(self.recvMsg())

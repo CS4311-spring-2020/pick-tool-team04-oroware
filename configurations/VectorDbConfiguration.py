@@ -35,7 +35,6 @@ class VectorDbConfiguration(QWidget):
             self.approvalTableWidget = QtWidgets.QTableWidget(self)
             self.approvalTableWidget.setColumnCount(0)
             self.approvalTableWidget.setRowCount(0)
-            self.approvalTableWidget.setMinimumSize(1250, 1750)
             self.vectorDbLayout.addWidget(self.approvalTableWidget)
             self.updateApproveTable(self.pendingVectors)
         else:
@@ -44,7 +43,6 @@ class VectorDbConfiguration(QWidget):
             self.pullTableWidget = QtWidgets.QTableWidget(self)
             self.pullTableWidget.setColumnCount(0)
             self.pullTableWidget.setRowCount(0)
-            self.pullTableWidget.setMinimumSize(1250, 850)
             self.vectorDbLayout.addWidget(self.pullTableWidget)
             self.pullButton = QtWidgets.QPushButton(self)
             self.pullButton.clicked.connect(self.handlePull)
@@ -54,7 +52,6 @@ class VectorDbConfiguration(QWidget):
             self.pushTableWidget = QtWidgets.QTableWidget(self)
             self.pushTableWidget.setColumnCount(0)
             self.pushTableWidget.setRowCount(0)
-            self.pushTableWidget.setMinimumSize(1250, 850)
             self.vectorDbLayout.addWidget(self.pushTableWidget)
             self.pushButton = QtWidgets.QPushButton(self)
             self.vectorDbLayout.addWidget(self.pushButton)
@@ -110,7 +107,6 @@ class VectorDbConfiguration(QWidget):
         self.pullTableWidget.setRowCount(totalRows)
         header = self.pullTableWidget.horizontalHeader()
         for colNum in range(len(self.colsPullTable)):
-            self.pullTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.pullTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsPullTable[colNum]))
         rowNum = 0
@@ -134,7 +130,6 @@ class VectorDbConfiguration(QWidget):
         self.pushTableWidget.setRowCount(totalRows)
         header = self.pushTableWidget.horizontalHeader()
         for colNum in range(len(self.colsPushTable)):
-            self.pushTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.pushTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsPushTable[colNum]))
         rowNum = 0
@@ -170,7 +165,6 @@ class VectorDbConfiguration(QWidget):
         self.approvalTableWidget.setRowCount(totalRows)
         header = self.approvalTableWidget.horizontalHeader()
         for colNum in range(len(self.colsApproveTable)):
-            self.approvalTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.approvalTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsApproveTable[colNum]))
         rowNum = 0

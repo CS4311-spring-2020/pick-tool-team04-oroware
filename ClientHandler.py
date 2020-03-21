@@ -39,8 +39,6 @@ class ClientHandler():
         self.serverIp = '127.0.0.1'
         self.serverPort = 65432
         self.address = hex(uuid.getnode())
-        self.establishedConnections = 0
-        self.numConnections = 0
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.serverIp, self.serverPort))
         serverInformation = self.recvMsg()
@@ -50,8 +48,6 @@ class ClientHandler():
         if self.hasLead:
             if serverInformation["Lead Address"] == self.address:
                 self.isLead = True
-        self.establishedConnections = len(serverInformation["Connected Clients"])
-        self.numConnections = self.establishedConnections
         self.requestEventConfig()
 
     @synchronized_method

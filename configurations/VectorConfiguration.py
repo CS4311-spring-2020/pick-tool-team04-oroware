@@ -22,6 +22,7 @@ class VectorConfiguration(QWidget):
         self.configurationVectorDescriptionLabel = QtWidgets.QLabel(self)
         self.vectorConfigurationLayout.addWidget(self.configurationVectorDescriptionLabel)
         self.configurationVectorDescriptionTextEdit = QtWidgets.QPlainTextEdit(self)
+        self.configurationVectorDescriptionTextEdit.setMaximumHeight(120)
         self.vectorConfigurationLayout.addWidget(self.configurationVectorDescriptionTextEdit)
         self.addVectorButton = QtWidgets.QPushButton(self)
         self.vectorConfigurationLayout.addWidget(self.addVectorButton)
@@ -29,7 +30,6 @@ class VectorConfiguration(QWidget):
         self.vectorConfigurationTableWidget = QtWidgets.QTableWidget(self)
         self.vectorConfigurationTableWidget.setColumnCount(0)
         self.vectorConfigurationTableWidget.setRowCount(0)
-        self.vectorConfigurationTableWidget.setMinimumSize(1250, 1750)
         self.vectorConfigurationLayout.addWidget(self.vectorConfigurationTableWidget)
         self.intializeText()
 
@@ -51,7 +51,6 @@ class VectorConfiguration(QWidget):
         self.vectorConfigurationTableWidget.setRowCount(totalRows)
         header = self.vectorConfigurationTableWidget.horizontalHeader()
         for colNum in range(len(self.colsVectorConfigurationTable)):
-            self.vectorConfigurationTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.vectorConfigurationTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorConfigurationTable[colNum]))
         rowNum = 0

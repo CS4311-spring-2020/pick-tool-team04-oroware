@@ -143,7 +143,6 @@ class IngestionConfiguration(QWidget):
         header = self.logFileTableWidget.horizontalHeader()
 
         for col in range(len(self.colsLogFileTable)):
-            self.logFileTableWidget.setColumnWidth(col, 200)
             header.setSectionResizeMode(col, QtWidgets.QHeaderView.Stretch)
             self.logFileTableWidget.setHorizontalHeaderItem(col, QTableWidgetItem(self.colsLogFileTable[col]))
 
@@ -186,7 +185,6 @@ class IngestionConfiguration(QWidget):
         header = self.enfActRepTableWidget.horizontalHeader()
 
         for col in range(len(self.colsEnfActRepTable)):
-            self.enfActRepTableWidget.setColumnWidth(col, 200)
             header.setSectionResizeMode(col, QtWidgets.QHeaderView.Stretch)
             self.enfActRepTableWidget.setHorizontalHeaderItem(col, QTableWidgetItem(self.colsEnfActRepTable[col]))
 

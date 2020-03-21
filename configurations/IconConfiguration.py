@@ -21,7 +21,6 @@ class IconConfiguration(QWidget):
         self.iconConfigurationTableWidget = QtWidgets.QTableWidget(self)
         self.iconConfigurationTableWidget.setColumnCount(0)
         self.iconConfigurationTableWidget.setRowCount(0)
-        self.iconConfigurationTableWidget.setMinimumSize(1250, 1750)
         self.iconConfigurationLayout.addWidget(self.iconConfigurationTableWidget)
         self.intializeText()
 
@@ -41,7 +40,6 @@ class IconConfiguration(QWidget):
         self.iconConfigurationTableWidget.setRowCount(totalRows)
         header = self.iconConfigurationTableWidget.horizontalHeader()
         for colNum in range(len(self.colsIconConfigurationTable)):
-            self.iconConfigurationTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.iconConfigurationTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(
                 self.colsIconConfigurationTable[colNum]))

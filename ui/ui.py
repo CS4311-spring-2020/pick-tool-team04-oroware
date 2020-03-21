@@ -102,15 +102,10 @@ class Ui_PICK(object):
         self.editVectorTab.updateComboBox()
 
     def setupUi(self, PICK):
-        PICK.resize(3500, 2000)
-        # PICK.setGeometry(0, 0, 1900, 970)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(PICK.sizePolicy().hasHeightForWidth())
         PICK.setSizePolicy(sizePolicy)
-        PICK.setMaximumSize(QtCore.QSize(16777215, 3000))
-        PICK.setMinimumSize(QtCore.QSize(0, 900))
 
         self.clientHandler = ClientHandler()
         if self.clientHandler.isLead:

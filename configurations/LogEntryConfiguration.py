@@ -16,6 +16,7 @@ class LogEntryConfiguration(QWidget):
         self.keywordSearchLabel = QtWidgets.QLabel(self)
         self.searchLogsLayout.addWidget(self.keywordSearchLabel)
         self.commandSearchTextEdit = QtWidgets.QPlainTextEdit(self)
+        self.commandSearchTextEdit.setMaximumHeight(40)
         self.searchLogsLayout.addWidget(self.commandSearchTextEdit)
         self.creatorSearchLabel = QtWidgets.QLabel(self)
         self.searchLogsLayout.addWidget(self.creatorSearchLabel)
@@ -37,6 +38,7 @@ class LogEntryConfiguration(QWidget):
         self.locationSearchLabel = QtWidgets.QLabel(self)
         self.searchLogsLayout.addWidget(self.locationSearchLabel)
         self.locationSearchTextEdit = QtWidgets.QPlainTextEdit(self)
+        self.locationSearchTextEdit.setMaximumHeight(40)
         self.searchLogsLayout.addWidget(self.locationSearchTextEdit)
         # End Location variables
         self.fromSearchLabel = QtWidgets.QLabel(self)
@@ -56,7 +58,6 @@ class LogEntryConfiguration(QWidget):
         self.searchLogsTableWidget = QtWidgets.QTableWidget(self)
         self.searchLogsTableWidget.setColumnCount(0)
         self.searchLogsTableWidget.setRowCount(0)
-        self.searchLogsTableWidget.setMinimumSize(1250, 1750)
         self.searchLogsLayout.addWidget(self.searchLogsTableWidget)
         self.intializeText()
         self.updateLogTable()
@@ -110,7 +111,6 @@ class LogEntryConfiguration(QWidget):
         self.searchLogsTableWidget.setRowCount(totalRows)
         header = self.searchLogsTableWidget.horizontalHeader()
         for colNum in range(len(self.colsSearchLogsTable)):
-            self.searchLogsTableWidget.setColumnWidth(colNum, 200)
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
             self.searchLogsTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsSearchLogsTable[colNum]))
         for rowNum in range(totalRows):
