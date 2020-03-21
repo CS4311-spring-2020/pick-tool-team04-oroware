@@ -30,10 +30,19 @@ class AddIconPopup(QWidget):
     def onSaveClick(self):
         icon = Icon()
         icon.name = self.nameTextEdit.toPlainText()
+        if len(icon.name) == 0:
+            print("No icon name provided.")
+            return
         icon.source = self.fileDialog.selectedFiles()[0]
         icon.location = self.fileDialog.selectedFiles()[0]
+        if len(icon.source) == 0:
+            print("No source icon file provided.")
+            return
         if self.clientHandler.iconManager.addIcon(icon):
             self.clientHandler.updateIcons()
             self.updateIconConfigurationTable()
             self.clientHandler.iconManager.storeIcons()
             self.close()
+        else:
+            print("Choose different icon name.")
+            return

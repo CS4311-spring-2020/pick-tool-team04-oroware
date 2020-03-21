@@ -105,6 +105,9 @@ class IngestionConfiguration(QWidget):
     def ingestLogsClicked(self):
         if self.clientHandler.logFileManager.rootPath != None:
             self.ingestLogs(self.clientHandler.logFileManager.rootPath)
+        else:
+            print("No root path selected.")
+            return
 
     def ingestLogs(self, root):
         if self.clientHandler.eventConfig.eventStartTime != None and self.clientHandler.eventConfig.eventEndTime != None and root != None:
@@ -113,19 +116,16 @@ class IngestionConfiguration(QWidget):
             whiteTeamPath = root + "/white/"
 
             for filename in os.listdir(redTeamPath):
-                self.updateLogFileTable()
-                self.updateEnfActRepTable()
                 self.clientHandler.logFileManager.createLogFile(redTeamPath + filename, "Red Team", "Red Team")
+
             for filename in os.listdir(blueTeamPath):
-                self.updateLogFileTable()
-                self.updateEnfActRepTable()
                 self.clientHandler.logFileManager.createLogFile(blueTeamPath + filename, "Blue Team", "Blue Team")
 
             for filename in os.listdir(whiteTeamPath):
-                self.updateLogFileTable()
-                self.updateEnfActRepTable()
                 self.clientHandler.logFileManager.createLogFile(whiteTeamPath + filename, "White Team", "White Team")
 
+            self.updateLogFileTable()
+            self.updateEnfActRepTable()
             self.clientHandler.logFileManager.storeLogFiles()
 
             self.threadpool = QThreadPool()
@@ -159,7 +159,7 @@ class IngestionConfiguration(QWidget):
             self.logFileTableWidget.setItem(counter, self.colsLogFileTable.index("Cleansing Status"),
                                             logFileCleansingStatusItem)
 
-            logFileValidationStatusItem = QtWidgets.QTableWidgetItem(logFile.validated)
+            logFileValidationStatusItem = QtWidgets.QTableWidgetItem("Validated" if logFile.validated else "Not Validated")
             self.logFileTableWidget.setItem(counter, self.colsLogFileTable.index("Validation Status"),
                                             logFileValidationStatusItem)
 

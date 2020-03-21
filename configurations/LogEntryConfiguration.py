@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QWidget
 
@@ -44,10 +46,12 @@ class LogEntryConfiguration(QWidget):
         self.fromSearchLabel = QtWidgets.QLabel(self)
         self.searchLogsLayout.addWidget(self.fromSearchLabel)
         self.fromDateTimeEditSearchLogs = QtWidgets.QDateTimeEdit(self)
+        self.fromDateTimeEditSearchLogs.setDisplayFormat("M/d/yyyy hh:mm A")
         self.searchLogsLayout.addWidget(self.fromDateTimeEditSearchLogs)
         self.toSearchLabel = QtWidgets.QLabel(self)
         self.searchLogsLayout.addWidget(self.toSearchLabel)
         self.toDateTimeEditSearchLogs = QtWidgets.QDateTimeEdit(self)
+        self.toDateTimeEditSearchLogs.setDisplayFormat("M/d/yyyy hh:mm A")
         self.searchLogsLayout.addWidget(self.toDateTimeEditSearchLogs)
         self.searchButton = QtWidgets.QPushButton(self)
         self.searchLogsLayout.addWidget(self.searchButton)
@@ -100,6 +104,9 @@ class LogEntryConfiguration(QWidget):
         startTime = self.fromDateTimeEditSearchLogs.text()
         endTime = self.toDateTimeEditSearchLogs.text()
         locationSearch = self.locationSearchTextEdit.toPlainText()
+        if (datetime.strptime(endTime, "%m/%d/%Y %I:%M %p") <= datetime.strptime(startTime, "%m/%d/%Y %I:%M %p")):
+            print("Invalid start or end time.")
+            return
         self.clientHandler.searchLogEntries(commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch)
         self.updateLogTable()
 

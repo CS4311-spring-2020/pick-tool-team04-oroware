@@ -64,6 +64,9 @@ class ExportPopup(QWidget):
 
     def onExportClick(self):
         exportPath = self.fileDialog.selectedFiles()[0]
+        if len(exportPath) == 0:
+            print("No export path selected.")
+            return
         self.exportVectorTable(exportPath)
         self.exportRelationshipTable(exportPath)
         self.exportGraph(exportPath)

@@ -1,0 +1,10 @@
+Thu Mar 03 2020 00:15:01 www1 sshd[2149]: Failed password for nobody from 118.142.68.222 port 1527 ssh2
+Thu Mar 03 2020 00:15:01 www1 sshd[2766]: Failed password for invalid user guest from 118.142.68.222 port 2581 ssh2
+Thu Mar 03 2020 00:15:01 www1 sshd[3118]: pam_unix(sshd:session): session opened for user djohnson by (uid=0)
+Thu Mar 03 2020 00:15:01 www1 sshd[2598]: Failed password for invalid user system from 118.142.68.222 port 1848 ssh2
+Thu Mar 03 2020 00:15:01 www1 sshd[4637]: Failed password for invalid user sys from 211.140.3.183 port 1202 ssh2
+Thu Mar 03 2020 00:15:01 www1 sshd[1335]: Failed password for invalid user mysql from 211.140.3.183 port 3043 ssh2
+Thu Mar 03 2020 00:15:01 www1 sshd[4153]: Failed password for squid from 211.140.3.183 port 3634 ssh2
+Thu Mar 03 2020 00:15:01 www1 sshd[3149]: Failed password for invalid user irc from 208.240.243.170 port 3104 ssh2
+Thu Mar 03 2020 00:15:01 www1 sshd[4620]: Failed password for invalid user sysadmin from 208.240.243.170 port 3321 ssh2
+Thu Mar 03 2020 00:15:01 www1 sshd[1260]: Failed password for invalid user limbo from 208.240.243.170 port 3720 ssh2

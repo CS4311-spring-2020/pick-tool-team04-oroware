@@ -2,7 +2,6 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal, QObject
 import sys
 from ClientHandler import ClientHandler
-from configurations.DirectoryConfiguration import DirectoryConfiguration
 from configurations.EditVectorConfiguration import EditVectorConfiguration
 from configurations.IconConfiguration import IconConfiguration
 from configurations.LogEntryConfiguration import LogEntryConfiguration
@@ -24,10 +23,6 @@ class Ui_PICK(object):
     def setupTeamTab(self):
         self.teamConfigurationTab = TeamConfiguration(self.clientHandler)
         self.tabWidget.addTab(self.teamConfigurationTab, "")
-
-    def setupDirectoryTab(self):
-        self.directoryTab = DirectoryConfiguration(self.clientHandler)
-        self.tabWidget.addTab(self.directoryTab, "")
 
     def setupSearchLogsTab(self):
         self.searchLogsTab = LogEntryConfiguration(self.clientHandler)

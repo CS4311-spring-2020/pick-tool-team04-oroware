@@ -31,7 +31,8 @@ class ServerHandler():
         self.port = 65432
         self.leadAddress = None
         self.logEntryManager = LogEntryManager()
-        self.logEntryManager.retrieveLogEntries()
+        self.logEntryManager.deleteLogEntriesDb()
+        self.logEntryManager.retrieveLogEntriesDb()
         self.vectorManager = VectorManager()
         self.vectorManager.retrieveVectors()
         self.iconManager = IconManager()
@@ -111,7 +112,6 @@ class ServerThread(Thread):
     def handleLogEntryUpdate(self, logEntry):
         if self.serverHandler.logEntryManager.updateLogEntry(logEntry):
             self.sendMsg(pickle.dumps(logEntry))
-            self.serverHandler.logEntryManager.storeLogEntries()
         else:
             self.sendMsg(pickle.dumps(None))
 
@@ -149,7 +149,6 @@ class ServerThread(Thread):
         self.serverHandler.vectorManager.storeVectors()
         vectors = list(self.serverHandler.vectorManager.vectors.values())
         self.serverHandler.logEntryManager.updateLogEntries(vectors)
-        self.serverHandler.logEntryManager.storeLogEntries()
 
     # def h
     #     self.serverHandler.logEntryManager.handleVectorDeleted()
@@ -167,13 +166,11 @@ class ServerThread(Thread):
                 del self.serverHandler.vectorManager.vectors[vector.vectorName]
                 self.serverHandler.vectorManager.storeVectors()
                 self.serverHandler.logEntryManager.handleVectorDeleted(vector)
-                self.serverHandler.logEntryManager.storeLogEntries()
         else:
             self.serverHandler.vectorManager.vectors[vector.vectorName] = vector
             self.serverHandler.vectorManager.storeVectors()
             vectors = list(self.serverHandler.vectorManager.vectors.values())
             self.serverHandler.logEntryManager.updateLogEntries(vectors)
-            self.serverHandler.logEntryManager.storeLogEntries()
 
     @synchronized_method
     def handleRejectVector(self, vectorKey):
@@ -184,7 +181,6 @@ class ServerThread(Thread):
     def handleSendLogEntries(self, logEntries):
         for logEntry in logEntries:
             self.serverHandler.logEntryManager.addLogEntry(logEntry)
-        self.serverHandler.logEntryManager.storeLogEntries()
 
     @synchronized_method
     def handleSearchLogs(self, commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch):

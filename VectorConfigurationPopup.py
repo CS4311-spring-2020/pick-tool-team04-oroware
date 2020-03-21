@@ -28,10 +28,19 @@ class VectorConfigurationPopup(QWidget):
     def onSaveClick(self):
         vector = Vector()
         vector.vectorName = self.vectorConfigurationEdit.toPlainText()
+        if len(vector.vectorName) == 0:
+            print("No vector name provided.")
+            return
+        if len(vector.vectorDescription) == 0:
+            print("No vector description provided.")
+            return
         vector.vectorDescription = self.vectorConfigurationDescriptionEdit.toPlainText()
         if self.clientHandler.vectorManager.addVector(vector):
             self.triggerHelper.emitVectorConfigurationTableTrigger()
             self.clientHandler.vectorManager.storeVectors()
             self.close()
+        else:
+            print("Vector already exists.")
+            return
 
 

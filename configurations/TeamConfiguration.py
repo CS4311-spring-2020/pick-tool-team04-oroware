@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtCore import QDateTime, QDate
+from PyQt5.QtCore import QDateTime
 from PyQt5.QtWidgets import QWidget
 
 
@@ -48,10 +50,12 @@ class TeamConfiguration(QWidget):
         self.startEventConfigurationLabel = QtWidgets.QLabel(self.eventConfiguration)
         self.eventConfigurationLayout.addWidget(self.startEventConfigurationLabel)
         self.startEventConfigurationDateEdit = QtWidgets.QDateTimeEdit(self.eventConfiguration)
+        self.startEventConfigurationDateEdit.setDisplayFormat("M/d/yyyy hh:mm A")
         self.eventConfigurationLayout.addWidget(self.startEventConfigurationDateEdit)
         self.endEventConfigurationLabel = QtWidgets.QLabel(self.eventConfiguration)
         self.eventConfigurationLayout.addWidget(self.endEventConfigurationLabel)
         self.endEventConfigurationDateEdit = QtWidgets.QDateTimeEdit(self.eventConfiguration)
+        self.endEventConfigurationDateEdit.setDisplayFormat("M/d/yyyy hh:mm A")
         self.eventConfigurationLayout.addWidget(self.endEventConfigurationDateEdit)
         self.teamConfigurationTabLayout.addWidget(self.eventConfiguration)
         self.saveEventButton = QtWidgets.QPushButton(self.eventConfiguration)
@@ -61,6 +65,15 @@ class TeamConfiguration(QWidget):
 
     def handleSaveEvent(self):
         eventConfig = self.clientHandler.eventConfig
+        if (datetime.strptime(self.endEventConfigurationDateEdit.text(), "%m/%d/%Y %I:%M %p") <= datetime.strptime(self.startEventConfigurationDateEdit.text(), "%m/%d/%Y %I:%M %p")):
+            print("Invalid start or end timestamp.")
+            return
+        if len(self.eventNameTextEdit.toPlainText()) == 0:
+            print("Must enter event name.")
+            return
+        if len(self.eventDescriptionTextEdit.toPlainText()) == 0:
+            print("Must enter event description.")
+            return
         eventConfig.eventStartTime = self.startEventConfigurationDateEdit.text()
         eventConfig.eventEndTime = self.endEventConfigurationDateEdit.text()
         eventConfig.eventDescription = self.eventDescriptionTextEdit.toPlainText()
