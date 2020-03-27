@@ -16,13 +16,14 @@ class VectorConfiguration(QWidget):
         self.currentVectorConfigurationLabel = QtWidgets.QLabel(self)
         self.vectorConfigurationLayout.addWidget(self.currentVectorConfigurationLabel)
         self.vectorComboBoxConfiguration = QtWidgets.QComboBox(self)
+        self.vectorComboBoxConfiguration.setFont(QtGui.QFont('SansSerif', 7))
         self.vectorComboBoxConfiguration.setModel(QtGui.QStandardItemModel())
         self.vectorComboBoxConfiguration.view().pressed.connect(self.handleVectorComboBoxConfiguration)
         self.vectorConfigurationLayout.addWidget(self.vectorComboBoxConfiguration)
         self.configurationVectorDescriptionLabel = QtWidgets.QLabel(self)
         self.vectorConfigurationLayout.addWidget(self.configurationVectorDescriptionLabel)
         self.configurationVectorDescriptionTextEdit = QtWidgets.QPlainTextEdit(self)
-        self.configurationVectorDescriptionTextEdit.setMaximumHeight(120)
+        self.configurationVectorDescriptionTextEdit.setMaximumHeight(25)
         self.vectorConfigurationLayout.addWidget(self.configurationVectorDescriptionTextEdit)
         self.addVectorButton = QtWidgets.QPushButton(self)
         self.vectorConfigurationLayout.addWidget(self.addVectorButton)
@@ -52,17 +53,22 @@ class VectorConfiguration(QWidget):
         header = self.vectorConfigurationTableWidget.horizontalHeader()
         for colNum in range(len(self.colsVectorConfigurationTable)):
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
-            self.vectorConfigurationTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorConfigurationTable[colNum]))
+            headerItem = QTableWidgetItem(self.colsVectorConfigurationTable[colNum])
+            headerItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.vectorConfigurationTableWidget.setHorizontalHeaderItem(colNum, headerItem)
         rowNum = 0
         for vectorName, vector in vectors.items():
             self.vectorConfigurationTableWidget.setRowHeight(rowNum, 50)
             vectorNameItem = QtWidgets.QTableWidgetItem(vectorName)
+            vectorNameItem.setFont(QtGui.QFont('SansSerif', 7))
             self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Name"), vectorNameItem)
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
+            vectorDescriptionItem.setFont(QtGui.QFont('SansSerif', 7))
             self.vectorConfigurationTableWidget.setItem(rowNum, self.colsVectorConfigurationTable.index("Vector Description"), vectorDescriptionItem)
             self.btn = QtWidgets.QPushButton(self)
             self.btn.setCursor(QtCore.Qt.ArrowCursor)
             self.btn.setText("Delete")
+            self.btn.setFont(QtGui.QFont('SansSerif', 7))
             self.btn.clicked.connect(partial(self.deleteClicked, vectorName))
             self.vectorConfigurationTableWidget.setCellWidget(rowNum, 2, self.btn)
             rowNum += 1
@@ -87,9 +93,13 @@ class VectorConfiguration(QWidget):
 
     def intializeText(self):
         self.vectorConfigurationLabel.setText("VECTOR CONFIGURATION")
+        self.vectorConfigurationLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.addVectorButton.setText("Add Vector")
+        self.addVectorButton.setFont(QtGui.QFont('SansSerif', 7))
         self.configurationVectorDescriptionLabel.setText("Vector Description:")
+        self.configurationVectorDescriptionLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.currentVectorConfigurationLabel.setText("Current vector:")
+        self.currentVectorConfigurationLabel.setFont(QtGui.QFont('SansSerif', 7))
 
     def vectorConfigurationDoubleClicked(self):
         pass

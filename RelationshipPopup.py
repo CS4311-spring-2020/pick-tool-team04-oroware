@@ -1,3 +1,4 @@
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
 
 class RelationshipPopup(QWidget):
@@ -11,20 +12,26 @@ class RelationshipPopup(QWidget):
         layout = QVBoxLayout()
         self.relationshipDescriptionLabel = QLabel()
         self.relationshipDescriptionLabel.setText("Label:")
+        self.relationshipDescriptionLabel.setFont(QtGui.QFont('SansSerif', 7))
         layout.addWidget(self.relationshipDescriptionLabel)
         self.relationshipDescriptionTextEdit = QPlainTextEdit()
+        self.relationshipDescriptionTextEdit.setFont(QtGui.QFont('SansSerif', 7))
         self.relationshipDescriptionTextEdit.setPlainText(self.relationship.description)
         layout.addWidget(self.relationshipDescriptionTextEdit)
         self.sourceIdLabel = QLabel()
+        self.sourceIdLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.sourceIdLabel.setText("Source Event ID: " + str(self.relationship.sourceSignificantEventId))
         layout.addWidget(self.sourceIdLabel)
         self.destinationIdLabel = QLabel()
+        self.destinationIdLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.destinationIdLabel.setText("Destination Event ID: " + str(self.relationship.destSignificantEventId))
         layout.addWidget(self.destinationIdLabel)
         self.deleteButtonRelationshipPopup = QPushButton('Delete', self)
+        self.deleteButtonRelationshipPopup.setFont(QtGui.QFont('SansSerif', 7))
         self.deleteButtonRelationshipPopup.clicked.connect(self.delete)
         layout.addWidget(self.deleteButtonRelationshipPopup)
         self.saveButtonRelationshipPopup = QPushButton('Save Changes', self)
+        self.saveButtonRelationshipPopup.setFont(QtGui.QFont('SansSerif', 7))
         self.saveButtonRelationshipPopup.clicked.connect(self.onSaveClick)
         layout.addWidget(self.saveButtonRelationshipPopup)
         self.setLayout(layout)

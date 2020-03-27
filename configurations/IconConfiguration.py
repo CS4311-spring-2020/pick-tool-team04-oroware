@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import QDataStream, QIODevice
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem
@@ -26,7 +26,9 @@ class IconConfiguration(QWidget):
 
     def intializeText(self):
         self.iconConfigurationLabel.setText("ICON CONFIGURATION")
+        self.iconConfigurationLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.addIconButton.setText("Add Icon")
+        self.addIconButton.setFont(QtGui.QFont('SansSerif', 7))
 
     def onTabChange(self):
         self.clientHandler.requestIcons()
@@ -41,25 +43,30 @@ class IconConfiguration(QWidget):
         header = self.iconConfigurationTableWidget.horizontalHeader()
         for colNum in range(len(self.colsIconConfigurationTable)):
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
-            self.iconConfigurationTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(
-                self.colsIconConfigurationTable[colNum]))
+            headerItem = QTableWidgetItem(self.colsIconConfigurationTable[colNum])
+            headerItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.iconConfigurationTableWidget.setHorizontalHeaderItem(colNum, headerItem)
         rowNum = 0
         for iconName, icon in icons.items():
             self.iconConfigurationTableWidget.setRowHeight(rowNum, 50)
             iconNameItem = QtWidgets.QTableWidgetItem(iconName)
+            iconNameItem.setFont(QtGui.QFont('SansSerif', 7))
             self.iconConfigurationTableWidget.setItem(rowNum, self.colsIconConfigurationTable.index("Icon Name"),
                                                       iconNameItem)
             iconSourceItem = QtWidgets.QTableWidgetItem(icon.source)
+            iconSourceItem.setFont(QtGui.QFont('SansSerif', 7))
             self.iconConfigurationTableWidget.setItem(rowNum, self.colsIconConfigurationTable.index("Icon Source"),
                                                       iconSourceItem)
             viewIconButton = ViewIconButton(iconName, icon.pixmapByteArray)
             viewIconButton.setText("View Icon")
+            viewIconButton.setFont(QtGui.QFont('SansSerif', 7))
             self.iconConfigurationTableWidget.setCellWidget(rowNum,
                                                             self.colsIconConfigurationTable.index("Icon Preview"),
                                                             viewIconButton)
             icon.rowIndexInTable = rowNum
             self.btn = QtWidgets.QPushButton(self)
             self.btn.setCursor(QtCore.Qt.ArrowCursor)
+            self.btn.setFont(QtGui.QFont('SansSerif', 7))
             self.btn.setText("Delete")
             self.btn.clicked.connect(partial(self.deleteClicked, iconName))
             self.iconConfigurationTableWidget.setCellWidget(rowNum, 3, self.btn)

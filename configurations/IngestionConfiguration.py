@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import QRunnable, pyqtSlot, QThreadPool
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QFileDialog
 
@@ -87,13 +87,21 @@ class IngestionConfiguration(QWidget):
 
     def initializeText(self):
         self.enfActRepTableLabel.setText("Enforcement Action Report Table")
+        self.enfActRepTableLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.logFileTableLabel.setText("Log File Table")
+        self.logFileTableLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.logFileConfigurationLabel.setText("LOG FILE CONFIGURATION")
+        self.logFileConfigurationLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.directoryConfigurationLabel.setText("DIRECTORY CONFIGURATION")
+        self.directoryConfigurationLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.ingestionButton.setText("Start Data Ingestion")
+        self.ingestionButton.setFont(QtGui.QFont('SansSerif', 7))
         self.setRootPathButton.setText("Change Root Path")
+        self.setRootPathButton.setFont(QtGui.QFont('SansSerif', 7))
         self.rootPathField.setText(self.clientHandler.logFileManager.rootPath)
+        self.rootPathField.setFont(QtGui.QFont('SansSerif', 7))
         self.rootPathLabel.setText("Current Root Directory:")
+        self.rootPathLabel.setFont(QtGui.QFont('SansSerif', 7))
 
     def handleSetRootPath(self):
         self.fileDialog = QFileDialog()
@@ -144,31 +152,39 @@ class IngestionConfiguration(QWidget):
 
         for col in range(len(self.colsLogFileTable)):
             header.setSectionResizeMode(col, QtWidgets.QHeaderView.Stretch)
-            self.logFileTableWidget.setHorizontalHeaderItem(col, QTableWidgetItem(self.colsLogFileTable[col]))
+            headerItem = QTableWidgetItem(self.colsLogFileTable[col])
+            headerItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.logFileTableWidget.setHorizontalHeaderItem(col, headerItem)
 
         counter = 0
         for filename, logFile in logFiles.items():
             logFileFilenameItem = QtWidgets.QTableWidgetItem(filename)
+            logFileFilenameItem.setFont(QtGui.QFont('SansSerif', 7))
             self.logFileTableWidget.setItem(counter, self.colsLogFileTable.index("Filename"), logFileFilenameItem)
 
             logFileSourceItem = QtWidgets.QTableWidgetItem(logFile.source)
+            logFileSourceItem.setFont(QtGui.QFont('SansSerif', 7))
             self.logFileTableWidget.setItem(counter, self.colsLogFileTable.index("Source"), logFileSourceItem)
 
             logFileCleansingStatus = ("Cleansed" if logFile.cleansed else "Uncleansed")
             logFileCleansingStatusItem = QtWidgets.QTableWidgetItem(logFileCleansingStatus)
+            logFileCleansingStatusItem.setFont(QtGui.QFont('SansSerif', 7))
             self.logFileTableWidget.setItem(counter, self.colsLogFileTable.index("Cleansing Status"),
                                             logFileCleansingStatusItem)
 
             logFileValidationStatusItem = QtWidgets.QTableWidgetItem("Validated" if logFile.validated else "Not Validated")
+            logFileValidationStatusItem.setFont(QtGui.QFont('SansSerif', 7))
             self.logFileTableWidget.setItem(counter, self.colsLogFileTable.index("Validation Status"),
                                             logFileValidationStatusItem)
 
             logFileIngestionStatus = ("Ingested" if logFile.ingested else "Not Ingested")
             logFileIngestionStatusItem = QtWidgets.QTableWidgetItem(logFileIngestionStatus)
+            logFileIngestionStatusItem.setFont(QtGui.QFont('SansSerif', 7))
             self.logFileTableWidget.setItem(counter, self.colsLogFileTable.index("Ingestion Status"),
                                             logFileIngestionStatusItem)
 
             logFileViewReportItem = QtWidgets.QTableWidgetItem("<button goes here>")
+            logFileViewReportItem.setFont(QtGui.QFont('SansSerif', 7))
             self.logFileTableWidget.setItem(counter, self.colsLogFileTable.index("View Enforcement Action Report"),
                                             logFileViewReportItem)
 
@@ -186,27 +202,34 @@ class IngestionConfiguration(QWidget):
 
         for col in range(len(self.colsEnfActRepTable)):
             header.setSectionResizeMode(col, QtWidgets.QHeaderView.Stretch)
-            self.enfActRepTableWidget.setHorizontalHeaderItem(col, QTableWidgetItem(self.colsEnfActRepTable[col]))
+            headerItem = QTableWidgetItem(self.colsEnfActRepTable[col])
+            headerItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.enfActRepTableWidget.setHorizontalHeaderItem(col, headerItem)
 
         counter = 0
         for filename, reportFile in reportFiles.items():
             reportFileFilenameItem = QtWidgets.QTableWidgetItem(filename)
+            reportFileFilenameItem.setFont(QtGui.QFont('SansSerif', 7))
             self.enfActRepTableWidget.setItem(counter, self.colsEnfActRepTable.index("Filename"),
                                               reportFileFilenameItem)
 
             reportFileLineNumberItem = QtWidgets.QTableWidgetItem(str(reportFile.invalidLineNumber))
+            reportFileLineNumberItem.setFont(QtGui.QFont('SansSerif', 7))
             self.enfActRepTableWidget.setItem(counter, self.colsEnfActRepTable.index("Line Number"),
                                               reportFileLineNumberItem)
 
             reportFileErrMsgItem = QtWidgets.QTableWidgetItem(reportFile.errorMessage)
+            reportFileErrMsgItem.setFont(QtGui.QFont('SansSerif', 7))
             self.enfActRepTableWidget.setItem(counter, self.colsEnfActRepTable.index("Error Message"),
                                               reportFileErrMsgItem)
 
             reportFileValidateItem = QtWidgets.QTableWidgetItem("<Validate Button goes here>")
+            reportFileValidateItem.setFont(QtGui.QFont('SansSerif', 7))
             self.enfActRepTableWidget.setItem(counter, self.colsEnfActRepTable.index("Validate"),
                                               reportFileValidateItem)
 
             reportFileCancelItem = QtWidgets.QTableWidgetItem("<Cancel Button goes here>")
+            reportFileCancelItem.setFont()
             self.enfActRepTableWidget.setItem(counter, self.colsEnfActRepTable.index("Cancel"),
                                               reportFileCancelItem)
 

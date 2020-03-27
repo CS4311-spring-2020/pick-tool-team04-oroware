@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QVBoxLayout
 from copy import deepcopy
 
@@ -66,7 +66,6 @@ class VectorDbConfiguration(QWidget):
             self.pendingVectors = self.clientHandler.getPendingVectors()
         self.initializeConfiguration()
 
-
     def handlePull(self):
         self.clientHandler.pullVectorDb()
         self.triggerHelper.connectVectorConfigurationTableTrigger()
@@ -108,16 +107,21 @@ class VectorDbConfiguration(QWidget):
         header = self.pullTableWidget.horizontalHeader()
         for colNum in range(len(self.colsPullTable)):
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
-            self.pullTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsPullTable[colNum]))
+            headerItem = QTableWidgetItem(self.colsPullTable[colNum])
+            headerItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.pullTableWidget.setHorizontalHeaderItem(colNum, headerItem)
         rowNum = 0
         for vectorName, vector in vectors.items():
             self.pullTableWidget.setRowHeight(rowNum, 50)
             vectorNameItem = QtWidgets.QTableWidgetItem(vectorName)
+            vectorNameItem.setFont(QtGui.QFont('SansSerif', 7))
             self.pullTableWidget.setItem(rowNum, self.colsPullTable.index("Vector Name"), vectorNameItem)
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
+            vectorDescriptionItem.setFont(QtGui.QFont('SansSerif', 7))
             self.pullTableWidget.setItem(rowNum, self.colsPullTable.index("Vector Description"), vectorDescriptionItem)
             graphButton = ViewGraphButton(vector)
             graphButton.setText("View Graph")
+            graphButton.setFont(QtGui.QFont('SansSerif', 7))
             self.pullTableWidget.setCellWidget(rowNum, self.colsPullTable.index("Vector Graph"), graphButton)
             rowNum += 1
         self.pullTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
@@ -131,31 +135,43 @@ class VectorDbConfiguration(QWidget):
         header = self.pushTableWidget.horizontalHeader()
         for colNum in range(len(self.colsPushTable)):
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
-            self.pushTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsPushTable[colNum]))
+            headerItem = QTableWidgetItem(self.colsPushTable[colNum])
+            headerItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.pushTableWidget.setHorizontalHeaderItem(colNum, headerItem)
         rowNum = 0
         for vectorName, vector in vectors.items():
             self.pushTableWidget.setRowHeight(rowNum, 50)
             vectorNameItem = QtWidgets.QTableWidgetItem(vectorName)
+            vectorNameItem.setFont(QtGui.QFont('SansSerif', 7))
             self.pushTableWidget.setItem(rowNum, self.colsPushTable.index("Vector Name"), vectorNameItem)
             vectorChangeSummaryItem = QtWidgets.QTableWidgetItem(vector.changeSummary)
+            vectorChangeSummaryItem.setFont(QtGui.QFont('SansSerif', 7))
             self.pushTableWidget.setItem(rowNum, self.colsPushTable.index("Change Summary"), vectorChangeSummaryItem)
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
+            vectorDescriptionItem.setFont(QtGui.QFont('SansSerif', 7))
             self.pushTableWidget.setItem(rowNum, self.colsPushTable.index("Vector Description"), vectorDescriptionItem)
             graphButton = ViewGraphButton(vector)
             graphButton.setText("View Graph")
+            graphButton.setFont(QtGui.QFont('SansSerif', 7))
             self.pushTableWidget.setCellWidget(rowNum, self.colsPushTable.index("Vector Graph"), graphButton)
             rowNum += 1
         self.pushTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
     def initializeText(self):
         self.vectorDbLabel.setText("VECTOR DB CONFIGURATION")
+        self.vectorDbLabel.setFont(QtGui.QFont('SansSerif', 7))
         if self.clientHandler.isLead:
             self.approvalLabel.setText("Approval sync:")
+            self.approvalLabel.setFont(QtGui.QFont('SansSerif', 7))
         else:
             self.pullTableLabel.setText("Pulled Vector DB Table (Analyst):")
+            self.pullTableLabel.setFont(QtGui.QFont('SansSerif', 7))
             self.pushTableLabel.setText("Pushed Vector DB Table (Analyst):")
+            self.pushTableLabel.setFont(QtGui.QFont('SansSerif', 7))
             self.pushButton.setText("Push Button")
+            self.pushButton.setFont(QtGui.QFont('SansSerif', 7))
             self.pullButton.setText("Pull Button")
+            self.pullButton.setFont(QtGui.QFont('SansSerif', 7))
 
     def updateApproveTable(self, pendingVectors):
         self.colsApproveTable = ["Vector Name", "Vector Description", "Change Summary", "Graph", "Approve", "Reject"]
@@ -166,24 +182,32 @@ class VectorDbConfiguration(QWidget):
         header = self.approvalTableWidget.horizontalHeader()
         for colNum in range(len(self.colsApproveTable)):
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
-            self.approvalTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsApproveTable[colNum]))
+            headerItem = QTableWidgetItem(self.colsApproveTable[colNum])
+            headerItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.approvalTableWidget.setHorizontalHeaderItem(colNum, headerItem)
         rowNum = 0
         for vectorKey, vector in pendingVectors.items():
             self.approvalTableWidget.setRowHeight(rowNum, 50)
             vectorNameItem = QtWidgets.QTableWidgetItem(vector.vectorName)
+            vectorNameItem.setFont(QtGui.QFont('SansSerif', 7))
             self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Vector Name"), vectorNameItem)
             changeItem = QtWidgets.QTableWidgetItem(vector.changeSummary)
+            changeItem.setFont(QtGui.QFont('SansSerif', 7))
             self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Change Summary"), changeItem)
             vectorDescriptionItem = QtWidgets.QTableWidgetItem(vector.vectorDescription)
+            vectorDescriptionItem.setFont(QtGui.QFont('SansSerif', 7))
             self.approvalTableWidget.setItem(rowNum, self.colsApproveTable.index("Vector Description"), vectorDescriptionItem)
             graphButton = ViewGraphButton(vector)
             graphButton.setText("View Graph")
+            graphButton.setFont(QtGui.QFont('SansSerif', 7))
             self.approvalTableWidget.setCellWidget(rowNum, self.colsApproveTable.index("Graph"), graphButton)
             approveButton = ApproveVectorButton(self.updateApproveTable, self.clientHandler, vectorKey, vector)
             approveButton.setText("Approve")
+            approveButton.setFont(QtGui.QFont('SansSerif', 7))
             self.approvalTableWidget.setCellWidget(rowNum, self.colsApproveTable.index("Approve"), approveButton)
             rejectButton = ApproveVectorButton(self.updateApproveTable, self.clientHandler, vectorKey, vector)
             rejectButton.setText("Reject")
+            rejectButton.setFont(QtGui.QFont('SansSerif', 7))
             self.approvalTableWidget.setCellWidget(rowNum, self.colsApproveTable.index("Reject"), rejectButton)
             rowNum += 1
         self.approvalTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)

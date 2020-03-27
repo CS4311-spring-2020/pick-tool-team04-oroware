@@ -1,3 +1,4 @@
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
 
 from Vector import Vector
@@ -11,15 +12,20 @@ class VectorConfigurationPopup(QWidget):
         self.layout = QVBoxLayout()
         self.vectorConfigurationLabel = QLabel()
         self.vectorConfigurationLabel.setText("Vector Name:")
+        self.vectorConfigurationLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.layout.addWidget(self.vectorConfigurationLabel)
         self.vectorConfigurationEdit = QPlainTextEdit()
+        self.vectorConfigurationEdit.setFont(QtGui.QFont('SansSerif', 7))
         self.layout.addWidget(self.vectorConfigurationEdit)
         self.vectorConfigurationDescription = QLabel()
+        self.vectorConfigurationDescription.setFont(QtGui.QFont('SansSerif', 7))
         self.vectorConfigurationDescription.setText("Vector Description: ")
         self.layout.addWidget(self.vectorConfigurationDescription)
         self.vectorConfigurationDescriptionEdit = QPlainTextEdit()
+        self.vectorConfigurationDescriptionEdit.setFont(QtGui.QFont('SansSerif', 7))
         self.layout.addWidget(self.vectorConfigurationDescriptionEdit)
         self.saveButton = QPushButton('Add Vector', self)
+        self.saveButton.setFont(QtGui.QFont('SansSerif', 7))
         self.saveButton.clicked.connect(self.onSaveClick)
         self.layout.addWidget(self.saveButton)
         self.setLayout(self.layout)

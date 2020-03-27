@@ -21,10 +21,6 @@ class GraphWidget(QWidget):
 
     def __init__(self, parent, trigger, clientHandler=None, mutable=True):
         super(GraphWidget, self).__init__(parent)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        self.setSizePolicy(sizePolicy)
         self.trigger = trigger
         self.clientHandler = clientHandler
         if mutable:
@@ -33,7 +29,6 @@ class GraphWidget(QWidget):
             self.initImmutableUI()
 
     def initUI(self):
-        self.setGeometry(10, 10, 505, 476)
         self.vector = None
         self.node1 = None
         self.node2 = None
@@ -53,7 +48,6 @@ class GraphWidget(QWidget):
         self.vbox.addWidget(self.canvas)
 
     def initImmutableUI(self):
-        self.setGeometry(10, 10, 505, 476)
         self.vector = None
         self.nodeSize = GraphWidget.STARTING_NODE_SIZE
         self.fontSize = GraphWidget.STARTING_FONT_SIZE
@@ -244,9 +238,3 @@ class GraphWidget(QWidget):
             self.fontSize = (self.fontSize - 1) if self.fontSize > GraphWidget.MINIMUM_FONT_SIZE else GraphWidget.MINIMUM_FONT_SIZE
             self.iconSize = (self.iconSize - 0.01) if self.iconSize > GraphWidget.MINIMUM_ICON_SIZE else GraphWidget.MINIMUM_ICON_SIZE
             self.plotGraph()
-
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())

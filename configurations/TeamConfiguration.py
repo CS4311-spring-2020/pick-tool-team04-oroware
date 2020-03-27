@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import QDateTime
 from PyQt5.QtWidgets import QWidget
 
@@ -26,7 +26,7 @@ class TeamConfiguration(QWidget):
         self.leadLabel = QtWidgets.QLabel(self.teamConfiguration)
         self.teamConfigurationLayout.addWidget(self.leadLabel)
         self.leadTextEdit = QtWidgets.QTextEdit(self.teamConfiguration)
-        self.leadTextEdit.setMaximumHeight(40)
+        self.leadTextEdit.setMaximumHeight(30)
         self.teamConfigurationLayout.addWidget(self.leadTextEdit)
         self.connectButton = QtWidgets.QPushButton(self.teamConfiguration)
         self.teamConfigurationLayout.addWidget(self.connectButton)
@@ -41,21 +41,25 @@ class TeamConfiguration(QWidget):
         self.eventNameLabel = QtWidgets.QLabel(self.eventConfiguration)
         self.eventConfigurationLayout.addWidget(self.eventNameLabel)
         self.eventNameTextEdit = QtWidgets.QTextEdit(self.eventConfiguration)
-        self.eventNameTextEdit.setMaximumHeight(40)
+        self.eventNameTextEdit.setMaximumHeight(25)
         self.eventConfigurationLayout.addWidget(self.eventNameTextEdit)
         self.eventDescriptionLabel = QtWidgets.QLabel(self.eventConfiguration)
         self.eventConfigurationLayout.addWidget(self.eventDescriptionLabel)
         self.eventDescriptionTextEdit = QtWidgets.QTextEdit(self.eventConfiguration)
+        self.eventDescriptionTextEdit.setMaximumHeight(25)
         self.eventConfigurationLayout.addWidget(self.eventDescriptionTextEdit)
         self.startEventConfigurationLabel = QtWidgets.QLabel(self.eventConfiguration)
         self.eventConfigurationLayout.addWidget(self.startEventConfigurationLabel)
         self.startEventConfigurationDateEdit = QtWidgets.QDateTimeEdit(self.eventConfiguration)
         self.startEventConfigurationDateEdit.setDisplayFormat("M/d/yyyy hh:mm A")
+        self.startEventConfigurationDateEdit.setFont(QtGui.QFont('SansSerif', 7))
+        self.startEventConfigurationLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.eventConfigurationLayout.addWidget(self.startEventConfigurationDateEdit)
         self.endEventConfigurationLabel = QtWidgets.QLabel(self.eventConfiguration)
         self.eventConfigurationLayout.addWidget(self.endEventConfigurationLabel)
         self.endEventConfigurationDateEdit = QtWidgets.QDateTimeEdit(self.eventConfiguration)
         self.endEventConfigurationDateEdit.setDisplayFormat("M/d/yyyy hh:mm A")
+        self.endEventConfigurationDateEdit.setFont(QtGui.QFont('SansSerif', 7))
         self.eventConfigurationLayout.addWidget(self.endEventConfigurationDateEdit)
         self.teamConfigurationTabLayout.addWidget(self.eventConfiguration)
         self.saveEventButton = QtWidgets.QPushButton(self.eventConfiguration)
@@ -92,23 +96,37 @@ class TeamConfiguration(QWidget):
 
     def intializeText(self):
         self.eventNameLabel.setText("Event name: ")
+        self.eventNameLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.connectButton.setText("Connect")
+        self.connectButton.setFont(QtGui.QFont('SansSerif', 7))
         self.startEventConfigurationLabel.setText("Event start timestamp:")
+        self.startEventConfigurationLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.leadLabel.setText("Server's IP Address: ")
+        self.leadLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.leadCheckBox.setText("Lead: ")
+        self.leadCheckBox.setFont(QtGui.QFont('SansSerif', 7))
         self.teamConfigurationLabel.setText("TEAM CONFIGURATION")
+        self.teamConfigurationLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.eventConfigurationLabel.setText("EVENT CONFIGURATION")
+        self.eventConfigurationLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.saveEventButton.setText("Save Event")
-        self.leadCheckBox.setText("Lead")
+        self.saveEventButton.setFont(QtGui.QFont('SansSerif', 7))
         self.endEventConfigurationLabel.setText("Event end timestamp:")
+        self.endEventConfigurationLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.saveEventButton.setText("Save Event")
+        self.saveEventButton.setFont(QtGui.QFont('SansSerif', 7))
         self.eventDescriptionLabel.setText("Event description: ")
+        self.eventDescriptionLabel.setFont(QtGui.QFont('SansSerif', 7))
         eventConfig = self.clientHandler.eventConfig
         if eventConfig.eventEndTime != None:
             self.endEventConfigurationDateEdit.setDateTime(QDateTime.fromString(eventConfig.eventEndTime, "M/d/yyyy h:mm A"))
+            self.endEventConfigurationDateEdit.setFont(QtGui.QFont('SansSerif', 7))
         if eventConfig.eventStartTime != None:
             self.startEventConfigurationDateEdit.setDateTime(QDateTime.fromString(eventConfig.eventStartTime,"M/d/yyyy h:mm A"))
+            self.startEventConfigurationDateEdit.setFont(QtGui.QFont('SansSerif', 7))
         if eventConfig.eventName != None:
             self.eventNameTextEdit.setText(eventConfig.eventName)
+            self.eventNameTextEdit.setFont(QtGui.QFont('SansSerif', 7))
         if eventConfig.eventDescription != None:
             self.eventDescriptionTextEdit.setText(eventConfig.eventDescription)
+            self.eventDescriptionTextEdit.setFont(QtGui.QFont('SansSerif', 7))

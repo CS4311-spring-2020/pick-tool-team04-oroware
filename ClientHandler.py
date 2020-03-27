@@ -37,7 +37,7 @@ class ClientHandler():
         self.isLead = False
         self.hasLead = False
         self.serverIp = '127.0.0.1'
-        self.serverPort = 65432
+        self.serverPort = 65433
         self.address = hex(uuid.getnode())
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.serverIp, self.serverPort))

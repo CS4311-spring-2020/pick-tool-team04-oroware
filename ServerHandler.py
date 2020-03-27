@@ -28,7 +28,7 @@ def synchronized_method(method):
 class ServerHandler():
     def __init__(self):
         self.host = '127.0.0.1'
-        self.port = 65432
+        self.port = 65433
         self.leadAddress = None
         self.logEntryManager = LogEntryManager()
         self.logEntryManager.deleteLogEntriesDb()
@@ -261,4 +261,3 @@ if __name__ == "__main__":
         serverHandler.addNewClient(clientAddress)
         serverThread = ServerThread(clientSocket, serverHandler)
         serverThread.start()
-

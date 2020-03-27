@@ -27,32 +27,27 @@ class EditVectorConfiguration(QWidget):
         self.editVectorLayout = QtWidgets.QHBoxLayout(self)
         self.leftEditVectorWidget = QtWidgets.QWidget(self)
         self.leftEditVectorLayout = QtWidgets.QVBoxLayout(self.leftEditVectorWidget)
-        self.graphWidget = QtWidgets.QWidget(self.leftEditVectorWidget)
-        self.graphLayout = QtWidgets.QVBoxLayout(self.graphWidget)
-        self.vectorGraphWidget = GraphWidget(self.graphWidget, triggerHelper)
-        self.graphLayout.addWidget(self.vectorGraphWidget)
-        self.leftEditVectorLayout.addWidget(self.graphWidget)
-        self.editVectorLayout.addWidget(self.leftEditVectorWidget)
+        self.vectorGraphWidget = GraphWidget(self.leftEditVectorWidget, triggerHelper)
+        self.leftEditVectorLayout.addWidget(self.vectorGraphWidget)
+        self.editVectorLayout.addWidget(self.leftEditVectorWidget, 1)
+
         self.rightEditVectorWidget = QtWidgets.QWidget(self)
         self.rightEditVectorLayout = QtWidgets.QVBoxLayout(self.rightEditVectorWidget)
-        self.vectorFrame = QtWidgets.QFrame(self.rightEditVectorWidget)
-        self.vectorFrame.setFrameShape(QtWidgets.QFrame.Box)
-        self.vectorFrame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.editVectorTableLayout = QtWidgets.QVBoxLayout(self.vectorFrame)
-        self.vectorTableLabel = QtWidgets.QLabel(self.vectorFrame)
-        self.editVectorTableLayout.addWidget(self.vectorTableLabel)
-        self.vectorComboBoxTable = QtWidgets.QComboBox(self.vectorFrame)
+        self.vectorTableLabel = QtWidgets.QLabel(self.rightEditVectorWidget)
+        self.rightEditVectorLayout.addWidget(self.vectorTableLabel)
+        self.vectorComboBoxTable = QtWidgets.QComboBox(self.rightEditVectorWidget)
+        self.vectorComboBoxTable.setFont(QtGui.QFont('SansSerif', 7))
         self.vectorComboBoxTable.view().pressed.connect(self.handleVectorComboBoxTable)
-        self.editVectorTableLayout.addWidget(self.vectorComboBoxTable)
-        self.vectorDescriptionLabel = QtWidgets.QLabel(self.vectorFrame)
-        self.editVectorTableLayout.addWidget(self.vectorDescriptionLabel)
-        self.exportTableButton = QtWidgets.QPushButton(self.vectorFrame)
+        self.rightEditVectorLayout.addWidget(self.vectorComboBoxTable)
+        self.vectorDescriptionLabel = QtWidgets.QLabel(self.rightEditVectorWidget)
+        self.vectorDescriptionLabel.setFont(QtGui.QFont('SansSerif', 7))
+        self.rightEditVectorLayout.addWidget(self.vectorDescriptionLabel)
+        self.exportTableButton = QtWidgets.QPushButton(self.rightEditVectorWidget)
         self.exportTableButton.clicked.connect(self.handleExport)
-        self.editVectorTableLayout.addWidget(self.exportTableButton)
-        self.addNodeTableButton = QtWidgets.QPushButton(self.vectorFrame)
+        self.rightEditVectorLayout.addWidget(self.exportTableButton)
+        self.addNodeTableButton = QtWidgets.QPushButton(self.rightEditVectorWidget)
         self.addNodeTableButton.clicked.connect(self.handleAddNode)
-        self.editVectorTableLayout.addWidget(self.addNodeTableButton)
-        self.rightEditVectorLayout.addWidget(self.vectorFrame)
+        self.rightEditVectorLayout.addWidget(self.addNodeTableButton)
         self.nodeTableLabel = QtWidgets.QLabel(self.rightEditVectorWidget)
         self.rightEditVectorLayout.addWidget(self.nodeTableLabel)
         self.vectorTableWidget = QtWidgets.QTableWidget(self.rightEditVectorWidget)
@@ -65,7 +60,8 @@ class EditVectorConfiguration(QWidget):
         self.relationshipTableWidget.setColumnCount(0)
         self.relationshipTableWidget.setRowCount(0)
         self.rightEditVectorLayout.addWidget(self.relationshipTableWidget)
-        self.editVectorLayout.addWidget(self.rightEditVectorWidget)
+        self.editVectorLayout.addWidget(self.rightEditVectorWidget, 1)
+
         self.zoomInShortcut = QShortcut(QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Up), self)
         self.zoomInShortcut.activated.connect(self.handleZoomInShortcut)
         self.zoomOutShortcut = QShortcut(QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Down), self)
@@ -87,7 +83,9 @@ class EditVectorConfiguration(QWidget):
         header = self.vectorTableWidget.horizontalHeader()
         for colNum in range(len(self.colsVectorTable)):
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
-            self.vectorTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorTable[colNum]))
+            headerItem = QTableWidgetItem(self.colsVectorTable[colNum])
+            headerItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.vectorTableWidget.setHorizontalHeaderItem(colNum, headerItem)
 
     def clearRelationshipTable(self):
         self.relationshipTableWidget.setColumnCount(len(self.colsRelationshipTable))
@@ -96,7 +94,9 @@ class EditVectorConfiguration(QWidget):
         header = self.relationshipTableWidget.horizontalHeader()
         for colNum in range(len(self.colsRelationshipTable)):
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
-            self.relationshipTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsRelationshipTable[colNum]))
+            headerItem = QTableWidgetItem(self.colsRelationshipTable[colNum])
+            headerItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.relationshipTableWidget.setHorizontalHeaderItem(colNum, headerItem)
 
     def updateVectorTable(self, vector):
         self.clientHandler.vectorManager.storeVectors()
@@ -110,33 +110,43 @@ class EditVectorConfiguration(QWidget):
         header = self.vectorTableWidget.horizontalHeader()
         for colNum in range(len(self.colsVectorTable)):
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
-            self.vectorTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsVectorTable[colNum]))
+            headerItem = QTableWidgetItem(self.colsVectorTable[colNum])
+            headerItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.vectorTableWidget.setHorizontalHeaderItem(colNum, headerItem)
             if colNum == self.colsVectorTable.index("Visibility"):
                 nodeVisibilityCheckbox = NodeVisibilityCheckBox(self.updateVectorGraph, self.updateVectorTable, None, vector, True)
+                nodeVisibilityCheckbox.setFont(QtGui.QFont('SansSerif', 7))
                 nodeVisibilityCheckbox.setCheckState(QtCore.Qt.Checked if vector.allVisible else QtCore.Qt.Unchecked)
                 nodeVisibilityCheckbox.setText("All")
                 self.vectorTableWidget.setCellWidget(0, colNum, nodeVisibilityCheckbox)
                 continue
             if colNum != self.colsVectorTable.index("Icon Type") and colNum != self.colsVectorTable.index("Reference"):
                 visibilityCheckbox = VisibilityCheckBox(self.colsVectorTable[colNum], self.updateVectorGraph, vector)
+                visibilityCheckbox.setFont(QtGui.QFont('SansSerif', 7))
                 visibilityCheckbox.setCheckState(QtCore.Qt.Checked if vector.visibility[self.colsVectorTable[colNum]] else QtCore.Qt.Unchecked)
                 visibilityCheckbox.setText("Visible")
                 self.vectorTableWidget.setCellWidget(0, colNum, visibilityCheckbox)
-        self.vectorTableWidget.setVerticalHeaderItem(0, QtWidgets.QTableWidgetItem(""))
+        placerHeaderItem = QtWidgets.QTableWidgetItem("")
+        placerHeaderItem.setFont(QtGui.QFont('SansSerif', 7))
+        self.vectorTableWidget.setVerticalHeaderItem(0, placerHeaderItem)
         rowNum = 1
         while(rowNum < totalRows):
             significantEvent = significantEvents[rowNum-1]
             significantEventIdItem = QtWidgets.QTableWidgetItem(str(significantEvent.id))
+            significantEventIdItem.setFont(QtGui.QFont('SansSerif', 7))
             self.vectorTableWidget.setVerticalHeaderItem(rowNum, significantEventIdItem)
             self.vectorTableWidget.setRowHeight(rowNum, 50)
             significantEventTypeItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.eventType)
+            significantEventTypeItem.setFont(QtGui.QFont('SansSerif', 7))
             logEntry = significantEvent.logEntry
             viewEntryButton = ViewReferenceButton(logEntry)
+            viewEntryButton.setFont(QtGui.QFont('SansSerif', 7))
             viewEntryButton.setText("View Log Entry")
             self.vectorTableWidget.setCellWidget(rowNum, self.colsVectorTable.index("Reference"),
                                                      viewEntryButton)
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Event Type"), significantEventTypeItem)
             iconComboBox = IconComboBox(significantEvent, self.clientHandler, self.updateVectorGraph, vector.vectorName)
+            iconComboBox.setFont(QtGui.QFont('SansSerif', 7))
             iconComboBox.addItem(significantEvent.iconType)
             if Icon.DEFAULT != significantEvent.iconType:
                 iconComboBox.addItem(Icon.DEFAULT)
@@ -145,16 +155,22 @@ class EditVectorConfiguration(QWidget):
                     iconComboBox.addItem(iconName)
             self.vectorTableWidget.setCellWidget(rowNum, self.colsVectorTable.index("Icon Type"), iconComboBox)
             significantEventNameItem = QtWidgets.QTableWidgetItem(significantEvent.name)
+            significantEventNameItem.setFont(QtGui.QFont('SansSerif', 7))
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Name"), significantEventNameItem)
             significantEventDateItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.date)
+            significantEventDateItem.setFont(QtGui.QFont('SansSerif', 7))
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Timestamp"), significantEventDateItem)
             significantEventCreatorItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.creator)
+            significantEventCreatorItem.setFont(QtGui.QFont('SansSerif', 7))
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Event Creator"), significantEventCreatorItem)
             significantEventDescriptionItem = QtWidgets.QTableWidgetItem(significantEvent.description)
+            significantEventDescriptionItem.setFont(QtGui.QFont('SansSerif', 7))
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Description"), significantEventDescriptionItem)
             significantEventArtifactItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.artifact)
+            significantEventArtifactItem.setFont(QtGui.QFont('SansSerif', 7))
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Artifact"), significantEventArtifactItem)
             nodeVisibilityCheckbox = NodeVisibilityCheckBox(self.updateVectorGraph, self.updateVectorTable, significantEvent, vector, False)
+            nodeVisibilityCheckbox.setFont(QtGui.QFont('SansSerif', 7))
             nodeVisibilityCheckbox.setCheckState(QtCore.Qt.Checked if significantEvent.visible else QtCore.Qt.Unchecked)
             self.vectorTableWidget.setCellWidget(rowNum, self.colsVectorTable.index("Visibility"), nodeVisibilityCheckbox)
             significantEvent.rowIndexInTable = rowNum
@@ -165,25 +181,26 @@ class EditVectorConfiguration(QWidget):
     def handleRelationshipTableEntryUpdate(self, relationship, vectorName):
         if relationship.rowIndexInTable != -1 and self.vectorComboBoxTable.count() > 0 and self.vectorComboBoxTable.currentText() == vectorName:
             relationshipDescriptionItem = QtWidgets.QTableWidgetItem(relationship.description)
+            relationshipDescriptionItem.setFont(QtGui.QFont('SansSerif', 7))
             self.relationshipTableWidget.setItem(relationship.rowIndexInTable, self.colsRelationshipTable.index("Label"),
                                                    relationshipDescriptionItem)
 
     def onTabChange(self):
         if self.vectorComboBoxTable.count() > 0:
-            self.graphLayout.removeWidget(self.vectorGraphWidget)
+            self.leftEditVectorLayout.removeWidget(self.vectorGraphWidget)
             self.triggerHelper.connectRelationshipTableTrigger()
-            self.vectorGraphWidget = GraphWidget(self.graphWidget, self.triggerHelper, self.clientHandler)
-            self.graphLayout.addWidget(self.vectorGraphWidget)
+            self.vectorGraphWidget = GraphWidget(self.leftEditVectorWidget, self.triggerHelper, self.clientHandler)
+            self.leftEditVectorLayout.addWidget(self.vectorGraphWidget)
             vectorName = self.vectorComboBoxTable.currentText()
             vector = self.clientHandler.vectorManager.vectors[vectorName]
             self.updateVectorTable(vector)
             self.updateRelationshipTable(vector)
             self.updateVectorGraph(vector)
         else:
-            self.graphLayout.removeWidget(self.vectorGraphWidget)
+            self.leftEditVectorLayout.removeWidget(self.vectorGraphWidget)
             self.triggerHelper.connectRelationshipTableTrigger()
-            self.vectorGraphWidget = GraphWidget(self.graphWidget, self.triggerHelper, self.clientHandler)
-            self.graphLayout.addWidget(self.vectorGraphWidget)
+            self.vectorGraphWidget = GraphWidget(self.leftEditVectorWidget, self.triggerHelper, self.clientHandler)
+            self.leftEditVectorLayout.addWidget(self.vectorGraphWidget)
             self.clearVectorTable()
             self.clearRelationshipTable()
 
@@ -202,6 +219,7 @@ class EditVectorConfiguration(QWidget):
     def handleVectorTableEntryUpdate(self, significantEvent, vectorName):
         if significantEvent.rowIndexInTable != -1 and self.vectorComboBoxTable.count() > 0 and self.vectorComboBoxTable.currentText() == vectorName:
             significantEventDescriptionItem = QtWidgets.QTableWidgetItem(significantEvent.logEntry.description)
+            significantEventDescriptionItem.setFont(QtGui.QFont('SansSerif', 7))
             self.vectorTableWidget.setItem(significantEvent.rowIndexInTable, len(self.colsVectorTable) - 1,
                                                    significantEventDescriptionItem)
 
@@ -217,16 +235,22 @@ class EditVectorConfiguration(QWidget):
         header = self.relationshipTableWidget.horizontalHeader()
         for colNum in range(len(self.colsRelationshipTable)):
             header.setSectionResizeMode(colNum, QtWidgets.QHeaderView.Stretch)
-            self.relationshipTableWidget.setHorizontalHeaderItem(colNum, QTableWidgetItem(self.colsRelationshipTable[colNum]))
+            headerItem = QTableWidgetItem(self.colsRelationshipTable[colNum])
+            headerItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.relationshipTableWidget.setHorizontalHeaderItem(colNum, headerItem)
         for rowNum in range(totalRows):
             self.relationshipTableWidget.setRowHeight(rowNum, 50)
             relationshipIdItem = QtWidgets.QTableWidgetItem(str(relationships[rowNum].id))
+            relationshipIdItem.setFont(QtGui.QFont('SansSerif', 7))
             self.relationshipTableWidget.setVerticalHeaderItem(rowNum, relationshipIdItem)
             relationshipSourceItem = QtWidgets.QTableWidgetItem(str(relationships[rowNum].sourceSignificantEventId))
+            relationshipSourceItem.setFont(QtGui.QFont('SansSerif', 7))
             self.relationshipTableWidget.setItem(rowNum, self.colsRelationshipTable.index("Parent"), relationshipSourceItem)
             relationshipDestItem = QtWidgets.QTableWidgetItem(str(relationships[rowNum].destSignificantEventId))
+            relationshipDestItem.setFont(QtGui.QFont('SansSerif', 7))
             self.relationshipTableWidget.setItem(rowNum, self.colsRelationshipTable.index("Child"), relationshipDestItem)
             relationshipDescriptionItem = QtWidgets.QTableWidgetItem(relationships[rowNum].description)
+            relationshipDescriptionItem.setFont(QtGui.QFont('SansSerif', 7))
             self.relationshipTableWidget.setItem(rowNum, self.colsRelationshipTable.index("Label"), relationshipDescriptionItem)
             relationships[rowNum].rowIndexInTable = rowNum
         self.relationshipTableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
@@ -254,10 +278,15 @@ class EditVectorConfiguration(QWidget):
 
     def intializeText(self):
         self.addNodeTableButton.setText("Add Node")
+        self.addNodeTableButton.setFont(QtGui.QFont('SansSerif', 7))
         self.nodeTableLabel.setText("Nodes:")
+        self.nodeTableLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.relationshipTableLabel.setText("Relationships:")
+        self.relationshipTableLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.vectorTableLabel.setText("Vector:")
+        self.vectorTableLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.exportTableButton.setText("Export Vector")
+        self.exportTableButton.setFont(QtGui.QFont('SansSerif', 7))
 
     def updateVectorGraph(self, vector):
         self.clientHandler.vectorManager.storeVectors()

@@ -1,4 +1,4 @@
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import *
 import csv
 
@@ -13,11 +13,13 @@ class ExportPopup(QWidget):
         self.layout = QVBoxLayout()
         self.locationLabel = QLabel()
         self.locationLabel.setText("Location: ")
+        self.locationLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.layout.addWidget(self.locationLabel)
         self.fileDialog = QFileDialog()
         self.fileDialog.setFileMode(QFileDialog.AnyFile)
         self.layout.addWidget(self.fileDialog)
         self.exportButton = QPushButton('Export', self)
+        self.exportButton.setFont(QtGui.QFont('SansSerif', 7))
         self.exportButton.clicked.connect(self.onExportClick)
         self.layout.addWidget(self.exportButton)
         self.setLayout(self.layout)
