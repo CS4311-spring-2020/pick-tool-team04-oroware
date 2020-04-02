@@ -29,10 +29,10 @@ def synchronized_method(method):
 class ClientHandler():
     def __init__(self):
         self.logEntryManager = LogEntryManager()
-        self.vectorManager = VectorManager()
+        self.vectorManager = VectorManager(str(hex(uuid.getnode())))
         self.iconManager = IconManager()
         self.logFileManager = LogFileManager()
-        self.logFileManager.retrieveLogFiles()
+        self.logFileManager.retrieveLogFilesDb()
         self.eventConfig = EventConfig()
         self.isLead = False
         self.hasLead = False
@@ -58,12 +58,19 @@ class ClientHandler():
     @synchronized_method
     def requestEventConfig(self):
         self.sendMsg(pickle.dumps({"Request event config": None}))
-        self.eventConfig = pickle.loads(self.recvMsg())
+        configFields = pickle.loads(self.recvMsg())
+        self.eventConfig.eventName = configFields[0]
+        self.eventConfig.eventDescription = configFields[1]
+        self.eventConfig.eventStartTime = configFields[2]
+        self.eventConfig.eventEndTime = configFields[3]
 
     @synchronized_method
     def updateEventConfig(self):
-        self.sendMsg(pickle.dumps({"Update event config": self.eventConfig}))
-        self.eventConfig = pickle.loads(self.recvMsg())
+        eventName = self.eventConfig.eventName
+        eventDescription = self.eventConfig.eventDescription
+        eventStartTime = self.eventConfig.eventStartTime
+        eventEndTime = self.eventConfig.eventEndTime
+        self.sendMsg(pickle.dumps({"Update event config": [eventName, eventDescription, eventStartTime, eventEndTime]}))
 
     @synchronized_method
     def updateIcons(self):
@@ -169,7 +176,6 @@ class ClientHandler():
                 self.logEntryManager.handleVectorDeleted(vector)
             self.vectorManager.vectors.clear()
             self.vectorManager.deleteStoredVectors()
-            self.iconManager.deleteStoredIcons()
 
     @synchronized_method
     def sendMsg(self, msg):

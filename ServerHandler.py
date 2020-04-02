@@ -31,14 +31,13 @@ class ServerHandler():
         self.port = 65433
         self.leadAddress = None
         self.logEntryManager = LogEntryManager()
-        self.logEntryManager.deleteLogEntriesDb()
         self.logEntryManager.retrieveLogEntriesDb()
-        self.vectorManager = VectorManager()
+        self.vectorManager = VectorManager(str(0))
         self.vectorManager.retrieveVectors()
         self.iconManager = IconManager()
-        self.iconManager.retrieveIcons()
+        self.iconManager.retrieveIconsDb()
         self.eventConfig = EventConfig()
-        self.eventConfig.retrieveEventConfig()
+        self.eventConfig.retrieveEventConfigDb()
         self.pendingVectors = dict()
         self.pendingVectorFilename = "pendingVectors.pkl"
         self.retrievePendingVectors()
@@ -104,8 +103,12 @@ class ServerThread(Thread):
         for iconName in list(self.serverHandler.iconManager.icons.keys()):
             if iconName not in icons:
                 icons[iconName] = self.serverHandler.iconManager.icons[iconName]
+        for iconName, icon in icons.items():
+            if iconName not in self.serverHandler.iconManager.icons:
+                self.serverHandler.iconManager.storeIconDb(icon)
+            else:
+                self.serverHandler.iconManager.updateIcon(icon)
         self.serverHandler.iconManager.icons = icons
-        self.serverHandler.iconManager.storeIcons()
         self.sendMsg(pickle.dumps(self.serverHandler.iconManager.icons))
 
     @synchronized_method
@@ -133,7 +136,6 @@ class ServerThread(Thread):
 
     @synchronized_method
     def handlePushedVectors(self, pushedVectors):
-        print(pushedVectors)
         for vector in pushedVectors:
             key = 0 if len(self.serverHandler.pendingVectors.keys()) == 0 else (max(self.serverHandler.pendingVectors.keys()) + 1)
             self.serverHandler.pendingVectors[key] = vector
@@ -189,18 +191,23 @@ class ServerThread(Thread):
 
     @synchronized_method
     def handleRequestEventConfig(self):
-        self.sendMsg(pickle.dumps(self.serverHandler.eventConfig))
+        eventName = self.serverHandler.eventConfig.eventName
+        eventDescription = self.serverHandler.eventConfig.eventDescription
+        eventStartTime = self.serverHandler.eventConfig.eventStartTime
+        eventEndTime = self.serverHandler.eventConfig.eventEndTime
+        self.sendMsg(pickle.dumps([eventName, eventDescription, eventStartTime, eventEndTime]))
 
     @synchronized_method
-    def handleUpdateEventConfig(self, eventConfig):
-        self.serverHandler.eventConfig = eventConfig
-        self.serverHandler.eventConfig.storeEventConfig()
-        self.sendMsg(pickle.dumps(self.serverHandler.eventConfig))
+    def handleUpdateEventConfig(self, configFields):
+        self.serverHandler.eventConfig.eventName = configFields[0]
+        self.serverHandler.eventConfig.eventDescription = configFields[1]
+        self.serverHandler.eventConfig.eventStartTime = configFields[2]
+        self.serverHandler.eventConfig.eventEndTime = configFields[3]
+        self.serverHandler.eventConfig.storeEventConfigDb()
 
     @synchronized_method
     def handleDeleteIcon(self, iconName):
         self.serverHandler.iconManager.deleteIcon(iconName)
-        self.serverHandler.iconManager.storeIcons()
 
     def run(self):
         msg = pickle.dumps({"Server Information" : {"Lead Address" : self.serverHandler.leadAddress}})

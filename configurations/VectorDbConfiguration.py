@@ -14,10 +14,10 @@ class VectorDbConfiguration(QWidget):
         self.colsPullTable = ["Vector Name", "Vector Description", "Vector Graph"]
         self.colsPushTable = ["Vector Name", "Vector Description", "Change Summary", "Vector Graph"]
         self.colsApproveTable = ["Source IP", "Request Timestamp", "Vector Name", "Vector Description", "Graph", "Approve"]
-        self.pushedVectorManager = VectorManager()
+        self.pushedVectorManager = VectorManager(str(0))
         self.pushedVectorManager.filename = "pushedVectors.pkl"
         self.pushedVectorManager.retrieveVectors()
-        self.pulledVectorManager = VectorManager()
+        self.pulledVectorManager = VectorManager(str(0))
         self.pulledVectorManager.filename = "pulledVectors.pkl"
         self.pulledVectorManager.retrieveVectors()
         self.pendingVectors = dict()

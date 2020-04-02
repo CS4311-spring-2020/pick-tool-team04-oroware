@@ -229,7 +229,7 @@ class IngestionConfiguration(QWidget):
                                               reportFileValidateItem)
 
             reportFileCancelItem = QtWidgets.QTableWidgetItem("<Cancel Button goes here>")
-            reportFileCancelItem.setFont()
+            reportFileCancelItem.setFont(QtGui.QFont('SansSerif', 7))
             self.enfActRepTableWidget.setItem(counter, self.colsEnfActRepTable.index("Cancel"),
                                               reportFileCancelItem)
 
@@ -251,7 +251,7 @@ class IngestionWorker(QRunnable):
             logEntries = self.ingestLogFile(logFile, eventStartTime, eventEndTime)
             if logEntries != None:
                 self.clientHandler.sendLogEntries(logEntries)
-                self.clientHandler.logFileManager.storeLogFiles()
+                self.clientHandler.logFileManager.storeLogFileDb(logFile)
 
     def ingestLogFile(self, logFile, eventStartTime, eventEndTime):
         logEntries = list()

@@ -1,6 +1,8 @@
 import pickle
 from pathlib import Path
 
+import pymongo
+
 from AudioLogFile import AudioLogFile
 from ImageLogFile import ImageLogFile
 from LogFile import LogFile
@@ -15,6 +17,9 @@ class LogFileManager:
         self.filename = "logfiles.pkl"
         self.splunkInterface = SplunkInterface()
         self.rootPath = None
+        self.client = pymongo.MongoClient('mongodb://localhost:27017/')
+        self.db = self.client["database"]
+        self.col = self.db["files"]
 
     def addLogFile(self, logFile):
         if logFile.filename in self.files:
@@ -43,6 +48,28 @@ class LogFileManager:
             return True
 
         return False
+
+    def storeLogFileDb(self, logFile):
+        fileEntry = {"_id": logFile.filename, "logFile": pickle.dumps(logFile)}
+        self.col.insert_one(fileEntry)
+
+    def retrieveLogFilesDb(self):
+        self.files.clear()
+        for fileEntry in self.col.find():
+            logFile = pickle.loads(fileEntry["logFile"])
+            self.files[logFile.filename] = logFile
+
+    def deleteLogFilesDb(self):
+        self.col.delete_many({})
+
+    def storeLogFilesDb(self):
+        for filename, logFile in self.files.items():
+            self.storeLogFileDb(logFile)
+
+    def updateLogFileDb(self, logFile):
+        query = {"_id": logFile.filename}
+        values = {"$set": {"_id": logFile.filename, "logFile": pickle.dumps(logFile)}}
+        self.col.update_one(query, values)
 
     def storeLogFiles(self):
         with open(self.filename, 'wb') as pkl_file:
