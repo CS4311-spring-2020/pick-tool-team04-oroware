@@ -40,7 +40,7 @@ class IconManager:
         iconEntry = {"_id": icon.name, "icon": pickle.dumps(icon)}
         self.col.insert_one(iconEntry)
 
-    def deleteStoredIconsDb(self):
+    def deleteStoredconsDb(self):
         self.col.delete_many({})
 
     def deleteIconDb(self, iconName):
@@ -60,6 +60,13 @@ class IconManager:
     def storeIconsDb(self):
         for iconName, icon in self.icons.items():
             self.storeIconDb(icon)
+
+    def updateIconsDb(self):
+        for iconName, icon in self.icons.items():
+            if self.col.find_one({"_id": iconName}):
+                self.updateIcon(icon)
+            else:
+                self.storeIconDb(icon)
 
     def retrieveIcons(self):
         filename_path = Path(self.filename)

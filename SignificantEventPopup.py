@@ -2,11 +2,13 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
 
 class SignificantEventPopup(QWidget):
-    def __init__(self, vector, significantEvent, trigger):
+    def __init__(self, vector, significantEvent, trigger, isLead, logEntryManager):
         super(SignificantEventPopup, self).__init__()
         self.vector = vector
         self.significantEvent = significantEvent
         self.trigger = trigger
+        self.isLead = isLead
+        self.logEntryManager = logEntryManager
         self.trigger.connectVectorTableTrigger()
         layout = QVBoxLayout()
         self.eventNameLabel = QLabel()
@@ -63,6 +65,8 @@ class SignificantEventPopup(QWidget):
         logEntry = self.significantEvent.logEntry
         vectorIndex = logEntry.associatedVectors.index(self.vector.vectorName)
         del logEntry.associatedVectors[vectorIndex]
+        if self.isLead:
+            self.logEntryManager.handleEventDeletedDb(logEntry)
         self.trigger.emitVectorTableTrigger()
         self.close()
 

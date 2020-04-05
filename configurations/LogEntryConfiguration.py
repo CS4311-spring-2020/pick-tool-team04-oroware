@@ -100,8 +100,10 @@ class LogEntryConfiguration(QWidget):
         self.searchButton.setFont(QtGui.QFont('SansSerif', 7))
 
     def searchTableDoubleClicked(self):
-        logEntryId = self.searchLogsTableWidget.verticalHeaderItem(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row()).text()
-        logEntry = self.clientHandler.logEntryManager.logEntries[int(logEntryId)]
+        logEntryLineNumber = self.searchLogsTableWidget.verticalHeaderItem(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row()).text()
+        logEntryArtifact = self.searchLogsTableWidget.item(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Artifact")).text()
+        logEntryId = logEntryArtifact + "_" + logEntryLineNumber
+        logEntry = self.clientHandler.logEntryManager.logEntries[logEntryId]
         logEntryDescriptionWidget = self.searchLogsTableWidget.item(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Content"))
         logEntryLocationWidget = self.searchLogsTableWidget.item(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Location"))
         associatedVectorsWidget = self.searchLogsTableWidget.cellWidget(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Vectors"))
@@ -139,9 +141,9 @@ class LogEntryConfiguration(QWidget):
             headerItem.setFont(QtGui.QFont('SansSerif', 7))
             self.searchLogsTableWidget.setHorizontalHeaderItem(colNum, headerItem)
         for rowNum in range(totalRows):
-            logEntryIdItem = QtWidgets.QTableWidgetItem(str(logEntries[rowNum].id))
-            logEntryIdItem.setFont(QtGui.QFont('SansSerif', 7))
-            self.searchLogsTableWidget.setVerticalHeaderItem(rowNum, logEntryIdItem)
+            logEntryLineNumberItem = QtWidgets.QTableWidgetItem(str(logEntries[rowNum].lineNumber))
+            logEntryLineNumberItem.setFont(QtGui.QFont('SansSerif', 7))
+            self.searchLogsTableWidget.setVerticalHeaderItem(rowNum, logEntryLineNumberItem)
             self.searchLogsTableWidget.setRowHeight(rowNum, 50)
             logEntryDescriptionItem = QtWidgets.QTableWidgetItem(logEntries[rowNum].description)
             logEntryDescriptionItem.setFont(QtGui.QFont('SansSerif', 7))

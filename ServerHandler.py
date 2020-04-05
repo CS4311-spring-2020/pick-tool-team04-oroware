@@ -1,10 +1,5 @@
 import struct
 
-from EventConfig import EventConfig
-from IconManager import IconManager
-from LogEntry import LogEntry
-from LogEntryManager import LogEntryManager
-from Vector import Vector
 from VectorManager import VectorManager
 import socket
 import threading
@@ -30,15 +25,8 @@ class ServerHandler():
         self.host = '127.0.0.1'
         self.port = 65433
         self.leadAddress = None
-        self.logEntryManager = LogEntryManager()
-        self.logEntryManager.retrieveLogEntriesDb()
-        self.vectorManager = VectorManager(str(0))
+        self.vectorManager = VectorManager()
         self.vectorManager.retrieveVectors()
-        self.iconManager = IconManager()
-        self.iconManager.retrieveIconsDb()
-        self.eventConfig = EventConfig()
-        self.eventConfig.retrieveEventConfigDb()
-        self.pendingVectors = dict()
         self.pendingVectorFilename = "pendingVectors.pkl"
         self.retrievePendingVectors()
         self.clientsConnected = list()
@@ -95,30 +83,6 @@ class ServerThread(Thread):
         return data
 
     @synchronized_method
-    def handleIconManagerRequest(self):
-        self.sendMsg(pickle.dumps(self.serverHandler.iconManager.icons))
-
-    @synchronized_method
-    def handleIconManagerUpdate(self, icons):
-        for iconName in list(self.serverHandler.iconManager.icons.keys()):
-            if iconName not in icons:
-                icons[iconName] = self.serverHandler.iconManager.icons[iconName]
-        for iconName, icon in icons.items():
-            if iconName not in self.serverHandler.iconManager.icons:
-                self.serverHandler.iconManager.storeIconDb(icon)
-            else:
-                self.serverHandler.iconManager.updateIcon(icon)
-        self.serverHandler.iconManager.icons = icons
-        self.sendMsg(pickle.dumps(self.serverHandler.iconManager.icons))
-
-    @synchronized_method
-    def handleLogEntryUpdate(self, logEntry):
-        if self.serverHandler.logEntryManager.updateLogEntry(logEntry):
-            self.sendMsg(pickle.dumps(logEntry))
-        else:
-            self.sendMsg(pickle.dumps(None))
-
-    @synchronized_method
     def handleSetLead(self, address):
         if self.serverHandler.leadAddress == None:
             self.serverHandler.leadAddress = address
@@ -149,11 +113,6 @@ class ServerThread(Thread):
     def handleUpdateVector(self, vector):
         self.serverHandler.vectorManager.vectors[vector.vectorName] = vector
         self.serverHandler.vectorManager.storeVectors()
-        vectors = list(self.serverHandler.vectorManager.vectors.values())
-        self.serverHandler.logEntryManager.updateLogEntries(vectors)
-
-    # def h
-    #     self.serverHandler.logEntryManager.handleVectorDeleted()
 
     @synchronized_method
     def handlePendingVectors(self):
@@ -167,47 +126,15 @@ class ServerThread(Thread):
             if vector.vectorName in self.serverHandler.vectorManager.vectors:
                 del self.serverHandler.vectorManager.vectors[vector.vectorName]
                 self.serverHandler.vectorManager.storeVectors()
-                self.serverHandler.logEntryManager.handleVectorDeleted(vector)
         else:
             self.serverHandler.vectorManager.vectors[vector.vectorName] = vector
             self.serverHandler.vectorManager.storeVectors()
-            vectors = list(self.serverHandler.vectorManager.vectors.values())
-            self.serverHandler.logEntryManager.updateLogEntries(vectors)
 
     @synchronized_method
     def handleRejectVector(self, vectorKey):
         self.serverHandler.storePendingVectors()
         del self.serverHandler.pendingVectors[vectorKey]
-
-    @synchronized_method
-    def handleSendLogEntries(self, logEntries):
-        for logEntry in logEntries:
-            self.serverHandler.logEntryManager.addLogEntry(logEntry)
-
-    @synchronized_method
-    def handleSearchLogs(self, commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch):
-        logEntries = self.serverHandler.logEntryManager.searchLogEntries(commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch)
-        self.sendMsg(pickle.dumps(logEntries))
-
-    @synchronized_method
-    def handleRequestEventConfig(self):
-        eventName = self.serverHandler.eventConfig.eventName
-        eventDescription = self.serverHandler.eventConfig.eventDescription
-        eventStartTime = self.serverHandler.eventConfig.eventStartTime
-        eventEndTime = self.serverHandler.eventConfig.eventEndTime
-        self.sendMsg(pickle.dumps([eventName, eventDescription, eventStartTime, eventEndTime]))
-
-    @synchronized_method
-    def handleUpdateEventConfig(self, configFields):
-        self.serverHandler.eventConfig.eventName = configFields[0]
-        self.serverHandler.eventConfig.eventDescription = configFields[1]
-        self.serverHandler.eventConfig.eventStartTime = configFields[2]
-        self.serverHandler.eventConfig.eventEndTime = configFields[3]
-        self.serverHandler.eventConfig.storeEventConfigDb()
-
-    @synchronized_method
-    def handleDeleteIcon(self, iconName):
-        self.serverHandler.iconManager.deleteIcon(iconName)
+        self.serverHandler.storePendingVectors()
 
     def run(self):
         msg = pickle.dumps({"Server Information" : {"Lead Address" : self.serverHandler.leadAddress}})
@@ -216,18 +143,10 @@ class ServerThread(Thread):
             msg = pickle.loads(self.recvMsg())
             print(msg)
             request = list(msg.keys())[0]
-            if request == "Icon Manager Request":
-                self.handleIconManagerRequest()
-            elif request == "Icon Manager Update":
-                self.handleIconManagerUpdate(list(msg.values())[0])
-            elif request == "Log Entry Update":
-                self.handleLogEntryUpdate(list(msg.values())[0])
-            elif request == "Set Lead":
+            if request == "Set Lead":
                 self.handleSetLead(list(msg.values())[0])
             elif request == "Release Lead":
                 self.handleReleaseLead(list(msg.values())[0])
-            elif request == "Delete Icon":
-                self.handleDeleteIcon(list(msg.values())[0])
             elif request == "Push Vectors":
                 self.handlePushedVectors(list(msg.values())[0])
             elif request == "Get Pending Vectors":
@@ -241,25 +160,6 @@ class ServerThread(Thread):
                 self.handlePullVectors()
             elif request == "Update Vector":
                 self.handleUpdateVector(list(msg.values())[0])
-            elif request == "Send Log Entries":
-                self.handleSendLogEntries(list(msg.values())[0])
-            elif request == "Search Logs":
-                searchCriteria = list(msg.values())[0]
-                commandSearch = searchCriteria[0]
-                creatorBlueTeam = searchCriteria[1]
-                creatorWhiteTeam = searchCriteria[2]
-                creatorRedTeam = searchCriteria[3]
-                eventTypeBlueTeam = searchCriteria[4]
-                eventTypeWhiteTeam = searchCriteria[5]
-                eventTypeRedTeam = searchCriteria[6]
-                startTime = searchCriteria[7]
-                endTime = searchCriteria[8]
-                locationSearch = searchCriteria[9]
-                self.handleSearchLogs(commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch)
-            elif request == "Request event config":
-                self.handleRequestEventConfig()
-            elif request == "Update event config":
-                self.handleUpdateEventConfig(list(msg.values())[0])
 
 if __name__ == "__main__":
     serverHandler = ServerHandler()

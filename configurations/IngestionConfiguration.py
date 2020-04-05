@@ -107,7 +107,7 @@ class IngestionConfiguration(QWidget):
         self.fileDialog = QFileDialog()
         self.clientHandler.logFileManager.rootPath = self.fileDialog.getExistingDirectory()
         self.rootPathField.setText(self.clientHandler.logFileManager.rootPath)
-        self.clientHandler.logFileManager.storeLogFiles()
+        self.clientHandler.logFileManager.storeRootPath()
         self.initializeText()
 
     def ingestLogsClicked(self):

@@ -88,6 +88,8 @@ class LogFile:
                 logEntry.creator = self.creator
                 logEntry.eventType = self.eventType
                 logEntry.artifact = self.filename
+                logEntry.lineNumber = lineNumber
+                logEntry.id = logEntry.artifact + "_" + str(logEntry.lineNumber)
                 logEntries.append(logEntry)
                 lineNumber += 1
             self.ingested = True

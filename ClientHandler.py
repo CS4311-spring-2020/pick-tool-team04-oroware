@@ -29,9 +29,11 @@ def synchronized_method(method):
 class ClientHandler():
     def __init__(self):
         self.logEntryManager = LogEntryManager()
-        self.vectorManager = VectorManager(str(hex(uuid.getnode())))
+        self.vectorManager = VectorManager()
+        self.vectorManager.retrieveVectors()
         self.iconManager = IconManager()
         self.logFileManager = LogFileManager()
+        self.logFileManager.retrieveRootPath()
         self.logFileManager.retrieveLogFilesDb()
         self.eventConfig = EventConfig()
         self.isLead = False
@@ -52,62 +54,47 @@ class ClientHandler():
 
     @synchronized_method
     def requestIcons(self):
-        self.sendMsg(pickle.dumps({"Icon Manager Request": None}))
-        self.iconManager.icons = pickle.loads(self.recvMsg())
+        self.iconManager.retrieveIconsDb()
 
     @synchronized_method
     def requestEventConfig(self):
-        self.sendMsg(pickle.dumps({"Request event config": None}))
-        configFields = pickle.loads(self.recvMsg())
-        self.eventConfig.eventName = configFields[0]
-        self.eventConfig.eventDescription = configFields[1]
-        self.eventConfig.eventStartTime = configFields[2]
-        self.eventConfig.eventEndTime = configFields[3]
+        self.eventConfig.retrieveEventConfigDb()
 
     @synchronized_method
     def updateEventConfig(self):
-        eventName = self.eventConfig.eventName
-        eventDescription = self.eventConfig.eventDescription
-        eventStartTime = self.eventConfig.eventStartTime
-        eventEndTime = self.eventConfig.eventEndTime
-        self.sendMsg(pickle.dumps({"Update event config": [eventName, eventDescription, eventStartTime, eventEndTime]}))
+        self.eventConfig.storeEventConfigDb()
 
     @synchronized_method
     def updateIcons(self):
-        self.sendMsg(pickle.dumps({"Icon Manager Update": self.iconManager.icons}))
-        self.iconManager.icons = pickle.loads(self.recvMsg())
+        self.iconManager.updateIconsDb()
 
     @synchronized_method
     def deleteIcon(self, iconName):
-        self.sendMsg(pickle.dumps({"Delete Icon": iconName}))
+        self.iconManager.deleteIconDb(iconName)
 
     @synchronized_method
     def editLogEntry(self, logEntry):
-        self.sendMsg(pickle.dumps({"Log Entry Update": logEntry}))
-        logEntry = pickle.loads(self.recvMsg())
-        if logEntry != None:
-            self.logEntryManager.updateLogEntry(logEntry)
+        self.logEntryManager.updateLogEntryDb(logEntry)
 
     @synchronized_method
     def setLead(self):
         self.sendMsg(pickle.dumps({"Set Lead": self.address}))
         self.vectorManager.deleteStoredVectors()
-        self.iconManager.deleteStoredIcons()
         self.deletePulledVectors()
         self.deletePushedVectors()
         address = pickle.loads(self.recvMsg())
         if self.address == address:
-            self.pullVectorDb()
+            self.pullVector()
             self.isLead = True
             self.hasLead = True
 
     @synchronized_method
-    def pushVectorDb(self, vectorManager):
+    def pushVector(self, vectorManager):
         pushedVectors = list(vectorManager.vectors.values())
         self.sendMsg(pickle.dumps({"Push Vectors" : pushedVectors}))
 
     @synchronized_method
-    def pullVectorDb(self):
+    def pullVector(self):
         self.sendMsg(pickle.dumps({"Pull Vectors": None}))
         newVectors = pickle.loads(self.recvMsg()).vectors
         for vector in list(self.vectorManager.vectors.values()):
@@ -124,25 +111,41 @@ class ClientHandler():
             if vector.vectorName in self.vectorManager.vectors:
                 del self.vectorManager.vectors[vector.vectorName]
                 self.logEntryManager.handleVectorDeleted(vector)
+                self.logEntryManager.handleVectorDeletedDb(vector)
         else:
+            self.handleDeletedEvents(vector)
             self.vectorManager.vectors[vector.vectorName] = vector
             vectors = list(self.vectorManager.vectors.values())
             self.logEntryManager.updateLogEntries(vectors)
+            self.logEntryManager.updateLogEntriesDb(vectors)
         self.sendMsg(pickle.dumps({"Approve Vector" : [vectorKey, vector]}))
         return self.getPendingVectors()
 
     @synchronized_method
+    def handleDeletedEvents(self, vector):
+        originalVector = self.vectorManager.vectors[vector.vectorName]
+        updatedLogEntries = set()
+        for significantEventId, significantEvent in vector.significantEvents.items():
+            updatedLogEntries.add(significantEvent.logEntry.id)
+        for significantEventId, significantEvent in originalVector.significantEvents.items():
+            if significantEvent.logEntry.id not in updatedLogEntries:
+                self.logEntryManager.handleEventDeletedDb(significantEvent.logEntry)
+
+    @synchronized_method
     def updateVector(self, vector):
+        self.logEntryManager.updateLogEntries([vector])
+        self.logEntryManager.updateLogEntriesDb([vector])
         self.sendMsg(pickle.dumps({"Update Vector": vector}))
 
     @synchronized_method
     def sendLogEntries(self, logEntries):
-        self.sendMsg(pickle.dumps({"Send Log Entries" : logEntries}))
+        for logEntry in logEntries:
+            self.logEntryManager.storeLogEntryDb(logEntry)
 
     @synchronized_method
     def searchLogEntries(self, commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch):
-        self.sendMsg(pickle.dumps({"Search Logs" : [commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch]}))
-        validLogEntries = pickle.loads(self.recvMsg())
+        self.logEntryManager.retrieveLogEntriesDb()
+        validLogEntries = self.logEntryManager.searchLogEntries(commandSearch, creatorBlueTeam, creatorWhiteTeam, creatorRedTeam, eventTypeBlueTeam, eventTypeWhiteTeam, eventTypeRedTeam, startTime, endTime, locationSearch)
         self.logEntryManager.logEntries.clear()
         self.logEntryManager.logEntriesInTable = validLogEntries
         for logEntry in validLogEntries:
