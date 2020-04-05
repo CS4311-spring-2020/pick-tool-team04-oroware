@@ -14,10 +14,10 @@ class VectorDbConfiguration(QWidget):
         self.colsPullTable = ["Vector Name", "Vector Description", "Vector Graph"]
         self.colsPushTable = ["Vector Name", "Vector Description", "Change Summary", "Vector Graph"]
         self.colsApproveTable = ["Source IP", "Request Timestamp", "Vector Name", "Vector Description", "Graph", "Approve"]
-        self.pushedVectorManager = VectorManager(str(0))
+        self.pushedVectorManager = VectorManager()
         self.pushedVectorManager.filename = "pushedVectors.pkl"
         self.pushedVectorManager.retrieveVectors()
-        self.pulledVectorManager = VectorManager(str(0))
+        self.pulledVectorManager = VectorManager()
         self.pulledVectorManager.filename = "pulledVectors.pkl"
         self.pulledVectorManager.retrieveVectors()
         self.pendingVectors = dict()
@@ -67,7 +67,7 @@ class VectorDbConfiguration(QWidget):
         self.initializeConfiguration()
 
     def handlePull(self):
-        self.clientHandler.pullVectorDb()
+        self.clientHandler.pullVector()
         self.triggerHelper.connectVectorConfigurationTableTrigger()
         self.triggerHelper.emitVectorConfigurationTableTrigger()
         self.pulledVectorManager = deepcopy(self.clientHandler.vectorManager)
@@ -78,7 +78,7 @@ class VectorDbConfiguration(QWidget):
     def handlePush(self):
         self.pushedVectorManager = deepcopy(self.clientHandler.vectorManager)
         self.determineVectorsToPush()
-        self.clientHandler.pushVectorDb(self.pushedVectorManager)
+        self.clientHandler.pushVector(self.pushedVectorManager)
         self.pushedVectorManager.filename = "pushedVectors.pkl"
         self.pushedVectorManager.storeVectors()
         self.updatePushTable(self.pushedVectorManager)

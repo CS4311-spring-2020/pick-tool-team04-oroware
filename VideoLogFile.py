@@ -70,6 +70,7 @@ class VideoLogFile(LogFile):
             if secondHalf[0] == "0":
                 secondHalf = secondHalf[1:]
             date = firstHalf + secondHalf
+            lineNumber = 0
             for line in self.lines:
                 logEntry = LogEntry()
                 logEntry.date = date
@@ -77,6 +78,9 @@ class VideoLogFile(LogFile):
                 logEntry.creator = self.creator
                 logEntry.eventType = self.eventType
                 logEntry.artifact = self.filename
+                logEntry.lineNumber = lineNumber
+                logEntry.id = logEntry.artifact + "_" + str(logEntry.lineNumber)
+                lineNumber += 1
                 logEntries.append(logEntry)
             self.ingested = True
             return logEntries

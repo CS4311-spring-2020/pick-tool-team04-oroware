@@ -11,5 +11,6 @@ class LogEntry:
         self.location = ""
         self.eventType = ""
         self.id = ""
+        self.lineNumber = ""
         self.rowIndexInTable = -1
         self.associatedVectors = list()
