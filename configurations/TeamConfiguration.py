@@ -23,12 +23,19 @@ class TeamConfiguration(QWidget):
             self.leadCheckBox.setCheckState(QtCore.Qt.Checked)
         self.leadCheckBox.clicked.connect(self.setLead)
         self.teamConfigurationLayout.addWidget(self.leadCheckBox)
+        self.connectionLabel = QtWidgets.QLabel(self.teamConfiguration)
+        self.teamConfigurationLayout.addWidget(self.connectionLabel)
+        self.leadStatusLabel = QtWidgets.QLabel(self.teamConfiguration)
+        self.teamConfigurationLayout.addWidget(self.leadStatusLabel)
         self.leadLabel = QtWidgets.QLabel(self.teamConfiguration)
         self.teamConfigurationLayout.addWidget(self.leadLabel)
         self.leadTextEdit = QtWidgets.QTextEdit(self.teamConfiguration)
         self.leadTextEdit.setMaximumHeight(30)
+        if self.clientHandler.serverIp != None:
+            self.leadTextEdit.setText(self.clientHandler.serverIp)
         self.teamConfigurationLayout.addWidget(self.leadTextEdit)
         self.connectButton = QtWidgets.QPushButton(self.teamConfiguration)
+        self.connectButton.clicked.connect(self.connectToServer)
         self.teamConfigurationLayout.addWidget(self.connectButton)
         self.teamConfigurationTabLayout.addWidget(self.teamConfiguration)
 
@@ -67,6 +74,14 @@ class TeamConfiguration(QWidget):
         self.eventConfigurationLayout.addWidget(self.saveEventButton)
         self.intializeText()
 
+    def connectToServer(self):
+        ipAddress = self.leadTextEdit.toPlainText()
+        self.clientHandler.serverIp = ipAddress
+        if self.clientHandler.connectToServer():
+            self.connectionLabel.setText("Connection Status: Connected to Server" if self.clientHandler.isConnected else "Connection Status: Not Connected to Server ")
+            self.leadStatusLabel.setText("Lead Status: Lead Exists" if self.clientHandler.hasLead else "Lead Status: No Lead Exists")
+            self.clientHandler.storeServerIp()
+
     def handleSaveEvent(self):
         eventConfig = self.clientHandler.eventConfig
         if (datetime.strptime(self.endEventConfigurationDateEdit.text(), "%m/%d/%Y %I:%M %p") <= datetime.strptime(self.startEventConfigurationDateEdit.text(), "%m/%d/%Y %I:%M %p")):
@@ -85,14 +100,17 @@ class TeamConfiguration(QWidget):
         self.clientHandler.updateEventConfig()
 
     def setLead(self):
-        if self.clientHandler.hasLead:
-            if self.clientHandler.isLead:
-                self.leadCheckBox.setCheckState(QtCore.Qt.Unchecked)
-                self.clientHandler.releaseLead()
+        if self.clientHandler.isConnected:
+            if self.clientHandler.hasLead:
+                if self.clientHandler.isLead:
+                    self.leadCheckBox.setCheckState(QtCore.Qt.Unchecked)
+                    self.clientHandler.releaseLead()
+                else:
+                    self.leadCheckBox.setCheckState(QtCore.Qt.Unchecked)
             else:
-                self.leadCheckBox.setCheckState(QtCore.Qt.Unchecked)
+                self.clientHandler.setLead()
         else:
-            self.clientHandler.setLead()
+            print("Not connected to server.")
 
     def intializeText(self):
         self.eventNameLabel.setText("Event name: ")
@@ -117,6 +135,10 @@ class TeamConfiguration(QWidget):
         self.saveEventButton.setFont(QtGui.QFont('SansSerif', 7))
         self.eventDescriptionLabel.setText("Event description: ")
         self.eventDescriptionLabel.setFont(QtGui.QFont('SansSerif', 7))
+        self.connectionLabel.setText("Connection Status: Connected to Server" if self.clientHandler.isConnected else "Connection Status: Not Connected to Server ")
+        self.connectionLabel.setFont(QtGui.QFont('SansSerif', 7))
+        self.leadStatusLabel.setText("Lead Status: Lead Exists" if self.clientHandler.hasLead else "Lead Status: No Lead Exists")
+        self.leadStatusLabel.setFont(QtGui.QFont('SansSerif', 7))
         eventConfig = self.clientHandler.eventConfig
         if eventConfig.eventEndTime != None:
             self.endEventConfigurationDateEdit.setDateTime(QDateTime.fromString(eventConfig.eventEndTime, "M/d/yyyy h:mm A"))

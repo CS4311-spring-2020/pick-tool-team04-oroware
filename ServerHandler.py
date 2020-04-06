@@ -27,6 +27,7 @@ class ServerHandler():
         self.leadAddress = None
         self.vectorManager = VectorManager()
         self.vectorManager.retrieveVectors()
+        self.pendingVectors = dict()
         self.pendingVectorFilename = "pendingVectors.pkl"
         self.retrievePendingVectors()
         self.clientsConnected = list()

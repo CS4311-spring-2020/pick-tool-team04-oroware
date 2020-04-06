@@ -16,6 +16,9 @@ class LogFileManager:
         self.files = dict()
         self.filename = "logfiles.pkl"
         self.rootPathFilename = "rootPath.pkl"
+        self.ingested = False
+        self.ingestedFilename = "ingested.pkl"
+        self.retrieveIngested()
         self.splunkInterface = SplunkInterface()
         self.rootPath = None
         self.client = pymongo.MongoClient('mongodb://localhost:27017/')
@@ -85,6 +88,16 @@ class LogFileManager:
         if filename_path.exists():
             with open(self.rootPathFilename, 'rb') as pkl_file:
                 self.rootPath = pickle.load(pkl_file)
+
+    def storeIngested(self):
+        with open(self.ingestedFilename, 'wb') as pkl_file:
+            pickle.dump(self.ingested, pkl_file)
+
+    def retrieveIngested(self):
+        filename_path = Path(self.ingestedFilename)
+        if filename_path.exists():
+            with open(self.ingestedFilename, 'rb') as pkl_file:
+                self.ingested = pickle.load(pkl_file)
 
     def retrieveLogFiles(self):
         filename_path = Path(self.filename)
