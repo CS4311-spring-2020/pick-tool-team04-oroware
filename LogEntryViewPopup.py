@@ -20,7 +20,7 @@ class LogEntryViewPopup(QWidget):
         self.layout.addWidget(self.locationLabel)
         self.typeLabel = QLabel()
         self.typeLabel.setFont(QtGui.QFont('SansSerif', 7))
-        self.typeLabel.setText("Event: " + self.logEntry.eventType)
+        self.typeLabel.setText("Event Type: " + self.logEntry.eventType)
         self.layout.addWidget(self.typeLabel)
         self.dateLabel = QLabel()
         self.dateLabel.setFont(QtGui.QFont('SansSerif', 7))

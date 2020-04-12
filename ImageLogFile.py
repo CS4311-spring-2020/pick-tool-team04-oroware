@@ -15,9 +15,10 @@ class ImageLogFile(LogFile):
 
     def __init__(self):
         super(ImageLogFile, self).__init__()
+        self.cmd = "libraries/tesseract.exe"
 
     def readLogFile(self):
-        pytesseract.pytesseract.tesseract_cmd = "libraries/tesseract.exe"
+        pytesseract.pytesseract.tesseract_cmd = self.cmd
         self.lines = list()
         self.lines.append(pytesseract.image_to_string(Image.open(self.filename)))
 

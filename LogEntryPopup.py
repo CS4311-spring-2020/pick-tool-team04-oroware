@@ -2,11 +2,12 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import *
 
 class LogEntryPopup(QWidget):
-    def __init__(self, logEntry, logEntryDescriptionWidget, logEntryLocationWidget, associatedVectorsWidget, clientHandler):
+    def __init__(self, logEntry, logEntryDescriptionWidget, logEntryLocationWidget, logEntryEventWidget, associatedVectorsWidget, clientHandler):
         super(LogEntryPopup, self).__init__()
         self.clientHandler = clientHandler
         self.logEntryDescriptionWidget = logEntryDescriptionWidget
         self.logEntryLocationWidget = logEntryLocationWidget
+        self.logEntryEventWidget = logEntryEventWidget
         self.associatedVectorsWidget = associatedVectorsWidget
         self.logEntry = logEntry
         self.layout = QVBoxLayout()
@@ -31,9 +32,21 @@ class LogEntryPopup(QWidget):
         self.creatorLabel.setText("Creator: " + self.logEntry.creator)
         self.layout.addWidget(self.creatorLabel)
         self.typeLabel = QLabel()
-        self.typeLabel.setFont(QtGui.QFont('SansSerif', 7))
-        self.typeLabel.setText("Event: " + self.logEntry.eventType)
+        self.typeLabel.setText("Event Type: ")
         self.layout.addWidget(self.typeLabel)
+        self.typeCombobox = QComboBox()
+        self.typeCombobox.addItem(self.logEntry.eventType)
+        self.typeCombobox.addItem("White Team")
+        self.typeCombobox.addItem("Blue Team")
+        self.typeCombobox.addItem("Red Team")
+        if "White Team" == self.logEntry.eventType:
+            self.typeCombobox.removeItem(1)
+        if "Blue Team" == self.logEntry.eventType:
+            self.typeCombobox.removeItem(2)
+        if "Red Team" == self.logEntry.eventType:
+            self.typeCombobox.removeItem(3)
+        self.typeCombobox.setFont(QtGui.QFont('SansSerif', 7))
+        self.layout.addWidget(self.typeCombobox)
         self.dateLabel = QLabel()
         self.dateLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.dateLabel.setText("Timestamp: " + self.logEntry.date)
@@ -66,8 +79,10 @@ class LogEntryPopup(QWidget):
     def onSaveClick(self):
         self.logEntryDescriptionWidget.setText(self.logEntryDescriptionTextEdit.toPlainText())
         self.logEntryLocationWidget.setText(self.locationTextEdit.toPlainText())
+        self.logEntryEventWidget.setText(self.typeCombobox.currentText())
         self.logEntry.description = self.logEntryDescriptionTextEdit.toPlainText()
         self.logEntry.location = self.locationTextEdit.toPlainText()
+        self.logEntry.eventType = self.typeCombobox.currentText()
         self.clientHandler.editLogEntry(self.logEntry)
         newVectors = list()
         for i in range(self.associationComboBox.count()):
