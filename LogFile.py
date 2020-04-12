@@ -12,7 +12,7 @@ class LogFile:
         self.filename = None
         self.source = None
         self.cleansed = False
-        self.validated = None
+        self.validated = False
         self.ingested = False
         self.acknowledged = False # optional, according to SRS
         self.invalidLineNumber = None

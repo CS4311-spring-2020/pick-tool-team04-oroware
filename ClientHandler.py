@@ -38,19 +38,47 @@ class ClientHandler():
         self.eventConfig = EventConfig()
         self.isLead = False
         self.hasLead = False
-        self.serverIp = '127.0.0.1'
+        self.serverIp = None
         self.serverPort = 65433
+        self.isConnected = False
+        self.retrieveServerIp()
         self.address = hex(uuid.getnode())
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.serverIp, self.serverPort))
-        serverInformation = self.recvMsg()
-        serverInformation = pickle.loads(serverInformation)
-        serverInformation = list(serverInformation.values())[0]
-        self.hasLead = serverInformation["Lead Address"] != None
-        if self.hasLead:
-            if serverInformation["Lead Address"] == self.address:
-                self.isLead = True
+        self.socket = None
+        self.connectToServer()
         self.requestEventConfig()
+
+    @synchronized_method
+    def connectToServer(self):
+        if self.serverIp != None:
+            try:
+                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.socket.connect((self.serverIp, self.serverPort))
+                serverInformation = self.recvMsg()
+                serverInformation = pickle.loads(serverInformation)
+                serverInformation = list(serverInformation.values())[0]
+                self.hasLead = serverInformation["Lead Address"] != None
+                if self.hasLead:
+                    if serverInformation["Lead Address"] == self.address:
+                        self.isLead = True
+                self.isConnected = True
+                return True
+            except:
+                print("Unable to connect to server. Check to make sure server is running and server IP address.")
+                return False
+        else:
+            return False
+
+    @synchronized_method
+    def storeServerIp(self):
+        with open("serverIp.pkl", 'wb') as pkl_file:
+            pickle.dump(self.serverIp, pkl_file)
+
+    @synchronized_method
+    def retrieveServerIp(self):
+        filename_path = Path("serverIp.pkl")
+        if filename_path.exists():
+            with open("serverIp.pkl", 'rb') as pkl_file:
+                self.serverIp = pickle.load(pkl_file)
 
     @synchronized_method
     def requestIcons(self):

@@ -22,6 +22,9 @@ class PDFLogFile(LogFile):
             pageObj = pdfReader.getPage(pageNumber)
             line = line + pageObj.extractText()
 
+        line = line.replace("\n", "")
+        line = line.strip()
+
         pdfFileObj.close()
         self.lines = list()
         self.lines.append(line)

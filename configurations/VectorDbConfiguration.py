@@ -63,25 +63,34 @@ class VectorDbConfiguration(QWidget):
 
     def onTabChange(self):
         if self.clientHandler.isLead:
-            self.pendingVectors = self.clientHandler.getPendingVectors()
+            if self.clientHandler.isConnected:
+                self.pendingVectors = self.clientHandler.getPendingVectors()
+            else:
+                print("Could not collect pending vectors. Not connected to server.")
         self.initializeConfiguration()
 
     def handlePull(self):
-        self.clientHandler.pullVector()
-        self.triggerHelper.connectVectorConfigurationTableTrigger()
-        self.triggerHelper.emitVectorConfigurationTableTrigger()
-        self.pulledVectorManager = deepcopy(self.clientHandler.vectorManager)
-        self.pulledVectorManager.filename = "pulledVectors.pkl"
-        self.pulledVectorManager.storeVectors()
-        self.updatePullTable(self.pulledVectorManager)
+        if self.clientHandler.isConnected:
+            self.clientHandler.pullVector()
+            self.triggerHelper.connectVectorConfigurationTableTrigger()
+            self.triggerHelper.emitVectorConfigurationTableTrigger()
+            self.pulledVectorManager = deepcopy(self.clientHandler.vectorManager)
+            self.pulledVectorManager.filename = "pulledVectors.pkl"
+            self.pulledVectorManager.storeVectors()
+            self.updatePullTable(self.pulledVectorManager)
+        else:
+            print("Not connected to server.")
 
     def handlePush(self):
-        self.pushedVectorManager = deepcopy(self.clientHandler.vectorManager)
-        self.determineVectorsToPush()
-        self.clientHandler.pushVector(self.pushedVectorManager)
-        self.pushedVectorManager.filename = "pushedVectors.pkl"
-        self.pushedVectorManager.storeVectors()
-        self.updatePushTable(self.pushedVectorManager)
+        if self.clientHandler.isConnected:
+            self.pushedVectorManager = deepcopy(self.clientHandler.vectorManager)
+            self.determineVectorsToPush()
+            self.clientHandler.pushVector(self.pushedVectorManager)
+            self.pushedVectorManager.filename = "pushedVectors.pkl"
+            self.pushedVectorManager.storeVectors()
+            self.updatePushTable(self.pushedVectorManager)
+        else:
+            print("Not connected to server.")
 
     def determineVectorsToPush(self):
         pushedVectors = list(self.pushedVectorManager.vectors.values())
@@ -222,7 +231,10 @@ class ApproveVectorButton(QtWidgets.QPushButton):
         self.clicked.connect(self.handleClick)
 
     def handleClick(self):
-        self.updateApproveTable(self.clientHandler.approveVector(self.vectorKey, self.vector))
+        if self.clientHandler.isConnected:
+            self.updateApproveTable(self.clientHandler.approveVector(self.vectorKey, self.vector))
+        else:
+            print("Not connected to server.")
 
 class RejectVectorButton(QtWidgets.QPushButton):
     def __init__(self, updateApproveTable, clientHandler, vectorKey, vector):
@@ -234,7 +246,10 @@ class RejectVectorButton(QtWidgets.QPushButton):
         self.clicked.connect(self.handleClick)
 
     def handleClick(self):
-        self.updateApproveTable(self.clientHandler.rejectVector(self.vectorKey, self.vector))
+        if self.clientHandler.isConnected:
+            self.updateApproveTable(self.clientHandler.rejectVector(self.vectorKey, self.vector))
+        else:
+            print("Not connected to server.")
 
 class ViewGraphButton(QtWidgets.QPushButton):
     def __init__(self, vector):

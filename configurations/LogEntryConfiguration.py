@@ -106,8 +106,9 @@ class LogEntryConfiguration(QWidget):
         logEntry = self.clientHandler.logEntryManager.logEntries[logEntryId]
         logEntryDescriptionWidget = self.searchLogsTableWidget.item(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Content"))
         logEntryLocationWidget = self.searchLogsTableWidget.item(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Location"))
+        logEntryEventWidget = self.searchLogsTableWidget.item(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Event Type"))
         associatedVectorsWidget = self.searchLogsTableWidget.cellWidget(self.searchLogsTableWidget.selectionModel().selectedIndexes()[0].row(), self.colsSearchLogsTable.index("Vectors"))
-        self.editPopup = LogEntryPopup(logEntry, logEntryDescriptionWidget, logEntryLocationWidget, associatedVectorsWidget, self.clientHandler)
+        self.editPopup = LogEntryPopup(logEntry, logEntryDescriptionWidget, logEntryLocationWidget, logEntryEventWidget, associatedVectorsWidget, self.clientHandler)
         self.editPopup.setGeometry(100, 200, 200, 200)
         self.editPopup.show()
 

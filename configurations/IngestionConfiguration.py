@@ -112,7 +112,12 @@ class IngestionConfiguration(QWidget):
 
     def ingestLogsClicked(self):
         if self.clientHandler.logFileManager.rootPath != None:
-            self.ingestLogs(self.clientHandler.logFileManager.rootPath)
+            if not self.clientHandler.logFileManager.ingested:
+                self.ingestLogs(self.clientHandler.logFileManager.rootPath)
+                self.clientHandler.logFileManager.ingested = True
+                self.clientHandler.logFileManager.storeIngested()
+            else:
+                print("Ingestion process has already been initiated once.")
         else:
             print("No root path selected.")
             return
