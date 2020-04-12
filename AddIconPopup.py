@@ -43,9 +43,9 @@ class AddIconPopup(QWidget):
             print("No source icon file provided.")
             return
         if self.clientHandler.iconManager.addIcon(icon):
-            self.clientHandler.updateIcons()
             self.updateIconConfigurationTable()
             self.close()
         else:
+            self.updateIconConfigurationTable()
             print("Choose different icon name.")
             return

@@ -12,14 +12,17 @@ from VideoLogFile import VideoLogFile
 
 
 class LogFileManager:
-    def __init__(self):
+    def __init__(self, splunkInterface = None):
         self.files = dict()
         self.filename = "logfiles.pkl"
         self.rootPathFilename = "rootPath.pkl"
         self.ingested = False
         self.ingestedFilename = "ingested.pkl"
         self.retrieveIngested()
-        self.splunkInterface = SplunkInterface()
+        if splunkInterface is None:
+            self.splunkInterface = SplunkInterface()
+        else:
+            self.splunkInterface = splunkInterface
         self.rootPath = None
         self.client = pymongo.MongoClient('mongodb://localhost:27017/')
         self.db = self.client["database"]
@@ -29,6 +32,7 @@ class LogFileManager:
         if logFile.filename in self.files:
             return False
         self.files[logFile.filename] = logFile
+        self.storeLogFileDb(logFile)
         return True
 
     def createLogFile(self, filename, creator, eventType):
@@ -43,7 +47,15 @@ class LogFileManager:
         elif ".tiff" in filename or ".PNG" in filename or ".JPG" in filename:
             logFile = ImageLogFile()
         else:
-            logFile = LogFile(self.splunkInterface)
+            try:
+                logFile = LogFile(self.splunkInterface)
+                logFile.filename = filename
+                if logFile.isIngestable():
+                    pass
+            except Exception as e:
+                logFile = None
+                print("Serendipity")
+                print(e)
         if logFile != None:
             logFile.creator = creator
             logFile.filename = filename

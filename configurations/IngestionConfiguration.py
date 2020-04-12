@@ -139,7 +139,6 @@ class IngestionConfiguration(QWidget):
 
             self.updateLogFileTable()
             self.updateEnfActRepTable()
-            self.clientHandler.logFileManager.storeLogFiles()
 
             self.threadpool = QThreadPool()
             ingestionWorker = IngestionWorker(self.clientHandler)

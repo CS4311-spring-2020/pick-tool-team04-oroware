@@ -39,6 +39,11 @@ class LogFile:
                 file_object.write(self.cleanLine(line))
                 file_object.write("\n")
 
+    def isIngestable(self):
+        self.splunkInterface.ingestLogFiles(self.filename)
+        self.splunkInterface.retrieveLogEntries(self.filename)
+        return True
+
     def readLogFile(self):
         self.cleanFile(self.filename)
         self.splunkInterface.ingestLogFiles(self.filename)

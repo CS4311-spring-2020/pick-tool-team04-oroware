@@ -16,12 +16,15 @@ class IconManager:
         self.db = self.client["database"]
         self.col = self.db["icons"]
 
-    def addIcon(self, icon):
+    def addIcon(self, icon, appInstance=True):
+        self.retrieveIconsDb()
         if icon.name in self.icons:
             return False
         self.icons[icon.name] = icon
-        icon.getPixmapFromSource()
-        icon.getGraphImageFromSource()
+        if appInstance:
+            icon.getPixmapFromSource()
+            icon.getGraphImageFromSource()
+        self.storeIconDb(icon)
         return True
 
     def deleteIcon(self, iconName):
