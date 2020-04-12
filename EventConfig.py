@@ -1,4 +1,5 @@
 import pickle
+from datetime import datetime
 from pathlib import Path
 
 import pymongo
@@ -41,6 +42,16 @@ class EventConfig():
 
     def deleteEventConfig(self):
         self.col.delete_one({})
+
+    def editEventConfig(self, eventName, eventDescription, startTimestamp, endTimestamp):
+        if (datetime.strptime(endTimestamp, "%m/%d/%Y %I:%M %p") <= datetime.strptime(startTimestamp, "%m/%d/%Y %I:%M %p")):
+            return False
+        self.eventName = eventName
+        self.eventDescription = eventDescription
+        self.eventStartTime = startTimestamp
+        self.eventEndTime = endTimestamp
+        self.storeEventConfigDb()
+        return True
 
     def retrieveEventConfig(self):
         filename_path = Path(self.filename)
