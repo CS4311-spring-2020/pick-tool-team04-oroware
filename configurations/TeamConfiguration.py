@@ -111,6 +111,7 @@ class TeamConfiguration(QWidget):
                 self.clientHandler.setLead()
         else:
             print("Not connected to server.")
+        self.intializeText()
 
     def intializeText(self):
         self.eventNameLabel.setText("Event name: ")

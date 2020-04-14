@@ -44,6 +44,8 @@ class VectorConfigurationPopup(QWidget):
         if self.clientHandler.vectorManager.addVector(vector):
             self.triggerHelper.emitVectorConfigurationTableTrigger()
             self.clientHandler.vectorManager.storeVectors()
+            if self.clientHandler.isLead:
+                self.clientHandler.updateVector(vector)
             self.close()
         else:
             print("Vector already exists.")

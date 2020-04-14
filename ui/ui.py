@@ -104,7 +104,7 @@ class Ui_PICK(object):
 
         self.clientHandler = ClientHandler()
         if self.clientHandler.isLead:
-            self.clientHandler.pullVectorDb()
+            self.clientHandler.pullVector()
         else:
             self.clientHandler.vectorManager.retrieveVectors()
 
