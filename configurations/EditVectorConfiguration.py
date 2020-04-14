@@ -315,7 +315,7 @@ class EditVectorConfiguration(QWidget):
         vectorName = self.vectorComboBoxTable.currentText()
         vector = self.clientHandler.vectorManager.vectors[vectorName]
         significantEventToEdit = vector.significantEvents[int(significantEventId)]
-        self.editEventPopup = SignificantEventPopup(vector, significantEventToEdit, self.triggerHelper, self.clientHandler.logEntryManager, self.clientHandler.isLead)
+        self.editEventPopup = SignificantEventPopup(vector, significantEventToEdit, self.triggerHelper, self.clientHandler.isLead, self.clientHandler.logEntryManager)
         self.editEventPopup.setGeometry(100, 200, 200, 200)
         self.editEventPopup.show()
 

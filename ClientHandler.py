@@ -9,6 +9,7 @@ from pathlib import Path
 from EventConfig import EventConfig
 from LogEntryManager import LogEntryManager
 from LogFileManager import LogFileManager
+from SplunkInterface import SplunkInterface
 from VectorManager import VectorManager
 from IconManager import IconManager
 
@@ -29,13 +30,17 @@ def synchronized_method(method):
 class ClientHandler():
     def __init__(self):
         self.logEntryManager = LogEntryManager()
+        # self.logEntryManager.deleteLogEntriesDb()
         self.vectorManager = VectorManager()
         self.vectorManager.retrieveVectors()
         self.iconManager = IconManager()
-        self.logFileManager = LogFileManager()
+        # self.iconManager.deleteStoredconsDb()
+        self.logFileManager = LogFileManager(SplunkInterface())
         self.logFileManager.retrieveRootPath()
+        # self.logFileManager.deleteLogFilesDb()
         self.logFileManager.retrieveLogFilesDb()
         self.eventConfig = EventConfig()
+        # self.eventConfig.deleteEventConfig()
         self.isLead = False
         self.hasLead = False
         self.serverIp = None

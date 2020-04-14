@@ -114,8 +114,6 @@ class IngestionConfiguration(QWidget):
         if self.clientHandler.logFileManager.rootPath != None:
             if not self.clientHandler.logFileManager.ingested:
                 self.ingestLogs(self.clientHandler.logFileManager.rootPath)
-                self.clientHandler.logFileManager.ingested = True
-                self.clientHandler.logFileManager.storeIngested()
             else:
                 print("Ingestion process has already been initiated once.")
         else:
@@ -139,6 +137,8 @@ class IngestionConfiguration(QWidget):
 
             self.updateLogFileTable()
             self.updateEnfActRepTable()
+            self.clientHandler.logFileManager.ingested = True
+            self.clientHandler.logFileManager.storeIngested()
 
             self.threadpool = QThreadPool()
             ingestionWorker = IngestionWorker(self.clientHandler)
