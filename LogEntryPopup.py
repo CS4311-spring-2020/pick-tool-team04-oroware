@@ -33,6 +33,7 @@ class LogEntryPopup(QWidget):
         self.layout.addWidget(self.creatorLabel)
         self.typeLabel = QLabel()
         self.typeLabel.setText("Event Type: ")
+        self.typeLabel.setFont(QtGui.QFont('SansSerif', 7))
         self.layout.addWidget(self.typeLabel)
         self.typeCombobox = QComboBox()
         self.typeCombobox.addItem(self.logEntry.eventType)
