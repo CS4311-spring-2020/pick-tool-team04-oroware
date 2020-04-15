@@ -156,13 +156,14 @@ class ClientHandler():
 
     @synchronized_method
     def handleDeletedEvents(self, vector):
-        originalVector = self.vectorManager.vectors[vector.vectorName]
-        updatedLogEntries = set()
-        for significantEventId, significantEvent in vector.significantEvents.items():
-            updatedLogEntries.add(significantEvent.logEntry.id)
-        for significantEventId, significantEvent in originalVector.significantEvents.items():
-            if significantEvent.logEntry.id not in updatedLogEntries:
-                self.logEntryManager.handleEventDeletedDb(significantEvent.logEntry)
+        if vector.vectorName in list(self.vectorManager.vectors.keys()):
+            originalVector = self.vectorManager.vectors[vector.vectorName]
+            updatedLogEntries = set()
+            for significantEventId, significantEvent in vector.significantEvents.items():
+                updatedLogEntries.add(significantEvent.logEntry.id)
+            for significantEventId, significantEvent in originalVector.significantEvents.items():
+                if significantEvent.logEntry.id not in updatedLogEntries:
+                    self.logEntryManager.handleEventDeletedDb(significantEvent.logEntry)
 
     @synchronized_method
     def updateVector(self, vector):
