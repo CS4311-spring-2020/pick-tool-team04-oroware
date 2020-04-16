@@ -4,6 +4,8 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import QDateTime
 from PyQt5.QtWidgets import QWidget
 
+from ErrorPopup import ErrorPopup
+
 
 class TeamConfiguration(QWidget):
     def __init__(self, clientHandler):
@@ -85,13 +87,19 @@ class TeamConfiguration(QWidget):
     def handleSaveEvent(self):
         eventConfig = self.clientHandler.eventConfig
         if (datetime.strptime(self.endEventConfigurationDateEdit.text(), "%m/%d/%Y %I:%M %p") <= datetime.strptime(self.startEventConfigurationDateEdit.text(), "%m/%d/%Y %I:%M %p")):
-            print("Invalid start or end timestamp.")
+            print("Invalid start or end timestamp.")  # This can be removed now that error popup are implemented
+            self.errorPopup = ErrorPopup("Invalid Date Range")
+            self.errorPopup.displayPopup()
             return
         if len(self.eventNameTextEdit.toPlainText()) == 0:
             print("Must enter event name.")
+            self.errorPopup = ErrorPopup("Event Name Required")
+            self.errorPopup.displayPopup()
             return
         if len(self.eventDescriptionTextEdit.toPlainText()) == 0:
             print("Must enter event description.")
+            self.errorPopup = ErrorPopup("Event Description Required")
+            self.errorPopup.displayPopup()
             return
         eventConfig.eventStartTime = self.startEventConfigurationDateEdit.text()
         eventConfig.eventEndTime = self.endEventConfigurationDateEdit.text()
