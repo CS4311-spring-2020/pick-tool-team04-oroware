@@ -147,11 +147,14 @@ class EditVectorConfiguration(QWidget):
             self.vectorTableWidget.setItem(rowNum, self.colsVectorTable.index("Event Type"), significantEventTypeItem)
             iconComboBox = IconComboBox(significantEvent, self.clientHandler, self.updateVectorGraph, vector.vectorName)
             iconComboBox.setFont(QtGui.QFont('SansSerif', 7))
-            iconComboBox.addItem(significantEvent.icon.name)
-            if Icon.DEFAULT != significantEvent.iconType:
-                iconComboBox.addItem(Icon.DEFAULT)
+            if significantEvent.icon:
+                iconComboBox.addItem(significantEvent.icon.name)
+            iconComboBox.addItem(Icon.DEFAULT)
             for iconName, icon in self.clientHandler.iconManager.icons.items():
-                if iconName != significantEvent.icon.name:
+                if significantEvent.icon:
+                    if iconName != significantEvent.icon.name:
+                        iconComboBox.addItem(iconName)
+                else:
                     iconComboBox.addItem(iconName)
             self.vectorTableWidget.setCellWidget(rowNum, self.colsVectorTable.index("Icon Type"), iconComboBox)
             significantEventNameItem = QtWidgets.QTableWidgetItem(significantEvent.name)
