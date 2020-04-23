@@ -1,8 +1,9 @@
+import os
+
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import QRunnable, pyqtSlot, QThreadPool
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QFileDialog
-
-import os
+from ErrorPopup import ErrorPopup
 
 
 class IngestionConfiguration(QWidget):
@@ -105,9 +106,28 @@ class IngestionConfiguration(QWidget):
 
     def handleSetRootPath(self):
         self.fileDialog = QFileDialog()
-        self.clientHandler.logFileManager.rootPath = self.fileDialog.getExistingDirectory()
-        self.rootPathField.setText(self.clientHandler.logFileManager.rootPath)
-        self.clientHandler.logFileManager.storeRootPath()
+        selectedDirectory = self.fileDialog.getExistingDirectory()
+        selectedDirectoryContents = os.listdir(selectedDirectory)
+
+        i = 0
+        for folder in selectedDirectoryContents:
+            selectedDirectoryContents[i] = folder.lower()
+            i += 1
+
+        blueFolderFound = bool('blue' in selectedDirectoryContents)
+        redFolderFound = bool('blue' in selectedDirectoryContents)
+        whiteFolderFound = bool('blue' in selectedDirectoryContents)
+
+        if blueFolderFound and redFolderFound and whiteFolderFound:
+            self.clientHandler.logFileManager.rootPath = selectedDirectory
+            self.rootPathField.setText(self.clientHandler.logFileManager.rootPath)
+            self.clientHandler.logFileManager.storeRootPath()
+        else:
+            self.errorPopup = ErrorPopup(f"Invalid directory. Root path was not set.\n\n"
+                                         f"{selectedDirectory}\n"
+                                         f"does is missing expected folders.\n\n"
+                                         f"Please select a valid directory as root path.")
+            self.errorPopup.displayPopup()
         self.initializeText()
 
     def ingestLogsClicked(self):
